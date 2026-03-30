@@ -4,6 +4,7 @@ import { hash } from "bcryptjs";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 import { spawn } from "child_process";
+import { readFile } from "fs/promises";
 import postgres from "postgres";
 import { bootstrapServer } from "@/core/bootstrap-server";
 import { Hooks } from "@/core/events/hooks";
@@ -132,6 +133,26 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
   }
   await sql.end({ timeout: 5 });
 
+  // Lire le .env.local existant pour préserver les variables supplémentaires
+  const envPath = join(process.cwd(), ".env.local");
+  const PRESERVED_KEYS = [
+    "AUTH_URL", "NEXTAUTH_URL", "NEXT_PUBLIC_APP_URL",
+    "SAAS_OS_AGENT_API_TOKEN", "SAAS_OS_AGENT_PRACTITIONER_ID", "SAAS_OS_AGENT_ALLOW_THEME",
+    "SAAS_OS_MCP_BASE_URL",
+    "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_NOTE_PRICE_ID", "STRIPE_NOTE_PRICE_CENTS",
+    "SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_SECURE", "MAIL_FROM",
+  ];
+  const preserved: Record<string, string> = {};
+  try {
+    const existing = await readFile(envPath, "utf8");
+    for (const line of existing.split("\n")) {
+      const m = line.match(/^([A-Z_0-9]+)=(.*)$/);
+      if (m && PRESERVED_KEYS.includes(m[1])) {
+        preserved[m[1]] = m[2];
+      }
+    }
+  } catch { /* pas de .env.local existant, c'est ok */ }
+
   const envLines = [
     "# Genere par Pelledor - ne pas commiter",
     `DATABASE_URL="${databaseUrl.replace(/"/g, '\\"')}"`,
@@ -141,11 +162,30 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
     `SECURE_AUTH_SALT=${secureAuthSalt}`,
     "SAAS_INSTALLED=true",
     "",
+    "# URL publique du site (adapte a votre domaine)",
+    `AUTH_URL=${preserved["AUTH_URL"] ?? preserved["NEXTAUTH_URL"] ?? "http://localhost:3000"}`,
+    `NEXT_PUBLIC_APP_URL=${preserved["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000"}`,
+    "",
+    "# Stripe (optionnel - paiements en ligne)",
+    `# STRIPE_SECRET_KEY=${preserved["STRIPE_SECRET_KEY"] ?? "sk_live_..."}`,
+    `# STRIPE_WEBHOOK_SECRET=${preserved["STRIPE_WEBHOOK_SECRET"] ?? "whsec_..."}`,
+    "",
+    "# Agent / MCP (optionnel - automatisation par IA)",
+    `# SAAS_OS_AGENT_API_TOKEN=${preserved["SAAS_OS_AGENT_API_TOKEN"] ?? "token-secret-min-32-chars"}`,
+    `# SAAS_OS_AGENT_PRACTITIONER_ID=${preserved["SAAS_OS_AGENT_PRACTITIONER_ID"] ?? "uuid-du-praticien"}`,
+    "",
   ];
+
+  // Réinjecter les variables préservées non encore incluses
+  for (const [k, v] of Object.entries(preserved)) {
+    if (!envLines.some(l => l.startsWith(k + "="))) {
+      envLines.push(`${k}=${v}`);
+    }
+  }
+
   const envSnippet = envLines.join("\n");
 
   let wroteEnv = false;
-  const envPath = join(process.cwd(), ".env.local");
   try {
     await writeFile(envPath, envSnippet, { mode: 0o600 });
     wroteEnv = true;
