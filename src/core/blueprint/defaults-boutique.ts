@@ -1,0 +1,23 @@
+export const boutiquePlaceholderDefaults: Record<string, string> = {
+  NOM_BOUTIQUE: "Ma Boutique",
+  SPECIALITE: "Boutique en ligne",
+  ACCROCHE_H1: "Bienvenue sur",
+  DESCRIPTION:
+    "Découvrez notre sélection de produits soigneusement choisis pour vous. Livraison rapide, paiement sécurisé.",
+  COLOR_PRIMARY: "#111827",
+  COLOR_PRIMARY_DARK: "#374151",
+  POLITIQUE_RETOURS: "30 jours pour changer d'avis",
+  TELEPHONE: "Contactez-nous par email",
+  LIVRAISON_GRATUITE_SEUIL: "50",
+  NB_PRODUITS: "Nombreux",
+  CAT1_SLUG: "nouveautes",
+  CAT1_ICON: "✨",
+  CAT1_NOM: "Nouveautés",
+  CAT2_SLUG: "bestsellers",
+  CAT2_ICON: "🔥",
+  CAT2_NOM: "Bestsellers",
+  CAT3_SLUG: "promotions",
+  CAT3_ICON: "🏷️",
+  CAT3_NOM: "Promotions",
+  ANNEE: new Date().getFullYear().toString(),
+};

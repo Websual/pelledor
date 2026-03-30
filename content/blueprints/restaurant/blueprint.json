@@ -1,0 +1,44 @@
+{
+  "id": "restaurant",
+  "label": "Restaurant & Café",
+  "summary": "Vitrine, menu QR code, réservation en ligne sans commission, click & collect avec paiement Stripe.",
+  "business": {
+    "needs": [
+      {
+        "need": "Identité & présentation du restaurant",
+        "admin": "Fiche établissement : nom, adresse, horaires, photos, lien réservation",
+        "modules": ["directory"]
+      },
+      {
+        "need": "Réservation de table en ligne",
+        "admin": "Créneaux, couverts disponibles, confirmation automatique",
+        "modules": ["booking", "notifications"]
+      },
+      {
+        "need": "Menu digital QR code",
+        "admin": "Cartes/menus en temps réel, photos plats, allergènes, plat du jour",
+        "modules": ["restaurant"]
+      },
+      {
+        "need": "Commande à emporter (Click & Collect)",
+        "admin": "Catalogue, créneau de retrait, paiement Stripe à la commande",
+        "modules": ["click-collect", "stripe"]
+      },
+      {
+        "need": "Notifications & rappels",
+        "admin": "Confirmation réservation, rappel avant service, annulation",
+        "modules": ["notifications"]
+      }
+    ],
+    "modulesOn": [
+      "notes",
+      "stripe",
+      "directory",
+      "restaurant",
+      "click-collect",
+      "notifications"
+    ],
+    "modulesOff": ["events", "blog", "gift-cards", "artisan-quotes", "lodging", "anamnese", "chat", "billing"]
+  },
+  "frontendTemplate": "restaurant"
+}

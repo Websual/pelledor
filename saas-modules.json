@@ -1,0 +1,20 @@
+{
+  "modules": [
+    "notes",
+    "stripe",
+    "directory",
+    "booking",
+    "billing",
+    "artisan-quotes",
+    "lodging",
+    "restaurant",
+    "events",
+    "blog",
+    "notifications",
+    "gift-cards",
+    "chat",
+    "anamnese",
+    "click-collect",
+    "page-builder"
+  ]
+}

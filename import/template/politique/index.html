@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_CANDIDAT}} — {{SLOGAN}}</title>
+<meta name="description" content="{{NOM_CANDIDAT}} — {{FONCTION}}. {{SLOGAN}}. Découvrez le programme et les engagements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+:root {
+  --primary: {{COLOR_ACCENT}};
+  --primary-dark: {{COLOR_ACCENT_DARK}};
+  --primary-light: {{COLOR_ACCENT_LIGHT}};
+  --bg: {{COLOR_BG}};
+  --dark: #0D0F14;
+  --text: #1A1D23;
+  --text-light: #5A6070;
+  --card-bg: #ffffff;
+  --border: rgba(26,29,35,0.08);
+  --sans: 'Inter', system-ui, sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
+  --radius: 16px;
+  --shadow: 0 2px 20px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.12);
+}
+[data-theme="dark"] {
+  --bg: #0D0F14;
+  --dark: #F0F0F5;
+  --text: #E0E0E8;
+  --text-light: #8A8FA0;
+  --card-bg: #161820;
+  --border: rgba(255,255,255,0.06);
+  --shadow: 0 2px 20px rgba(0,0,0,0.3);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.4);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; transition: background .4s, color .4s; }
+
+/* === NAV === */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); transition: all .4s; }
+[data-theme="dark"] .nav { background: rgba(13,15,20,0.92); }
+.nav-name { font-weight: 800; font-size: 1.15rem; text-decoration: none; color: var(--text); letter-spacing: -0.5px; }
+.nav-name span { color: var(--primary); }
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--text-light); font-size: .9rem; font-weight: 500; transition: color .3s; }
+.nav-links a:hover { color: var(--primary); }
+.theme-toggle { background: none; border: 2px solid var(--border); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all .3s; }
+.theme-toggle:hover { border-color: var(--primary); }
+.nav-cta { background: var(--primary); color: #fff !important; padding: .6rem 1.4rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: .85rem; transition: all .3s; }
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #fff !important; }
+
+/* === HERO FULL === */
+.hero { min-height: 100vh; display: flex; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; }
+.hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13,15,20,0.85) 0%, rgba(13,15,20,0.3) 60%, transparent 100%); }
+.hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; max-width: 650px; padding: 8rem 4rem 4rem; }
+.hero-badge { display: inline-flex; align-items: center; gap: .5rem; background: var(--primary); padding: .4rem 1rem; border-radius: 50px; font-size: .75rem; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem; width: fit-content; }
+.hero h1 { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 4.5rem); color: #fff; line-height: 1.08; margin-bottom: 1.5rem; font-weight: 800; }
+.hero h1 em { font-style: italic; color: var(--primary); }
+.hero p { font-size: 1.2rem; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 2.5rem; max-width: 500px; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-primary { background: var(--primary); color: #fff; padding: 1rem 2.2rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: all .3s; display: inline-flex; align-items: center; gap: .5rem; border: none; cursor: pointer; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
+.btn-outline { background: transparent; color: #fff; padding: 1rem 2.2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; border: 2px solid rgba(255,255,255,0.3); transition: all .3s; display: inline-flex; align-items: center; gap: .5rem; }
+.btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* === SECTIONS === */
+.section { padding: 6rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); margin-bottom: 1rem; }
+.section-title { font-family: var(--serif); font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-bottom: 1rem; line-height: 1.2; }
+.section-subtitle { font-size: 1.05rem; color: var(--text-light); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+/* === CONVICTION STATEMENT === */
+.conviction { background: var(--dark); color: #fff; padding: 6rem 2rem; text-align: center; position: relative; overflow: hidden; }
+[data-theme="dark"] .conviction { background: #0A0B0F; }
+.conviction::before { content: '"'; position: absolute; top: -40px; left: 50%; transform: translateX(-50%); font-family: var(--serif); font-size: 20rem; color: var(--primary); opacity: .08; }
+.conviction blockquote { font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2.2rem); max-width: 800px; margin: 0 auto; line-height: 1.5; font-style: italic; position: relative; z-index: 1; }
+.conviction cite { display: block; margin-top: 1.5rem; font-style: normal; font-family: var(--sans); font-size: .9rem; color: var(--primary); font-weight: 600; }
+
+/* === BIO / PARCOURS === */
+.bio-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.bio-image { border-radius: var(--radius); overflow: hidden; aspect-ratio: 3/4; }
+.bio-image img { width: 100%; height: 100%; object-fit: cover; }
+.bio-content h3 { font-family: var(--serif); font-size: 1.8rem; margin-bottom: 1.5rem; line-height: 1.3; }
+.bio-content p { color: var(--text-light); line-height: 1.8; margin-bottom: 1rem; }
+.bio-timeline { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+.timeline-item { display: flex; gap: 1rem; align-items: flex-start; }
+.timeline-item .year { font-weight: 800; color: var(--primary); min-width: 55px; font-size: .9rem; padding-top: 2px; }
+.timeline-item .desc { font-size: .9rem; color: var(--text-light); line-height: 1.5; }
+
+/* === PROGRAMME / ENGAGEMENTS === */
+.programme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.programme-card { background: var(--card-bg); border-radius: var(--radius); padding: 2rem; border: 1px solid var(--border); transition: all .4s; position: relative; overflow: hidden; }
+.programme-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+.programme-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--primary); transform: scaleX(0); transition: transform .4s; transform-origin: left; }
+.programme-card:hover::before { transform: scaleX(1); }
+.programme-num { font-family: var(--serif); font-size: 2.5rem; font-weight: 800; color: var(--primary); opacity: .3; margin-bottom: .5rem; }
+.programme-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .6rem; }
+.programme-card p { font-size: .85rem; color: var(--text-light); line-height: 1.6; }
+
+/* === CHIFFRES CLÉS === */
+.impact-bar { background: var(--primary); padding: 3.5rem 2rem; }
+.impact-bar .section-inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center; }
+.impact-item h3 { font-family: var(--serif); font-size: 2.8rem; color: #fff; font-weight: 800; }
+.impact-item p { color: rgba(255,255,255,0.75); font-size: .85rem; margin-top: .3rem; }
+
+/* === ACTUALITÉS === */
+.news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.news-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: all .4s; }
+.news-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.news-card img { width: 100%; height: 200px; object-fit: cover; }
+.news-body { padding: 1.5rem; }
+.news-tag { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; background: var(--primary); padding: .2rem .6rem; border-radius: 4px; display: inline-block; margin-bottom: .6rem; }
+.news-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; line-height: 1.4; }
+.news-card p { font-size: .85rem; color: var(--text-light); line-height: 1.5; }
+
+/* === SOUTIEN / CTA === */
+.soutien { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 6rem 2rem; text-align: center; position: relative; overflow: hidden; }
+.soutien::before { content: ''; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.soutien h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #fff; margin-bottom: 1rem; position: relative; z-index: 1; }
+.soutien p { color: rgba(255,255,255,0.85); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.7; position: relative; z-index: 1; }
+.soutien-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.btn-white { background: #fff; color: var(--primary); padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: all .3s; }
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.btn-ghost { background: transparent; color: #fff; padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; border: 2px solid rgba(255,255,255,0.4); transition: all .3s; }
+.btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* === NEWSLETTER / CONTACT === */
+.contact-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.contact-form input, .contact-form textarea { width: 100%; padding: 1rem; border: 2px solid var(--border); border-radius: var(--radius); background: var(--card-bg); color: var(--text); font-family: var(--sans); font-size: .95rem; transition: border-color .3s; outline: none; }
+.contact-form input:focus, .contact-form textarea:focus { border-color: var(--primary); }
+.contact-form textarea { min-height: 120px; resize: vertical; }
+.contact-right h3 { font-family: var(--serif); font-size: 1.6rem; margin-bottom: 1rem; }
+.contact-right p { color: var(--text-light); line-height: 1.7; margin-bottom: 2rem; }
+.social-links { display: flex; gap: 1rem; }
+.social-link { width: 48px; height: 48px; border-radius: 50%; background: var(--card-bg); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.2rem; transition: all .3s; }
+.social-link:hover { border-color: var(--primary); background: var(--primary); transform: translateY(-3px); }
+.social-link:hover span { filter: brightness(10); }
+.permanences { margin-top: 2rem; }
+.permanence-item { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+.permanence-item .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary); }
+.permanence-item .icon i { width: 18px; height: 18px; }
+.permanence-item h4 { font-size: .9rem; font-weight: 700; margin-bottom: .1rem; }
+.permanence-item p { font-size: .8rem; color: var(--text-light); }
+
+/* === FOOTER === */
+.footer { background: var(--dark); color: rgba(255,255,255,0.7); padding: 3rem 2rem; text-align: center; }
+[data-theme="dark"] .footer { background: #08090C; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer p { font-size: .85rem; line-height: 1.7; }
+.footer a { color: var(--primary); text-decoration: none; }
+.footer .legal { margin-top: 1.5rem; font-size: .75rem; opacity: .5; }
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .programme-grid, .news-grid { grid-template-columns: 1fr; }
+  .bio-section, .contact-section { grid-template-columns: 1fr; }
+  .impact-bar .section-inner { grid-template-columns: repeat(2, 1fr); }
+  .nav-links { display: none; }
+  .hero-content { padding: 6rem 2rem 3rem; }
+  .form-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .impact-bar .section-inner { grid-template-columns: 1fr 1fr; }
+  .hero-actions { flex-direction: column; }
+  .soutien-actions { flex-direction: column; align-items: center; }
+}
+
+/* === ANIMATIONS === */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s; }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity .7s, transform .7s; }
+.reveal-left.visible { opacity: 1; transform: none; }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: opacity .7s, transform .7s; }
+.reveal-right.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-name">{{NOM_PRENOM}} <span>{{NOM_FAMILLE}}</span></a>
+  <div class="nav-links">
+    <a href="#parcours">Parcours</a>
+    <a href="#programme">Programme</a>
+    <a href="#actualites">Actualités</a>
+    <a href="#contact">Contact</a>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème">🌙</button>
+    <a href="#soutien" class="nav-cta">Soutenir →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="{{HERO_IMAGE}}" alt="{{NOM_CANDIDAT}}" loading="eager">
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">{{FONCTION}}</div>
+    <h1>{{TITRE_HERO}}</h1>
+    <p>{{SOUS_TITRE_HERO}}</p>
+    <div class="hero-actions">
+      <a href="#programme" class="btn-primary">Découvrir le programme →</a>
+      <a href="#soutien" class="btn-outline">Soutenir la campagne</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONVICTION -->
+<section class="conviction">
+  <div class="section-inner">
+    <blockquote class="reveal">
+      {{CITATION}}
+    </blockquote>
+    <cite>— {{NOM_CANDIDAT}}</cite>
+  </div>
+</section>
+
+<!-- PARCOURS / BIO -->
+<section class="section" id="parcours">
+  <div class="section-inner">
+    <div class="bio-section">
+      <div class="bio-image reveal-left">
+        <img src="{{BIO_IMAGE}}" alt="{{NOM_CANDIDAT}}" loading="lazy">
+      </div>
+      <div class="bio-content reveal-right">
+        <div class="section-label">Parcours</div>
+        <h3>{{BIO_TITRE}}</h3>
+        <p>{{BIO_DESC}}</p>
+        <div class="bio-timeline">
+          <div class="timeline-item">
+            <div class="year">{{PARCOURS_1_ANNEE}}</div>
+            <div class="desc">{{PARCOURS_1_DESC}}</div>
+          </div>
+          <div class="timeline-item">
+            <div class="year">{{PARCOURS_2_ANNEE}}</div>
+            <div class="desc">{{PARCOURS_2_DESC}}</div>
+          </div>
+          <div class="timeline-item">
+            <div class="year">{{PARCOURS_3_ANNEE}}</div>
+            <div class="desc">{{PARCOURS_3_DESC}}</div>
+          </div>
+          <div class="timeline-item">
+            <div class="year">{{PARCOURS_4_ANNEE}}</div>
+            <div class="desc">{{PARCOURS_4_DESC}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHIFFRES / IMPACT -->
+<section class="impact-bar">
+  <div class="section-inner">
+    <div class="impact-item reveal">
+      <h3>{{IMPACT_1_CHIFFRE}}</h3>
+      <p>{{IMPACT_1_LABEL}}</p>
+    </div>
+    <div class="impact-item reveal">
+      <h3>{{IMPACT_2_CHIFFRE}}</h3>
+      <p>{{IMPACT_2_LABEL}}</p>
+    </div>
+    <div class="impact-item reveal">
+      <h3>{{IMPACT_3_CHIFFRE}}</h3>
+      <p>{{IMPACT_3_LABEL}}</p>
+    </div>
+    <div class="impact-item reveal">
+      <h3>{{IMPACT_4_CHIFFRE}}</h3>
+      <p>{{IMPACT_4_LABEL}}</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMME -->
+<section class="section" id="programme" style="background: var(--card-bg);">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Programme</div>
+      <h2 class="section-title">{{PROGRAMME_TITRE}}</h2>
+      <p class="section-subtitle">{{PROGRAMME_SOUS_TITRE}}</p>
+    </div>
+    <div class="programme-grid">
+      <div class="programme-card reveal">
+        <div class="programme-num">01</div>
+        <h3>{{PROG_1_TITRE}}</h3>
+        <p>{{PROG_1_DESC}}</p>
+      </div>
+      <div class="programme-card reveal">
+        <div class="programme-num">02</div>
+        <h3>{{PROG_2_TITRE}}</h3>
+        <p>{{PROG_2_DESC}}</p>
+      </div>
+      <div class="programme-card reveal">
+        <div class="programme-num">03</div>
+        <h3>{{PROG_3_TITRE}}</h3>
+        <p>{{PROG_3_DESC}}</p>
+      </div>
+      <div class="programme-card reveal">
+        <div class="programme-num">04</div>
+        <h3>{{PROG_4_TITRE}}</h3>
+        <p>{{PROG_4_DESC}}</p>
+      </div>
+      <div class="programme-card reveal">
+        <div class="programme-num">05</div>
+        <h3>{{PROG_5_TITRE}}</h3>
+        <p>{{PROG_5_DESC}}</p>
+      </div>
+      <div class="programme-card reveal">
+        <div class="programme-num">06</div>
+        <h3>{{PROG_6_TITRE}}</h3>
+        <p>{{PROG_6_DESC}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTUALITÉS -->
+<section class="section" id="actualites">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Actualités</div>
+      <h2 class="section-title">Sur le terrain</h2>
+      <p class="section-subtitle">Retrouvez les dernières actions et prises de position.</p>
+    </div>
+    <div class="news-grid">
+      <div class="news-card reveal">
+        <img src="{{ACTU_1_IMAGE}}" alt="{{ACTU_1_TITRE}}" loading="lazy">
+        <div class="news-body">
+          <span class="news-tag">{{ACTU_1_TAG}}</span>
+          <h3>{{ACTU_1_TITRE}}</h3>
+          <p>{{ACTU_1_DESC}}</p>
+        </div>
+      </div>
+      <div class="news-card reveal">
+        <img src="{{ACTU_2_IMAGE}}" alt="{{ACTU_2_TITRE}}" loading="lazy">
+        <div class="news-body">
+          <span class="news-tag">{{ACTU_2_TAG}}</span>
+          <h3>{{ACTU_2_TITRE}}</h3>
+          <p>{{ACTU_2_DESC}}</p>
+        </div>
+      </div>
+      <div class="news-card reveal">
+        <img src="{{ACTU_3_IMAGE}}" alt="{{ACTU_3_TITRE}}" loading="lazy">
+        <div class="news-body">
+          <span class="news-tag">{{ACTU_3_TAG}}</span>
+          <h3>{{ACTU_3_TITRE}}</h3>
+          <p>{{ACTU_3_DESC}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOUTENIR -->
+<section class="soutien" id="soutien">
+  <h2>{{CTA_TITRE}}</h2>
+  <p>{{CTA_DESC}}</p>
+  <div class="soutien-actions">
+    <a href="#contact" class="btn-white">Rejoindre l'équipe</a>
+    <a href="#contact" class="btn-ghost">Faire un don</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Contact</div>
+      <h2 class="section-title">Échangeons</h2>
+      <p class="section-subtitle">Une question, une idée, envie de rejoindre l'aventure ? Écrivez-nous.</p>
+    </div>
+    <div class="contact-section reveal">
+      <form class="contact-form" onsubmit="event.preventDefault(); alert('Message envoyé !');">
+        <div class="form-row">
+          <input type="text" placeholder="Prénom" required>
+          <input type="text" placeholder="Nom" required>
+        </div>
+        <input type="email" placeholder="Votre email" required>
+        <input type="text" placeholder="Sujet">
+        <textarea placeholder="Votre message"></textarea>
+        <button type="submit" class="btn-primary" style="align-self:flex-start;">Envoyer le message →</button>
+      </form>
+      <div class="contact-right">
+        <h3>Restons en contact</h3>
+        <p>{{CONTACT_DESC}}</p>
+        <div class="social-links">
+          <a href="#" class="social-link" title="Facebook"><i data-lucide="facebook" style="width:20px;height:20px;"></i></a>
+          <a href="#" class="social-link" title="Twitter / X"><i data-lucide="twitter" style="width:20px;height:20px;"></i></a>
+          <a href="#" class="social-link" title="Instagram"><i data-lucide="instagram" style="width:20px;height:20px;"></i></a>
+          <a href="#" class="social-link" title="LinkedIn"><i data-lucide="linkedin" style="width:20px;height:20px;"></i></a>
+        </div>
+        <div class="permanences">
+          <h4 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;">Permanences</h4>
+          <div class="permanence-item">
+            <div class="icon"><i data-lucide="map-pin"></i></div>
+            <div>
+              <h4>{{PERMANENCE_1_NOM}}</h4>
+              <p>{{PERMANENCE_1_INFO}}</p>
+            </div>
+          </div>
+          <div class="permanence-item">
+            <div class="icon"><i data-lucide="phone"></i></div>
+            <div>
+              <h4>Téléphone</h4>
+              <p>{{TELEPHONE}}</p>
+            </div>
+          </div>
+          <div class="permanence-item">
+            <div class="icon"><i data-lucide="mail"></i></div>
+            <div>
+              <h4>Email</h4>
+              <p>{{EMAIL}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <p>{{NOM_CANDIDAT}} — {{FONCTION}}<br>
+    {{FOOTER_DESC}}</p>
+    <p class="legal">© 2026 — Site réalisé par <a href="https://websual.fr" target="_blank">Websual</a> · Mentions légales · Données personnelles<br>
+    Mandataire financier : {{MANDATAIRE}} · Ne pas jeter sur la voie publique.</p>
+  </div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    if (saved === 'dark') document.querySelector('.theme-toggle').textContent = '☀️';
+  }
+})();
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+// Counter animation
+function animateCounters() {
+  document.querySelectorAll('.impact-item h3').forEach(el => {
+    const text = el.textContent;
+    const num = parseInt(text.replace(/[^\d]/g, ''));
+    if (isNaN(num)) return;
+    const suffix = text.replace(/[\d\s]/g, '');
+    const prefix = text.match(/^[^\d]*/)[0];
+    let current = 0;
+    const step = Math.ceil(num / 40);
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= num) { current = num; clearInterval(timer); }
+      el.textContent = prefix + current.toLocaleString('fr-FR') + suffix;
+    }, 30);
+  });
+}
+const statsObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); statsObs.disconnect(); } });
+}, { threshold: 0.3 });
+const el = document.querySelector('.impact-bar');
+if (el) statsObs.observe(el);
+
+// Init Lucide icons
+lucide.createIcons();
+</script>
+</body>
+</html>

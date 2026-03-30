@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{NOM_PRATICIEN}} — {{SPECIALITE}} à {{VILLE}}</title>
+  <meta name="description" content="{{NOM_PRATICIEN}}, {{SPECIALITE}} à {{VILLE}}. Accompagnement personnalisé en cabinet et à distance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: {{COLOR_BG}};
+      --bg-soft: {{COLOR_BG_ALT}};
+      --bg-dark: {{COLOR_BG_DARK}};
+      --accent: {{COLOR_ACCENT}};
+      --cta: {{COLOR_CTA}};
+      --text: {{COLOR_TEXT}};
+      --text-dark: {{COLOR_TEXT_DARK}};
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans: 'Inter', system-ui, sans-serif;
+      --white: #fff;
+      --space: clamp(4rem, 8vw, 8rem);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img { width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    section { padding: var(--space) 0; }
+    .container { width: min(1160px, calc(100% - 3rem)); margin: 0 auto; }
+    .serif { font-family: var(--serif); }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    .topbar-inner {
+      width: min(1220px, calc(100% - 2.5rem));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand { font-family: var(--serif); font-size: 1.18rem; letter-spacing: .02em; }
+    .brand span { color: var(--accent); }
+    .nav { display: flex; gap: 1.1rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; }
+    .nav a { opacity: .72; }
+    .nav a:hover { opacity: 1; }
+    .topbar-cta {
+      font-family: var(--sans);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: .7rem 1rem;
+      border-radius: 999px;
+      background: var(--cta);
+      color: #fff;
+      transition: transform .25s ease;
+    }
+    .topbar-cta:hover { transform: translateY(-2px) scale(1.02); }
+
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 8rem 0 5.5rem;
+      color: #f7f3ea;
+      isolation: isolate;
+      text-align: center;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg, rgba(9, 16, 13, .68) 20%, rgba(16, 29, 24, .44) 58%, rgba(13, 18, 16, .66) 100%),
+        url('{{HERO_IMAGE_URL}}') center/cover no-repeat;
+      z-index: -2;
+      transform: scale(1.02);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 72%, rgba(125, 160, 141, .26), transparent 44%);
+      z-index: -1;
+    }
+    .hero-content {
+      width: min(900px, calc(100% - 3rem));
+      margin: 0 auto;
+      display: grid;
+      justify-items: center;
+    }
+    .hero-kicker {
+      display: inline-block;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      opacity: .86;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 6.4vw, 5rem);
+      line-height: 1.05;
+      max-width: 15ch;
+      margin-bottom: 1.1rem;
+      font-weight: 600;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 62ch;
+      font-size: clamp(.95rem, 2.15vw, 1.15rem);
+      opacity: .93;
+      margin-bottom: 2rem;
+    }
+    .hero-actions {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      font-family: var(--sans);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-size: .78rem;
+      padding: .95rem 1.25rem;
+      border-radius: 999px;
+      transition: transform .25s ease, background .25s ease, color .25s ease;
+    }
+    .btn-primary { background: var(--cta); color: #fff; }
+    .btn-secondary { background: rgba(255,255,255,.14); color: #fff; }
+    .btn:hover { transform: translateY(-2px); }
+
+    .manifesto {
+      padding: clamp(4.8rem, 10vw, 9rem) 0;
+      text-align: center;
+      background: var(--bg);
+      min-height: clamp(420px, 70vh, 760px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .manifesto-inner {
+      width: min(980px, calc(100% - 3rem));
+      margin: 0 auto;
+    }
+    .manifesto-text {
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 4vw, 3.1rem);
+      line-height: 1.28;
+      max-width: 24ch;
+      margin: 0 auto;
+      color: var(--text);
+    }
+    .manifesto-text .word {
+      display: inline-block;
+      opacity: .1;
+      transform: translateY(4px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .manifesto-text .word.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .manifesto-tag {
+      display: block;
+      margin-top: 1.8rem;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity .45s ease;
+    }
+    .manifesto-tag.visible { opacity: 1; }
+
+    .praticienne .container {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: clamp(2rem, 7vw, 6rem);
+      align-items: center;
+    }
+    .praticienne-photo {
+      aspect-ratio: 4 / 5;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 20px 44px rgba(18, 39, 32, .16);
+    }
+    .praticienne-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(.88) contrast(.95);
+    }
+    .section-tag {
+      display: inline-block;
+      margin-bottom: .85rem;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--accent);
+    }
+    h2 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      text-wrap: balance;
+    }
+    .praticienne-content {
+      position: relative;
+      margin-left: -8%;
+      margin-top: 0;
+      background: transparent;
+      padding: clamp(1.2rem, 2vw, 1.8rem);
+      border-radius: 0;
+      box-shadow: none;
+      z-index: 2;
+    }
+    .praticienne-content p {
+      max-width: 52ch;
+      color: color-mix(in srgb, var(--text) 85%, white);
+      margin-bottom: 1rem;
+    }
+
+    .services {
+      padding-top: calc(var(--space) - 1rem);
+      padding-bottom: calc(var(--space) - 1rem);
+      background: var(--bg-soft);
+    }
+    .services .container {
+      width: min(1400px, calc(100% - 3rem));
+    }
+    .services-head { margin-bottom: 2rem; max-width: 760px; }
+    .services-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(1rem, 2.1vw, 1.6rem);
+      max-width: 100%;
+    }
+    .service {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(14, 30, 25, .14);
+      background: #d8d8d8;
+    }
+    .service img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(.86) contrast(.96);
+      transition: transform .7s ease, filter .6s ease;
+    }
+    .service-number {
+      position: absolute;
+      top: .8rem;
+      left: .8rem;
+      z-index: 2;
+      font-size: .75rem;
+      letter-spacing: .09em;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(20, 32, 28, .72);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      padding: .35rem .62rem;
+    }
+    .service-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: .45rem;
+      padding: clamp(1rem, 2vw, 1.4rem);
+      background: linear-gradient(to top, rgba(12,18,16,.78), rgba(12,18,16,.2) 62%, transparent);
+      color: #f4efe5;
+      transition: background .35s ease;
+      overflow: hidden;
+    }
+    .service h3 {
+      font-family: var(--serif);
+      font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+      transform: translateY(0);
+      transition: transform .35s ease;
+    }
+    .service-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .7rem;
+      font-size: .82rem;
+      opacity: .95;
+      transform: translateY(0);
+      transition: transform .35s ease;
+    }
+    .service-desc {
+      max-width: 58ch;
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(8px);
+      transition: opacity .35s ease, transform .35s ease, max-height .35s ease;
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+    .service:hover img,
+    .service.is-active img { transform: scale(1.04); filter: saturate(1) contrast(1); }
+    .service:hover h3,
+    .service.is-active h3,
+    .service:hover .service-meta,
+    .service.is-active .service-meta { transform: translateY(-44px); }
+    .service:hover .service-desc,
+    .service.is-active .service-desc {
+      opacity: 1;
+      max-height: 120px;
+      transform: translateY(-30px);
+    }
+
+    .avis {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(120deg, color-mix(in srgb, var(--bg-dark) 78%, #23362f), color-mix(in srgb, var(--bg-dark) 66%, #10211b));
+      color: var(--text-dark);
+    }
+    .avis::before {
+      content: "\201C";
+      position: absolute;
+      left: 6%;
+      top: -14%;
+      font-family: var(--serif);
+      font-size: clamp(14rem, 24vw, 22rem);
+      line-height: 1;
+      color: rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+    .avis-head {
+      margin-bottom: clamp(1.4rem, 2.8vw, 2.2rem);
+      max-width: 760px;
+    }
+    .avis-head .section-tag { color: var(--accent); margin-bottom: .55rem; }
+    .avis-head h2 {
+      font-size: clamp(2rem, 4.2vw, 3.4rem);
+      margin-bottom: 0;
+    }
+    .avis-slider {
+      position: relative;
+      min-height: 220px;
+      margin-top: 0;
+      padding-top: .7rem;
+      border-top: 1px solid rgba(239,231,218,.2);
+    }
+    .avis-item {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .45s ease, transform .45s ease;
+      pointer-events: none;
+      max-width: 860px;
+    }
+    .avis-item.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      position: relative;
+      pointer-events: auto;
+    }
+    .avis-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 3.1vw, 2.05rem);
+      line-height: 1.45;
+      margin-bottom: 1.2rem;
+      text-wrap: pretty;
+      color: rgba(244, 238, 226, .98);
+    }
+    .avis-author {
+      font-size: .82rem;
+      opacity: .86;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(228, 220, 207, .88);
+    }
+    .avis-controls {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: .55rem;
+    }
+    .dot {
+      width: 30px;
+      height: 2px;
+      background: rgba(255,255,255,.35);
+      border: 0;
+      cursor: pointer;
+      transition: transform .25s ease, background .25s ease;
+    }
+    .dot.is-active { background: var(--accent); transform: scaleX(1.16); }
+
+    .faq .container { max-width: 900px; }
+    .faq-list { display: grid; gap: .4rem; margin-top: 1.5rem; }
+    .faq-item { border-bottom: 1px solid color-mix(in srgb, var(--text) 16%, white); }
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 1rem 2rem 1rem 0;
+      font-weight: 600;
+      position: relative;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "+";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    .faq-item[open] summary::after { content: "−"; }
+    .faq-item p { padding: 0 0 1rem; color: color-mix(in srgb, var(--text) 82%, white); }
+
+    .final-cta {
+      position: relative;
+      color: #efe8dc;
+      background:
+        radial-gradient(circle at 80% 15%, rgba(125, 160, 141, .24), transparent 38%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 2px, transparent 2px 8px),
+        linear-gradient(120deg, #16231f, #101715 74%);
+      text-align: center;
+    }
+    .final-cta h2 { color: #f3ebdd; }
+    .final-cta p { max-width: 680px; margin: 0 auto 1.5rem; color: rgba(243,235,221,.82); }
+    .cta-magnet {
+      display: inline-block;
+      padding: 1.05rem 1.45rem;
+      border-radius: 999px;
+      background: var(--cta);
+      color: #fff;
+      font-family: var(--sans);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-size: .8rem;
+      transition: transform .22s ease, box-shadow .22s ease;
+      will-change: transform;
+    }
+    .cta-magnet:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 14px 34px rgba(0,0,0,.26);
+    }
+    .contact-list { margin-top: 1.4rem; display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
+    .contact-list a, .contact-list span {
+      font-size: .82rem;
+      color: rgba(239,231,218,.86);
+    }
+
+    footer {
+      background: linear-gradient(120deg, color-mix(in srgb, var(--bg-dark) 78%, #23362f), color-mix(in srgb, var(--bg-dark) 66%, #10211b));
+      color: rgba(255,255,255,.72);
+      text-align: center;
+      padding: 1.2rem 1rem;
+      font-size: .8rem;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
+
+    [data-reveal] { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+    [data-reveal].is-in { opacity: 1; transform: none; }
+
+    @media (max-width: 980px) {
+      .nav { display: none; }
+      .praticienne .container { grid-template-columns: 1fr; }
+      .praticienne-photo { aspect-ratio: 5 / 6; }
+      .praticienne-content { margin-left: 0; margin-top: -2rem; }
+      .hero { align-items: center; padding-bottom: 4rem; }
+      .services-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px) {
+      .container { width: min(1160px, calc(100% - 2rem)); }
+      .topbar-inner { width: min(1220px, calc(100% - 1.6rem)); }
+      .hero { min-height: 92vh; }
+      .hero-actions .btn { width: 100%; text-align: center; }
+      .services .container { width: min(1400px, calc(100% - 2rem)); }
+      .services-list { grid-template-columns: 1fr; }
+      .service { border-radius: 14px; }
+      .service-meta { flex-direction: column; align-items: flex-start; }
+      .avis-slider { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#" class="brand">{{NOM_PRATICIEN}}<span>.</span></a>
+      <nav class="nav">
+        <a href="#praticienne">Praticienne</a>
+        <a href="#offres">Services</a>
+        <a href="#avis">Avis</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="topbar-cta" href="{{CTA_PRIMARY_URL}}">{{CTA_TOPBAR}}</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content" data-reveal>
+      <span class="hero-kicker">{{SPECIALITE}} · {{VILLE}}</span>
+      <h1>{{TITRE_HERO}}</h1>
+      <p>{{SOUS_TITRE_HERO}}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{CTA_PRIMARY_URL}}">{{CTA_PRIMARY_LABEL}}</a>
+        <a class="btn btn-secondary" href="{{CTA_SECONDARY_URL}}">{{CTA_SECONDARY_LABEL}}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto" id="manifesto">
+    <div class="manifesto-inner">
+      <p class="manifesto-text" id="manifesto-text">{{MANIFESTO_TEXTE}}</p>
+      <span class="manifesto-tag" id="manifesto-tag">— {{NOM_PRATICIEN}}</span>
+    </div>
+  </section>
+
+  <section id="praticienne" class="praticienne">
+    <div class="container">
+      <figure class="praticienne-photo" data-reveal>
+        <img src="{{PRACTITIONER_IMAGE_URL}}" alt="{{TITRE_PRACTICIEN}}">
+      </figure>
+      <div class="praticienne-content" data-reveal>
+        <span class="section-tag">{{TITRE_PRACTICIEN_TAG}}</span>
+        <h2>{{TITRE_PRACTICIEN}}</h2>
+        <p>{{TEXTE_PRACTICIEN}}</p>
+        <p>{{TEXTE_PRACTICIEN_2}}</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="offres" class="services">
+    <div class="container">
+      <div class="services-head" data-reveal>
+        <span class="section-tag">{{TITRE_SERVICES_TAG}}</span>
+        <h2>{{TITRE_SERVICES}}</h2>
+        <p>{{INTRO_SERVICES}}</p>
+      </div>
+      <div class="services-list">
+        <article class="service" data-reveal>
+          <span class="service-number">01</span>
+          <img src="{{SEANCE_1_IMAGE_URL}}" alt="{{SEANCE_1_NOM}}">
+          <div class="service-overlay">
+            <h3>{{SEANCE_1_NOM}}</h3>
+            <div class="service-meta"><span>{{SEANCE_1_PRIX}}</span></div>
+            <p class="service-desc">{{SEANCE_1_DESC}}</p>
+          </div>
+        </article>
+        <article class="service" data-reveal>
+          <span class="service-number">02</span>
+          <img src="{{SEANCE_2_IMAGE_URL}}" alt="{{SEANCE_2_NOM}}">
+          <div class="service-overlay">
+            <h3>{{SEANCE_2_NOM}}</h3>
+            <div class="service-meta"><span>{{SEANCE_2_PRIX}}</span></div>
+            <p class="service-desc">{{SEANCE_2_DESC}}</p>
+          </div>
+        </article>
+        <article class="service" data-reveal>
+          <span class="service-number">03</span>
+          <img src="{{SEANCE_3_IMAGE_URL}}" alt="{{SEANCE_3_NOM}}">
+          <div class="service-overlay">
+            <h3>{{SEANCE_3_NOM}}</h3>
+            <div class="service-meta"><span>{{SEANCE_3_PRIX}}</span></div>
+            <p class="service-desc">{{SEANCE_3_DESC}}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="avis" class="avis">
+    <div class="container">
+      <div class="avis-head" data-reveal>
+        <span class="section-tag">{{TITRE_AVIS_TAG}}</span>
+        <h2>{{TITRE_AVIS}}</h2>
+      </div>
+      <div class="avis-slider" data-reveal>
+        <article class="avis-item is-visible">
+          <p class="avis-quote">{{AVIS_1}}</p>
+          <p class="avis-author">{{AVIS_1_AUTEUR}}</p>
+        </article>
+        <article class="avis-item">
+          <p class="avis-quote">{{AVIS_2}}</p>
+          <p class="avis-author">{{AVIS_2_AUTEUR}}</p>
+        </article>
+        <article class="avis-item">
+          <p class="avis-quote">{{AVIS_3}}</p>
+          <p class="avis-author">{{AVIS_3_AUTEUR}}</p>
+        </article>
+      </div>
+      <div class="avis-controls" aria-label="Navigation des témoignages">
+        <button class="dot is-active" type="button" data-slide="0" aria-label="Avis 1"></button>
+        <button class="dot" type="button" data-slide="1" aria-label="Avis 2"></button>
+        <button class="dot" type="button" data-slide="2" aria-label="Avis 3"></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="faq">
+    <div class="container">
+      <span class="section-tag">{{TITRE_FAQ_TAG}}</span>
+      <h2>{{TITRE_FAQ}}</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>{{FAQ_1_Q}}</summary>
+          <p>{{FAQ_1_R}}</p>
+        </details>
+        <details class="faq-item">
+          <summary>{{FAQ_2_Q}}</summary>
+          <p>{{FAQ_2_R}}</p>
+        </details>
+        <details class="faq-item">
+          <summary>{{FAQ_3_Q}}</summary>
+          <p>{{FAQ_3_R}}</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="container" data-reveal>
+      <span class="section-tag">{{TITRE_CTA_TAG}}</span>
+      <h2>{{TITRE_CTA}}</h2>
+      <p>{{TEXTE_CTA}}</p>
+      <a class="cta-magnet" href="{{CTA_PRIMARY_URL}}">{{CTA_PRIMARY_LABEL}}</a>
+      <div class="contact-list">
+        <a href="{{CTA_SECONDARY_URL}}">{{TELEPHONE}}</a>
+        <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+        <span>{{ADRESSE}}</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>{{FOOTER_DESC}}</footer>
+
+  <script>
+    (function () {
+      const cards = document.querySelectorAll('.service');
+      cards.forEach((card) => {
+        card.addEventListener('mouseenter', () => card.classList.add('is-active'));
+        card.addEventListener('mouseleave', () => card.classList.remove('is-active'));
+      });
+
+      const items = Array.from(document.querySelectorAll('.avis-item'));
+      const dots = Array.from(document.querySelectorAll('.dot'));
+      let current = 0;
+      let timer = null;
+
+      function show(index) {
+        items.forEach((item, i) => item.classList.toggle('is-visible', i === index));
+        dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+        current = index;
+      }
+
+      function next() { show((current + 1) % items.length); }
+      function start() { timer = window.setInterval(next, 5200); }
+      function reset() { window.clearInterval(timer); start(); }
+
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          show(Number(dot.dataset.slide));
+          reset();
+        });
+      });
+
+      show(0);
+      start();
+
+      // Manifesto "écriture au scroll" (reprise logique cabinet/comptable)
+      (function () {
+        const container = document.getElementById('manifesto-text');
+        const tag = document.getElementById('manifesto-tag');
+        const section = document.getElementById('manifesto');
+        if (!container || !tag || !section) return;
+
+        const text = container.innerHTML;
+        let inTag = false;
+        let wordBuffer = '';
+        let result = '';
+
+        for (let i = 0; i < text.length; i++) {
+          const ch = text[i];
+          if (ch === '<') {
+            inTag = true;
+            if (wordBuffer) {
+              result += '<span class="word">' + wordBuffer + '</span>';
+              wordBuffer = '';
+            }
+            result += ch;
+            continue;
+          }
+          if (ch === '>') { inTag = false; result += ch; continue; }
+          if (inTag) { result += ch; continue; }
+          if (ch === ' ' || ch === '\n') {
+            if (wordBuffer) {
+              result += '<span class="word">' + wordBuffer + '</span>';
+              wordBuffer = '';
+            }
+            result += ' ';
+          } else {
+            wordBuffer += ch;
+          }
+        }
+        if (wordBuffer) result += '<span class="word">' + wordBuffer + '</span>';
+
+        container.innerHTML = result;
+        const words = container.querySelectorAll('.word');
+
+        function updateManifesto() {
+          const rect = section.getBoundingClientRect();
+          const viewH = window.innerHeight;
+          const progress = Math.max(0, Math.min(1, (viewH - rect.top) / (viewH + rect.height * 0.5)));
+          const wordsToShow = Math.floor(progress * words.length * 1.2);
+
+          words.forEach((word, index) => word.classList.toggle('visible', index < wordsToShow));
+          tag.classList.toggle('visible', wordsToShow >= words.length);
+        }
+
+        window.addEventListener('scroll', updateManifesto, { passive: true });
+        updateManifesto();
+      })();
+
+      const reveals = document.querySelectorAll('[data-reveal]');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.18 });
+      reveals.forEach((el) => io.observe(el));
+
+      const magnet = document.querySelector('.cta-magnet');
+      if (magnet) {
+        magnet.addEventListener('mousemove', (e) => {
+          const r = magnet.getBoundingClientRect();
+          const x = ((e.clientX - r.left) / r.width - 0.5) * 8;
+          const y = ((e.clientY - r.top) / r.height - 0.5) * 8;
+          magnet.style.transform = `translate(${x}px, ${y}px)`;
+        });
+        magnet.addEventListener('mouseleave', () => { magnet.style.transform = ''; });
+      }
+    })();
+  </script>
+</body>
+</html>

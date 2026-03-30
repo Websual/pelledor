@@ -1,0 +1,71 @@
+import { MetadataRoute } from "next";
+
+// Configuration des segments de sitemap
+const SITEMAP_SEGMENTS = [
+  // Axe 1: Professions/Villes - divisé en 3 segments de ~5k URLs chacun
+  { id: 'trouver-0', type: 'trouver', segmentIndex: 0, description: 'Professions segment 1' },
+  { id: 'trouver-1', type: 'trouver', segmentIndex: 1, description: 'Professions segment 2' },
+  { id: 'trouver-2', type: 'trouver', segmentIndex: 2, description: 'Professions segment 3' },
+  // Axe 2: Sujets/Villes - segment unique (plus convertisseur)
+  { id: 'sujet', type: 'sujet', description: 'Sujets et symptômes' }
+] as const;
+
+// Génère la liste des sitemaps pour l'index principal
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3005";
+
+  const sitemap: MetadataRoute.Sitemap = [
+    // Pages principales
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/recherche`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/pro`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
+    // Pages statiques principales
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/legal`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    },
+  ];
+
+  // Ajouter les références aux segments PSEO
+  for (const segment of SITEMAP_SEGMENTS) {
+    sitemap.push({
+      url: `${baseUrl}/sitemap/${segment.id}.xml`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: segment.type === 'sujet' ? 0.9 : 0.7, // Sujets plus prioritaires
+    });
+  }
+
+  return sitemap;
+}
+
+// Génère la liste des segments disponibles pour generateSitemaps
+export function generateSitemaps() {
+  return SITEMAP_SEGMENTS.map(segment => ({
+    id: segment.id
+  }));
+}
+

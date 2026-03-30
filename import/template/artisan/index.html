@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_ENTREPRISE}} — {{SPECIALITE}} à {{VILLE}}</title>
+<meta name="description" content="{{NOM_ENTREPRISE}}, {{SPECIALITE}} à {{VILLE}}. Devis gratuit, intervention rapide, travail soigné.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+:root {
+  --accent: {{COLOR_ACCENT}};
+  --accent-dark: {{COLOR_ACCENT_DARK}};
+  --dark: #1a1a1a;
+  --text: #1a1a1a;
+  --text-light: #666;
+  --cream: {{COLOR_BG}};
+  --card-bg: #fff;
+  --border: rgba(0,0,0,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; color: var(--text); background: #fff; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ===== NAV ===== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 3rem; background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px); box-shadow: 0 1px 15px rgba(0,0,0,0.06);
+}
+.nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { font-size: 0.85rem; font-weight: 500; color: var(--text-light); transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.5rem; background: var(--accent); color: #fff !important;
+  font-size: 0.85rem; font-weight: 600; border-radius: 4px; transition: all 0.3s;
+}
+.nav-cta:hover { background: var(--accent-dark); transform: translateY(-1px); }
+.nav-cta svg { width: 16px; height: 16px; fill: white; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 8rem 3rem 5rem; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto;
+}
+.hero-content { max-width: 550px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem; background: var(--cream); border-radius: 50px;
+  font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 1.5rem;
+}
+.hero-badge::before { content: ''; }
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 700;
+  line-height: 1.15; margin-bottom: 1.5rem; letter-spacing: -0.02em;
+}
+.hero h1 .accent { color: var(--accent); }
+.hero-sub { font-size: 1.05rem; line-height: 1.8; color: var(--text-light); margin-bottom: 2rem; }
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2rem; font-size: 0.9rem; font-weight: 600;
+  border-radius: 4px; transition: all 0.3s; cursor: pointer; border: none;
+}
+.btn-fill { background: var(--accent); color: white; }
+.btn-fill:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+.btn-outline { background: transparent; color: var(--text); border: 2px solid var(--border); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.hero-image {
+  position: relative; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+}
+.hero-image img { width: 100%; height: 500px; object-fit: cover; }
+.hero-trust {
+  display: flex; gap: 2rem; margin-top: 2.5rem; padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+.trust-item { text-align: center; }
+.trust-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+.trust-label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ===== SECTION COMMON ===== */
+.section { padding: 6rem 3rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.8rem; }
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+.section-desc { font-size: 1rem; line-height: 1.8; color: var(--text-light); max-width: 600px; }
+
+/* ===== SERVICES ===== */
+.services { background: var(--cream); }
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+.service-card {
+  background: var(--card-bg); padding: 2rem; border-radius: 8px;
+  border: 1px solid var(--border); transition: all 0.3s;
+}
+.service-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+.service-icon { margin-bottom: 1rem; color: var(--accent); } .service-icon i { width: 28px; height: 28px; }
+.service-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+.service-card p { font-size: 0.9rem; line-height: 1.7; color: var(--text-light); }
+
+/* ===== REALISATIONS (Avant/Après) ===== */
+.realisations { background: #fff; }
+.real-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 3rem; }
+.real-card { border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.real-images { display: grid; grid-template-columns: 1fr 1fr; position: relative; }
+.real-images img { width: 100%; height: 220px; object-fit: cover; }
+.real-arrow {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 40px; height: 40px; background: var(--accent); color: white;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.2rem; z-index: 2;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.real-label {
+  position: absolute; bottom: 0.5rem; font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em; color: white;
+  background: rgba(0,0,0,0.5); padding: 0.2rem 0.6rem; border-radius: 2px;
+}
+.real-label.before { left: 0.5rem; }
+.real-label.after { right: 0.5rem; }
+.real-info { padding: 1.2rem; background: var(--card-bg); }
+.real-title { font-weight: 600; margin-bottom: 0.3rem; }
+.real-desc { font-size: 0.85rem; color: var(--text-light); }
+
+/* ===== ZONE D'INTERVENTION ===== */
+.zone { background: var(--dark); color: white; position: relative; overflow: hidden; }
+.zone .section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.zone .section-title { color: white; }
+.zone .section-desc { color: rgba(255,255,255,0.6); }
+.zone-list { list-style: none; margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.zone-list li {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 0.95rem; color: rgba(255,255,255,0.8);
+}
+.zone-list li { display: flex; align-items: center; gap: 0.5rem; }
+.zone-visual {
+  background: url('https://images.unsplash.com/photo-1524813686514-a57563d77965?auto=format&fit=crop&w=600&q=80') center/cover;
+  border-radius: 8px; min-height: 350px; position: relative;
+}
+.zone-visual::after {
+  content: ''; position: absolute; inset: 0; border-radius: 8px;
+  border: 2px solid var(--accent); opacity: 0.3;
+}
+
+/* ===== ENGAGEMENT / GARANTIES ===== */
+.guarantees { background: #fff; }
+.guarantees-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 3rem; }
+.guarantee-item { text-align: center; padding: 1.5rem; }
+.guarantee-icon { margin-bottom: 1rem; }
+.guarantee-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; margin-bottom: 0.5rem; }
+.guarantee-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+
+/* ===== TESTIMONIALS ===== */
+.testimonials { background: var(--cream); }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+.testimonial-card {
+  background: var(--card-bg); padding: 2rem; border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.testimonial-stars { color: #F59E0B; font-size: 0.9rem; margin-bottom: 0.8rem; }
+.testimonial-text { font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.2rem; font-style: italic; }
+.testimonial-author { font-weight: 600; font-size: 0.9rem; }
+.testimonial-detail { font-size: 0.8rem; color: var(--text-light); }
+
+/* ===== FAQ ===== */
+.faq { background: #fff; }
+.faq-list { max-width: 800px; margin-top: 2rem; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-question {
+  width: 100%; padding: 1.3rem 0; background: none; border: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500;
+  color: var(--text); text-align: left;
+}
+.faq-question::after { content: '+'; font-size: 1.5rem; font-weight: 300; color: var(--accent); transition: transform 0.3s; }
+.faq-item.open .faq-question::after { content: '−'; }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.faq-answer p { padding-bottom: 1.3rem; font-size: 0.95rem; line-height: 1.7; color: var(--text-light); }
+
+/* ===== CTA FINAL ===== */
+.cta-final {
+  background: var(--accent); text-align: center; padding: 5rem 3rem;
+  color: white; position: relative; overflow: hidden;
+}
+.cta-final::before {
+  content: ''; position: absolute; top: -40%; right: -10%;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.cta-final .section-title { color: white; max-width: 600px; margin: 0 auto 1rem; }
+.cta-final .section-desc { color: rgba(255,255,255,0.8); margin: 0 auto 2rem; }
+.cta-phone {
+  display: inline-flex; align-items: center; gap: 0.8rem;
+  font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700;
+  color: white; margin-bottom: 1rem;
+}
+.cta-sub { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--dark); color: rgba(255,255,255,0.5);
+  padding: 2.5rem 3rem; display: flex; justify-content: space-between;
+  align-items: center; font-size: 0.85rem;
+}
+.footer a { color: var(--accent); }
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem; background: rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 50px;
+  cursor: pointer; transition: all 0.3s;
+}
+.theme-toggle-icon { font-size: 0.9rem; }
+.theme-toggle-label { font-size: 0.75rem; font-weight: 600; color: white; text-transform: uppercase; }
+
+/* ===== ANIMATIONS ===== */
+.reveal { opacity: 0; transform: translateY(25px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ===== DARK MODE ===== */
+html.dark-mode { --text: #e0e0e0; --text-light: #999; --card-bg: #1e1e1e; --border: rgba(255,255,255,0.08); --cream: #141414; }
+html.dark-mode body { background: #121212; color: #e0e0e0; }
+html.dark-mode .nav { background: rgba(18,18,18,0.95); }
+html.dark-mode .hero-image { box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+html.dark-mode .theme-toggle { background: rgba(255,255,255,0.9); }
+html.dark-mode .theme-toggle-label { color: #111; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; gap: 2rem; padding: 7rem 2rem 3rem; }
+  .hero-image img { height: 350px; }
+  .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .real-grid { grid-template-columns: 1fr; }
+  .zone .section-inner { grid-template-columns: 1fr; }
+  .zone-visual { height: 250px; }
+  .guarantees-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero h1 { font-size: 2rem; }
+  .hero-trust { flex-wrap: wrap; gap: 1rem; }
+  .services-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .guarantees-grid { grid-template-columns: 1fr; }
+  .zone-list { grid-template-columns: 1fr; }
+  .footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-logo">{{NOM_ENTREPRISE_COURT}}<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#realisations">Réalisations</a></li>
+    <li><a href="#zone">Zone</a></li>
+    <li><a href="#avis">Avis</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="tel:{{TELEPHONE_RAW}}" class="nav-cta">
+    <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+    {{TELEPHONE}}
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><i data-lucide="check-circle" style="width:16px;height:16px;"></i>{{BADGE}}</div>
+    <h1>{{TITRE_HERO}}</h1>
+    <p class="hero-sub">{{SOUS_TITRE_HERO}}</p>
+    <div class="hero-buttons">
+      <a href="tel:{{TELEPHONE_RAW}}" class="btn btn-fill"><i data-lucide="phone" style="width:16px;height:16px;"></i> Devis gratuit</a>
+      <a href="#realisations" class="btn btn-outline">Voir nos réalisations</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item">
+        <div class="trust-num">{{STAT_1_VAL}}</div>
+        <div class="trust-label">{{STAT_1_LABEL}}</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-num">{{STAT_2_VAL}}</div>
+        <div class="trust-label">{{STAT_2_LABEL}}</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-num">{{STAT_3_VAL}}</div>
+        <div class="trust-label">{{STAT_3_LABEL}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="{{HERO_IMAGE}}" alt="{{SPECIALITE}}" loading="eager">
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section services" id="services">
+<div class="section-inner">
+  <span class="section-tag reveal">Nos services</span>
+  <h2 class="section-title reveal">{{TITRE_SERVICES}}</h2>
+  <p class="section-desc reveal">{{DESC_SERVICES}}</p>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-icon"><i data-lucide="{{SERVICE_1_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_1_NOM}}</h3>
+      <p>{{SERVICE_1_DESC}}</p>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-icon"><i data-lucide="{{SERVICE_2_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_2_NOM}}</h3>
+      <p>{{SERVICE_2_DESC}}</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-icon"><i data-lucide="{{SERVICE_3_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_3_NOM}}</h3>
+      <p>{{SERVICE_3_DESC}}</p>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <div class="service-icon"><i data-lucide="{{SERVICE_4_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_4_NOM}}</h3>
+      <p>{{SERVICE_4_DESC}}</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon"><i data-lucide="{{SERVICE_5_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_5_NOM}}</h3>
+      <p>{{SERVICE_5_DESC}}</p>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-icon"><i data-lucide="{{SERVICE_6_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+      <h3>{{SERVICE_6_NOM}}</h3>
+      <p>{{SERVICE_6_DESC}}</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- REALISATIONS -->
+<section class="section realisations" id="realisations">
+<div class="section-inner">
+  <span class="section-tag reveal">Réalisations</span>
+  <h2 class="section-title reveal">{{TITRE_REALISATIONS}}</h2>
+  <p class="section-desc reveal">{{DESC_REALISATIONS}}</p>
+  <div class="real-grid">
+    <div class="real-card reveal">
+      <div class="real-images">
+        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80" alt="Avant">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80" alt="Après">
+        <span class="real-arrow"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></span>
+        <span class="real-label before">Avant</span>
+        <span class="real-label after">Après</span>
+      </div>
+      <div class="real-info">
+        <div class="real-title">{{REAL_1_TITRE}}</div>
+        <div class="real-desc">{{REAL_1_DESC}}</div>
+      </div>
+    </div>
+    <div class="real-card reveal reveal-delay-1">
+      <div class="real-images">
+        <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=400&q=80" alt="Avant">
+        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80" alt="Après">
+        <span class="real-arrow"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></span>
+        <span class="real-label before">Avant</span>
+        <span class="real-label after">Après</span>
+      </div>
+      <div class="real-info">
+        <div class="real-title">{{REAL_2_TITRE}}</div>
+        <div class="real-desc">{{REAL_2_DESC}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ZONE D'INTERVENTION -->
+<section class="section zone" id="zone">
+<div class="section-inner">
+  <div>
+    <span class="section-tag reveal">Zone d'intervention</span>
+    <h2 class="section-title reveal">{{TITRE_ZONE}}</h2>
+    <p class="section-desc reveal">{{DESC_ZONE}}</p>
+    <ul class="zone-list reveal">
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_1}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_2}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_3}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_4}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_5}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_6}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_7}}</li>
+      <li><i data-lucide="map-pin" style="width:14px;height:14px;"></i> {{ZONE_8}}</li>
+    </ul>
+  </div>
+  <div class="zone-visual" role="img" aria-label="Zone d'intervention"></div>
+</div>
+</section>
+
+<!-- GARANTIES -->
+<section class="section guarantees">
+<div class="section-inner">
+  <div style="text-align:center;">
+    <span class="section-tag reveal">Nos engagements</span>
+    <h2 class="section-title reveal" style="margin:0 auto 1rem;">{{TITRE_GARANTIES}}</h2>
+  </div>
+  <div class="guarantees-grid">
+    <div class="guarantee-item reveal">
+      <div class="guarantee-icon"><i data-lucide="zap" style="width:40px;height:40px;color:var(--accent);"></i></div>
+      <div class="guarantee-title">{{GARANTIE_1_TITRE}}</div>
+      <div class="guarantee-desc">{{GARANTIE_1_DESC}}</div>
+    </div>
+    <div class="guarantee-item reveal reveal-delay-1">
+      <div class="guarantee-icon"><i data-lucide="shield-check" style="width:40px;height:40px;color:var(--accent);"></i></div>
+      <div class="guarantee-title">{{GARANTIE_2_TITRE}}</div>
+      <div class="guarantee-desc">{{GARANTIE_2_DESC}}</div>
+    </div>
+    <div class="guarantee-item reveal reveal-delay-2">
+      <div class="guarantee-icon"><i data-lucide="banknote" style="width:40px;height:40px;color:var(--accent);"></i></div>
+      <div class="guarantee-title">{{GARANTIE_3_TITRE}}</div>
+      <div class="guarantee-desc">{{GARANTIE_3_DESC}}</div>
+    </div>
+    <div class="guarantee-item reveal reveal-delay-3">
+      <div class="guarantee-icon"><i data-lucide="trophy" style="width:40px;height:40px;color:var(--accent);"></i></div>
+      <div class="guarantee-title">{{GARANTIE_4_TITRE}}</div>
+      <div class="guarantee-desc">{{GARANTIE_4_DESC}}</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- TEMOIGNAGES -->
+<section class="section testimonials" id="avis">
+<div class="section-inner">
+  <span class="section-tag reveal">Avis clients</span>
+  <h2 class="section-title reveal">{{TITRE_AVIS}}</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">{{AVIS_1_TEXTE}}</p>
+      <div class="testimonial-author">{{AVIS_1_AUTEUR}}</div>
+      <div class="testimonial-detail">{{AVIS_1_DETAIL}}</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">{{AVIS_2_TEXTE}}</p>
+      <div class="testimonial-author">{{AVIS_2_AUTEUR}}</div>
+      <div class="testimonial-detail">{{AVIS_2_DETAIL}}</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">{{AVIS_3_TEXTE}}</p>
+      <div class="testimonial-author">{{AVIS_3_AUTEUR}}</div>
+      <div class="testimonial-detail">{{AVIS_3_DETAIL}}</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq" id="faq">
+<div class="section-inner">
+  <span class="section-tag reveal">Questions fréquentes</span>
+  <h2 class="section-title reveal">{{TITRE_FAQ}}</h2>
+  <div class="faq-list">
+    <div class="faq-item reveal"><button class="faq-question">{{FAQ_1_Q}}</button><div class="faq-answer"><p>{{FAQ_1_A}}</p></div></div>
+    <div class="faq-item reveal"><button class="faq-question">{{FAQ_2_Q}}</button><div class="faq-answer"><p>{{FAQ_2_A}}</p></div></div>
+    <div class="faq-item reveal"><button class="faq-question">{{FAQ_3_Q}}</button><div class="faq-answer"><p>{{FAQ_3_A}}</p></div></div>
+    <div class="faq-item reveal"><button class="faq-question">{{FAQ_4_Q}}</button><div class="faq-answer"><p>{{FAQ_4_A}}</p></div></div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta-final" id="contact">
+  <h2 class="section-title reveal">{{CTA_TITRE}}</h2>
+  <p class="section-desc reveal" style="margin:0 auto 2rem; color:rgba(255,255,255,0.8);">{{CTA_DESC}}</p>
+  <a href="tel:{{TELEPHONE_RAW}}" class="cta-phone reveal"><i data-lucide="phone" style="width:16px;height:16px;"></i> {{TELEPHONE}}</a>
+  <p class="cta-sub reveal">{{ADRESSE}} · {{EMAIL}}</p>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>© 2026 {{NOM_ENTREPRISE}} · {{FOOTER_DESC}}</span>
+  <span>Site conçu par <a href="https://websual.fr" target="_blank">Websual</a></span>
+</footer>
+
+<!-- THEME TOGGLE -->
+<div class="theme-toggle" onclick="toggleTheme()">
+  <span class="theme-toggle-icon" id="themeIcon">🌙</span>
+  <span class="theme-toggle-label" id="themeLabel">Dark</span>
+</div>
+
+<script>
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.15 });
+reveals.forEach(el => observer.observe(el));
+
+// FAQ
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const answer = item.querySelector('.faq-answer');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-answer').style.maxHeight = null; });
+    if (!isOpen) { item.classList.add('open'); answer.style.maxHeight = answer.scrollHeight + 'px'; }
+  });
+});
+
+// Dark mode
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark-mode');
+  const isDark = document.documentElement.classList.contains('dark-mode');
+  document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = isDark ? 'Light' : 'Dark';
+}
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+</body>
+</html>

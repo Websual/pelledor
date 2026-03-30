@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_ENTREPRISE}} — {{SPECIALITE}}</title>
+<meta name="description" content="{{NOM_ENTREPRISE}} — {{SPECIALITE}} à {{VILLE}}. {{ACCROCHE_META}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+:root {
+  --accent: {{COLOR_ACCENT}};
+  --accent-dark: {{COLOR_ACCENT_DARK}};
+  --accent-light: {{COLOR_ACCENT_LIGHT}};
+  --bg: {{COLOR_BG}};
+  --dark: #0C0E13;
+  --text: #1A1D23;
+  --text-light: #5A6070;
+  --card-bg: #ffffff;
+  --border: rgba(26,29,35,0.08);
+  --sans: 'Inter', system-ui, sans-serif;
+  --display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --radius: 12px;
+  --shadow: 0 2px 20px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.12);
+}
+[data-theme="dark"] {
+  --bg: #0C0E13;
+  --dark: #F0F0F5;
+  --text: #E0E0E8;
+  --text-light: #8A8FA0;
+  --card-bg: #14161D;
+  --border: rgba(255,255,255,0.06);
+  --shadow: 0 2px 20px rgba(0,0,0,0.4);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.5);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; transition: background .4s, color .4s; }
+
+/* === NAV === */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); transition: all .4s; }
+[data-theme="dark"] .nav { background: rgba(12,14,19,0.92); }
+.nav-brand { display: flex; align-items: center; gap: .75rem; text-decoration: none; color: var(--text); }
+.nav-brand .mark { width: 38px; height: 38px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.nav-brand .mark i { width: 20px; height: 20px; }
+.nav-brand span { font-family: var(--display); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--text-light); font-size: .85rem; font-weight: 500; transition: color .3s; }
+.nav-links a:hover { color: var(--accent); }
+.theme-toggle { background: none; border: 2px solid var(--border); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all .3s; }
+.theme-toggle:hover { border-color: var(--accent); }
+.nav-cta { background: var(--accent); color: #fff !important; padding: .55rem 1.3rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: .8rem; transition: all .3s; text-transform: uppercase; letter-spacing: 1px; }
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #fff !important; }
+
+/* === HERO === */
+.hero { min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden; padding-top: 73px; }
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; }
+.hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(12,14,19,0.88) 0%, rgba(12,14,19,0.5) 60%, rgba(12,14,19,0.3) 100%); }
+.hero-content { position: relative; z-index: 2; max-width: 700px; padding: 4rem; }
+.hero-badges { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.hero-badge { display: inline-flex; align-items: center; gap: .4rem; background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: .4rem .9rem; border-radius: 6px; font-size: .7rem; color: rgba(255,255,255,0.9); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; border: 1px solid rgba(255,255,255,0.1); }
+.hero-badge.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.hero h1 { font-family: var(--display); font-size: clamp(2.5rem, 5vw, 3.8rem); color: #fff; line-height: 1.1; margin-bottom: 1.2rem; font-weight: 800; letter-spacing: -1px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { font-size: 1.1rem; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 2.5rem; max-width: 550px; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-primary { background: var(--accent); color: #fff; padding: .85rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: .9rem; transition: all .3s; display: inline-flex; align-items: center; gap: .5rem; border: none; cursor: pointer; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,0,0,0.25); }
+.btn-outline { background: transparent; color: #fff; padding: .85rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: .9rem; border: 2px solid rgba(255,255,255,0.25); transition: all .3s; display: inline-flex; align-items: center; gap: .5rem; }
+.btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.5); }
+
+/* === SECTIONS === */
+.section { padding: 6rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--accent); margin-bottom: 1rem; }
+.section-title { font-family: var(--display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); margin-bottom: 1rem; line-height: 1.2; letter-spacing: -0.5px; }
+.section-subtitle { font-size: 1rem; color: var(--text-light); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+/* === STATS BAR === */
+.stats-bar { background: var(--dark); padding: 3.5rem 2rem; }
+[data-theme="dark"] .stats-bar { background: #08090D; }
+.stats-bar .section-inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center; }
+.stat-item h3 { font-family: var(--display); font-size: 2.8rem; color: var(--accent); font-weight: 800; letter-spacing: -1px; }
+.stat-item p { color: rgba(255,255,255,0.6); font-size: .85rem; margin-top: .3rem; font-weight: 500; }
+
+/* === MÉTIERS / EXPERTISE === */
+.metiers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.metier-card { background: var(--card-bg); border-radius: var(--radius); padding: 2rem; border: 1px solid var(--border); transition: all .4s; position: relative; overflow: hidden; }
+.metier-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+.metier-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); transform: scaleX(0); transition: transform .4s; transform-origin: left; }
+.metier-card:hover::before { transform: scaleX(1); }
+.metier-icon { width: 52px; height: 52px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; color: var(--accent); }
+.metier-icon i { width: 24px; height: 24px; }
+.metier-card h3 { font-family: var(--display); font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+.metier-card p { font-size: .85rem; color: var(--text-light); line-height: 1.6; }
+
+/* === HISTOIRE / ABOUT === */
+.about-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.about-image { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; }
+.about-image img { width: 100%; height: 100%; object-fit: cover; }
+.about-content h3 { font-family: var(--display); font-size: 1.8rem; margin-bottom: 1.5rem; line-height: 1.3; letter-spacing: -0.5px; }
+.about-content p { color: var(--text-light); line-height: 1.8; margin-bottom: 1rem; }
+.about-features { display: flex; flex-direction: column; gap: .8rem; margin-top: 1.5rem; }
+.about-feature { display: flex; align-items: center; gap: .8rem; font-size: .9rem; font-weight: 500; }
+.about-feature i { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
+
+/* === CERTIFICATIONS === */
+.certifs-section { background: var(--card-bg); }
+[data-theme="dark"] .certifs-section { background: var(--card-bg); }
+.certifs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.certif-card { text-align: center; padding: 2rem 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); transition: all .3s; }
+.certif-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.certif-icon { width: 60px; height: 60px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--accent); }
+.certif-icon i { width: 26px; height: 26px; }
+.certif-card h4 { font-family: var(--display); font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+.certif-card p { font-size: .8rem; color: var(--text-light); line-height: 1.5; }
+
+/* === PARC MACHINES === */
+.machines-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.machine-card { display: flex; gap: 1.5rem; background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); transition: all .3s; align-items: center; }
+.machine-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.machine-icon { width: 48px; height: 48px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+.machine-icon i { width: 22px; height: 22px; }
+.machine-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .2rem; }
+.machine-card p { font-size: .8rem; color: var(--text-light); line-height: 1.5; }
+
+/* === SECTEURS / CLIENTS === */
+.secteurs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.secteur-card { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16/10; }
+.secteur-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.secteur-card:hover img { transform: scale(1.05); }
+.secteur-card .overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.8)); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem; color: #fff; }
+.secteur-card .overlay h3 { font-family: var(--display); font-size: 1.1rem; font-weight: 700; }
+.secteur-card .overlay p { font-size: .8rem; opacity: .8; }
+
+/* === RÉALISATIONS === */
+.realisations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.realisation-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: all .4s; }
+.realisation-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.realisation-card img { width: 100%; height: 200px; object-fit: cover; }
+.realisation-body { padding: 1.5rem; }
+.realisation-tag { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: .5rem; }
+.realisation-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; line-height: 1.4; }
+.realisation-card p { font-size: .85rem; color: var(--text-light); line-height: 1.5; }
+
+/* === ÉQUIPE === */
+.equipe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.equipe-card { text-align: center; }
+.equipe-photo { width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin: 0 auto 1rem; border: 3px solid var(--border); }
+.equipe-photo img { width: 100%; height: 100%; object-fit: cover; }
+.equipe-card h4 { font-size: .95rem; font-weight: 700; }
+.equipe-card .role { font-size: .8rem; color: var(--accent); font-weight: 600; }
+
+/* === CTA === */
+.cta-section { background: var(--accent); padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; top: -40%; right: -15%; width: 50%; height: 180%; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.cta-section h2 { font-family: var(--display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: #fff; margin-bottom: .8rem; position: relative; z-index: 1; letter-spacing: -0.5px; }
+.cta-section p { color: rgba(255,255,255,0.8); font-size: 1.05rem; max-width: 550px; margin: 0 auto 2rem; line-height: 1.7; position: relative; z-index: 1; }
+.btn-white { background: #fff; color: var(--accent); padding: .9rem 2.2rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: .95rem; transition: all .3s; position: relative; z-index: 1; }
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+
+/* === CONTACT === */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+.contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+.contact-item .icon { width: 44px; height: 44px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
+.contact-item .icon i { width: 20px; height: 20px; }
+.contact-item h4 { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+.contact-item p { font-size: .85rem; color: var(--text-light); line-height: 1.5; }
+.map-container { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; }
+.map-container iframe { width: 100%; height: 100%; border: 0; }
+
+/* === FOOTER === */
+.footer { background: var(--dark); padding: 3rem 2rem; }
+[data-theme="dark"] .footer { background: #08090D; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-brand { display: flex; align-items: center; gap: .6rem; }
+.footer-brand .mark { width: 32px; height: 32px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.footer-brand .mark i { width: 16px; height: 16px; }
+.footer-brand span { font-family: var(--display); font-weight: 700; color: rgba(255,255,255,0.8); font-size: .95rem; }
+.footer-desc { font-size: .8rem; color: rgba(255,255,255,0.4); max-width: 500px; }
+.footer-right { text-align: right; }
+.footer-right p { font-size: .8rem; color: rgba(255,255,255,0.4); }
+.footer-right a { color: var(--accent); text-decoration: none; }
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .metiers-grid, .realisations-grid, .secteurs-grid, .equipe-grid { grid-template-columns: 1fr; }
+  .certifs-grid { grid-template-columns: repeat(2, 1fr); }
+  .machines-grid { grid-template-columns: 1fr; }
+  .about-section, .contact-grid { grid-template-columns: 1fr; }
+  .stats-bar .section-inner { grid-template-columns: repeat(2, 1fr); }
+  .nav-links { display: none; }
+  .hero-content { padding: 2rem; }
+  .footer-inner { flex-direction: column; text-align: center; }
+  .footer-right { text-align: center; }
+}
+@media (max-width: 600px) {
+  .stats-bar .section-inner { grid-template-columns: 1fr 1fr; }
+  .certifs-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; }
+}
+
+/* === ANIMATIONS === */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s; }
+.reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-brand">
+    <div class="mark"><i data-lucide="factory"></i></div>
+    <span>{{NOM_ENTREPRISE}}</span>
+  </a>
+  <div class="nav-links">
+    <a href="#metiers">Métiers</a>
+    <a href="#about">Entreprise</a>
+    <a href="#certifications">Certifications</a>
+    <a href="#realisations">Réalisations</a>
+    <a href="#contact">Contact</a>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème">🌙</button>
+    <a href="#contact" class="nav-cta">Devis →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="{{HERO_IMAGE}}" alt="{{NOM_ENTREPRISE}}" loading="eager">
+  </div>
+  <div class="hero-content">
+    <div class="hero-badges">
+      <span class="hero-badge accent">{{SPECIALITE}}</span>
+      <span class="hero-badge">{{CERTIF_BADGE_1}}</span>
+      <span class="hero-badge">{{CERTIF_BADGE_2}}</span>
+    </div>
+    <h1>{{TITRE_HERO}}</h1>
+    <p>{{SOUS_TITRE_HERO}}</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary"><i data-lucide="send" style="width:16px;height:16px;"></i> Demander un devis</a>
+      <a href="#metiers" class="btn-outline">Nos expertises</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-bar">
+  <div class="section-inner">
+    <div class="stat-item reveal">
+      <h3>{{STAT_1_CHIFFRE}}</h3>
+      <p>{{STAT_1_LABEL}}</p>
+    </div>
+    <div class="stat-item reveal">
+      <h3>{{STAT_2_CHIFFRE}}</h3>
+      <p>{{STAT_2_LABEL}}</p>
+    </div>
+    <div class="stat-item reveal">
+      <h3>{{STAT_3_CHIFFRE}}</h3>
+      <p>{{STAT_3_LABEL}}</p>
+    </div>
+    <div class="stat-item reveal">
+      <h3>{{STAT_4_CHIFFRE}}</h3>
+      <p>{{STAT_4_LABEL}}</p>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTIERS -->
+<section class="section" id="metiers">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Nos métiers</div>
+      <h2 class="section-title">{{METIERS_TITRE}}</h2>
+      <p class="section-subtitle">{{METIERS_SOUS_TITRE}}</p>
+    </div>
+    <div class="metiers-grid">
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_1_LUCIDE}}"></i></div>
+        <h3>{{METIER_1_NOM}}</h3>
+        <p>{{METIER_1_DESC}}</p>
+      </div>
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_2_LUCIDE}}"></i></div>
+        <h3>{{METIER_2_NOM}}</h3>
+        <p>{{METIER_2_DESC}}</p>
+      </div>
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_3_LUCIDE}}"></i></div>
+        <h3>{{METIER_3_NOM}}</h3>
+        <p>{{METIER_3_DESC}}</p>
+      </div>
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_4_LUCIDE}}"></i></div>
+        <h3>{{METIER_4_NOM}}</h3>
+        <p>{{METIER_4_DESC}}</p>
+      </div>
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_5_LUCIDE}}"></i></div>
+        <h3>{{METIER_5_NOM}}</h3>
+        <p>{{METIER_5_DESC}}</p>
+      </div>
+      <div class="metier-card reveal">
+        <div class="metier-icon"><i data-lucide="{{METIER_6_LUCIDE}}"></i></div>
+        <h3>{{METIER_6_NOM}}</h3>
+        <p>{{METIER_6_DESC}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT / HISTOIRE -->
+<section class="section" id="about" style="background: var(--card-bg);">
+  <div class="section-inner">
+    <div class="about-section">
+      <div class="about-image reveal">
+        <img src="{{ABOUT_IMAGE}}" alt="{{NOM_ENTREPRISE}}" loading="lazy">
+      </div>
+      <div class="about-content reveal">
+        <div class="section-label">L'entreprise</div>
+        <h3>{{ABOUT_TITRE}}</h3>
+        <p>{{ABOUT_DESC}}</p>
+        <div class="about-features">
+          <div class="about-feature"><i data-lucide="check-circle"></i> {{ABOUT_POINT_1}}</div>
+          <div class="about-feature"><i data-lucide="check-circle"></i> {{ABOUT_POINT_2}}</div>
+          <div class="about-feature"><i data-lucide="check-circle"></i> {{ABOUT_POINT_3}}</div>
+          <div class="about-feature"><i data-lucide="check-circle"></i> {{ABOUT_POINT_4}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section class="section certifs-section" id="certifications">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Certifications & Qualité</div>
+      <h2 class="section-title">{{CERTIFS_TITRE}}</h2>
+    </div>
+    <div class="certifs-grid">
+      <div class="certif-card reveal">
+        <div class="certif-icon"><i data-lucide="{{CERTIF_1_LUCIDE}}"></i></div>
+        <h4>{{CERTIF_1_NOM}}</h4>
+        <p>{{CERTIF_1_DESC}}</p>
+      </div>
+      <div class="certif-card reveal">
+        <div class="certif-icon"><i data-lucide="{{CERTIF_2_LUCIDE}}"></i></div>
+        <h4>{{CERTIF_2_NOM}}</h4>
+        <p>{{CERTIF_2_DESC}}</p>
+      </div>
+      <div class="certif-card reveal">
+        <div class="certif-icon"><i data-lucide="{{CERTIF_3_LUCIDE}}"></i></div>
+        <h4>{{CERTIF_3_NOM}}</h4>
+        <p>{{CERTIF_3_DESC}}</p>
+      </div>
+      <div class="certif-card reveal">
+        <div class="certif-icon"><i data-lucide="{{CERTIF_4_LUCIDE}}"></i></div>
+        <h4>{{CERTIF_4_NOM}}</h4>
+        <p>{{CERTIF_4_DESC}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARC MACHINES -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Moyens de production</div>
+      <h2 class="section-title">{{MACHINES_TITRE}}</h2>
+      <p class="section-subtitle">{{MACHINES_SOUS_TITRE}}</p>
+    </div>
+    <div class="machines-grid">
+      <div class="machine-card reveal">
+        <div class="machine-icon"><i data-lucide="{{MACHINE_1_LUCIDE}}"></i></div>
+        <div>
+          <h4>{{MACHINE_1_NOM}}</h4>
+          <p>{{MACHINE_1_DESC}}</p>
+        </div>
+      </div>
+      <div class="machine-card reveal">
+        <div class="machine-icon"><i data-lucide="{{MACHINE_2_LUCIDE}}"></i></div>
+        <div>
+          <h4>{{MACHINE_2_NOM}}</h4>
+          <p>{{MACHINE_2_DESC}}</p>
+        </div>
+      </div>
+      <div class="machine-card reveal">
+        <div class="machine-icon"><i data-lucide="{{MACHINE_3_LUCIDE}}"></i></div>
+        <div>
+          <h4>{{MACHINE_3_NOM}}</h4>
+          <p>{{MACHINE_3_DESC}}</p>
+        </div>
+      </div>
+      <div class="machine-card reveal">
+        <div class="machine-icon"><i data-lucide="{{MACHINE_4_LUCIDE}}"></i></div>
+        <div>
+          <h4>{{MACHINE_4_NOM}}</h4>
+          <p>{{MACHINE_4_DESC}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTEURS -->
+<section class="section" style="background: var(--card-bg);">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Secteurs d'activité</div>
+      <h2 class="section-title">{{SECTEURS_TITRE}}</h2>
+    </div>
+    <div class="secteurs-grid reveal">
+      <div class="secteur-card">
+        <img src="{{SECTEUR_1_IMAGE}}" alt="{{SECTEUR_1_NOM}}" loading="lazy">
+        <div class="overlay">
+          <h3>{{SECTEUR_1_NOM}}</h3>
+          <p>{{SECTEUR_1_DESC}}</p>
+        </div>
+      </div>
+      <div class="secteur-card">
+        <img src="{{SECTEUR_2_IMAGE}}" alt="{{SECTEUR_2_NOM}}" loading="lazy">
+        <div class="overlay">
+          <h3>{{SECTEUR_2_NOM}}</h3>
+          <p>{{SECTEUR_2_DESC}}</p>
+        </div>
+      </div>
+      <div class="secteur-card">
+        <img src="{{SECTEUR_3_IMAGE}}" alt="{{SECTEUR_3_NOM}}" loading="lazy">
+        <div class="overlay">
+          <h3>{{SECTEUR_3_NOM}}</h3>
+          <p>{{SECTEUR_3_DESC}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>{{CTA_TITRE}}</h2>
+  <p>{{CTA_DESC}}</p>
+  <a href="#contact" class="btn-white">{{CTA_BOUTON}}</a>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Contact</div>
+      <h2 class="section-title">{{NOM_ENTREPRISE}}</h2>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="icon"><i data-lucide="map-pin"></i></div>
+          <div>
+            <h4>Adresse</h4>
+            <p>{{ADRESSE}}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon"><i data-lucide="phone"></i></div>
+          <div>
+            <h4>Téléphone</h4>
+            <p>{{TELEPHONE}}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon"><i data-lucide="mail"></i></div>
+          <div>
+            <h4>Email</h4>
+            <p>{{EMAIL}}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon"><i data-lucide="clock"></i></div>
+          <div>
+            <h4>Horaires</h4>
+            <p>{{HORAIRES}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="map-container">
+        <iframe src="https://maps.google.com/maps?q={{NOM_ENTREPRISE}}+{{VILLE}}&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">
+        <div class="mark"><i data-lucide="factory"></i></div>
+        <span>{{NOM_ENTREPRISE}}</span>
+      </div>
+      <p class="footer-desc" style="margin-top:.5rem;">{{FOOTER_DESC}}</p>
+    </div>
+    <div class="footer-right">
+      <p>© 2026 {{NOM_ENTREPRISE}} — Tous droits réservés</p>
+      <p>Site réalisé par <a href="https://websual.fr" target="_blank">Websual</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    if (saved === 'dark') document.querySelector('.theme-toggle').textContent = '☀️';
+  }
+})();
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+function animateCounters() {
+  document.querySelectorAll('.stat-item h3').forEach(el => {
+    const text = el.textContent;
+    const num = parseInt(text.replace(/[^\d]/g, ''));
+    if (isNaN(num) || num === 0) return;
+    const suffix = text.replace(/[\d\s]/g, '');
+    const prefix = text.match(/^[^\d]*/)[0];
+    let current = 0;
+    const step = Math.ceil(num / 40);
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= num) { current = num; clearInterval(timer); }
+      el.textContent = prefix + current.toLocaleString('fr-FR') + suffix;
+    }, 30);
+  });
+}
+const statsObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); statsObs.disconnect(); } });
+}, { threshold: 0.3 });
+const statsEl = document.querySelector('.stats-bar');
+if (statsEl) statsObs.observe(statsEl);
+
+lucide.createIcons();
+</script>
+</body>
+</html>

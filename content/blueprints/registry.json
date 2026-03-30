@@ -1,0 +1,19 @@
+{
+  "templates": [
+    { "id": "artisan", "label": "Artisan (bâtiment, dépannage)", "dir": "artisan" },
+    { "id": "cabinet", "label": "Cabinet (pro libéral)", "dir": "cabinet" },
+    { "id": "comptable", "label": "Comptable", "dir": "comptable" },
+    { "id": "gite", "label": "Gîte / hébergement", "dir": "gite" },
+    { "id": "hotel", "label": "Hôtel", "dir": "hotel" },
+    { "id": "immobilier", "label": "Immobilier", "dir": "immobilier" },
+    { "id": "industriel", "label": "Industriel / B2B", "dir": "industriel" },
+    { "id": "mairie", "label": "Mairie / collectivité", "dir": "mairie" },
+    { "id": "politique", "label": "Politique / campagne", "dir": "politique" },
+    { "id": "praticien", "label": "Praticien bien-être", "dir": "praticien" },
+    { "id": "restaurant", "label": "Restaurant", "dir": "restaurant" },
+    { "id": "salon", "label": "Salon / beauté", "dir": "salon" },
+    { "id": "spa", "label": "Spa", "dir": "spa" },
+    { "id": "viticole", "label": "Viticole", "dir": "viticole" }
+  ],
+  "defaultBlueprint": "artisan"
+}

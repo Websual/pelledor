@@ -1,0 +1,870 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  id                  String  @id
+  user_id             String
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, provider_account_id])
+}
+
+model appointments {
+  id                String                    @id
+  user_id           String
+  practitioner_id   String
+  service_id        String
+  starts_at         DateTime
+  status            AppointmentStatus         @default(PENDING)
+  payment_status    PaymentStatus             @default(PENDING)
+  created_at        DateTime                  @default(now())
+  updated_at        DateTime
+  location_choice   AppointmentLocationChoice? // Choix de l'utilisateur pour HYBRID (PRESENTIAL ou VIDEO)
+  google_event_id   String?                   // ID événement Google Calendar (sync)
+  reminder_sent     Boolean                   @default(false) // Rappel 24h envoyé (évite doublons)
+  practitioners     practitioners             @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  services          services                  @relation(fields: [service_id], references: [id], onDelete: Cascade)
+  users             users                     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  invoices          invoices[]
+  messages          messages[]
+  reviews           reviews?
+  appointment_notes appointment_notes?
+  client_documents  client_documents[]
+  refunds           refunds[]
+}
+
+model booking_clicks {
+  id              String        @id
+  practitioner_id String
+  service_id      String?
+  user_id         String?
+  ip_address      String?
+  clicked_at      DateTime      @default(now()) @db.Timestamp(6)
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  services        services?     @relation(fields: [service_id], references: [id], onUpdate: NoAction)
+  users           users?        @relation(fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([clicked_at], map: "idx_booking_clicks_clicked_at")
+  @@index([practitioner_id], map: "idx_booking_clicks_practitioner")
+}
+
+model favorites {
+  id              String        @id
+  user_id         String
+  practitioner_id String
+  private_note    String?       @db.Text
+  created_at      DateTime      @default(now())
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  users           users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, practitioner_id])
+}
+
+model invoices {
+  id                          String        @id
+  practitioner_id             String
+  appointment_id              String?       // RDV (prestation)
+  ticket_id                   String?      @unique // Achat place événement (une facture par ticket)
+  user_id                     String?      // Client (peut être null pour factures libres)
+  invoice_number              String        @unique
+  amount_cents                Int
+  tax_cents                   Int?          @default(0)
+  total_cents                 Int
+  status                      String        @default("draft") // draft, sent, paid, overdue, canceled
+  payment_method              String? // stripe, cash, check, bank_transfer, other
+  due_date                    DateTime?     @db.Timestamp(6)
+  paid_at                     DateTime?     @db.Timestamp(6)
+  pdf_url                     String?
+  notes                       String?
+  description                 String? // Description de la prestation (pour factures libres)
+  stripe_processing_fee_cents  Int? // Frais Stripe réels récupérés depuis balance_transaction (Direct Charges)
+  stripe_payment_intent_id    String? // ID du PaymentIntent Stripe pour récupérer les frais réels
+  practitioner_amount_cents   Int? // Montant net versé au praticien (après commission Holia)
+  platform_fee_cents          Int? // Commission Holia (8% pour Découverte, 0% pour Essentiel)
+  created_at                  DateTime      @default(now()) @db.Timestamp(6)
+  updated_at                  DateTime      @default(now()) @db.Timestamp(6)
+  appointments                appointments? @relation(fields: [appointment_id], references: [id], onUpdate: NoAction)
+  practitioners               practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tickets                     tickets?      @relation(fields: [ticket_id], references: [id], onUpdate: NoAction)
+  users                       users?        @relation(fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([appointment_id], map: "idx_invoices_appointment")
+  @@index([ticket_id], map: "idx_invoices_ticket")
+  @@index([practitioner_id], map: "idx_invoices_practitioner")
+  @@index([user_id], map: "idx_invoices_user")
+  @@index([status], map: "idx_invoices_status")
+  @@index([created_at], map: "idx_invoices_created_at")
+}
+
+model messages {
+  id             String       @id
+  appointment_id String
+  sender_id      String
+  content        String
+  created_at     DateTime     @default(now())
+  appointments   appointments @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+  users          users        @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+}
+
+model payouts {
+  id               String        @id
+  practitioner_id  String
+  amount_cents     Int
+  status           String        @default("pending")
+  iban             String?
+  requested_at     DateTime      @default(now()) @db.Timestamp(6)
+  processed_at     DateTime?     @db.Timestamp(6)
+  stripe_payout_id String?
+  created_at       DateTime      @default(now()) @db.Timestamp(6)
+  updated_at       DateTime      @default(now()) @db.Timestamp(6)
+  practitioners    practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([practitioner_id], map: "idx_payouts_practitioner")
+  @@index([status], map: "idx_payouts_status")
+}
+
+model refunds {
+  id                 String        @id @default(cuid())
+  appointment_id     String?
+  practitioner_id    String
+  amount_cents       Int
+  stripe_refund_id   String?       @unique
+  status             String        @default("pending") // pending, completed, failed
+  reason             String? // practitioner_cancellation, chargeback, etc.
+  error_message      String?       @db.Text
+  chargeback_dispute Boolean       @default(false)
+  created_at         DateTime      @default(now()) @db.Timestamp(6)
+  updated_at         DateTime      @default(now()) @db.Timestamp(6)
+  appointments       appointments? @relation(fields: [appointment_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  practitioners      practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([appointment_id], map: "idx_refunds_appointment")
+  @@index([practitioner_id], map: "idx_refunds_practitioner")
+  @@index([status], map: "idx_refunds_status")
+  @@index([chargeback_dispute], map: "idx_refunds_chargeback")
+}
+
+model practitioners {
+  id                         String             @id
+  user_id                    String?            @unique
+  title                      String
+  bio                        String
+  location_city              String
+  lat                        Float?
+  lng                        Float?
+  profession_id              String?
+  all_professions            String[]           @default([])
+  photo_url                  String?
+  is_verified                Boolean            @default(false)
+  rating_avg                 Float              @default(0)
+  created_at                 DateTime           @default(now())
+  updated_at                 DateTime
+  slug                       String             @unique
+  is_active                  Boolean            @default(true)
+  phone                      String?
+  website                    String?
+  languages                  String[]           @default([])
+  paymentMethods             String[]           @default([])
+  gallery                    String[]           @default([])
+  address                    String?
+  accept_new_patients        Boolean            @default(true)
+  access_info                String?
+  cover_photo_url            String?
+  first_name                 String?
+  has_rcp_insurance          Boolean            @default(false)
+  instagram_url              String?
+  last_name                  String?
+  linked_in_url              String?
+  siret                      String?
+  verification_document_url  String? // Déprécié - utiliser les champs spécifiques ci-dessous
+  diploma_document_url       String? // Diplôme ou Certification
+  diploma_verified           Boolean            @default(false)
+  kbis_document_url          String? // Extrait Kbis ou Avis de situation INSEE
+  kbis_verified              Boolean            @default(false)
+  rcp_document_url           String? // Attestation d'assurance RC Pro
+  rcp_verified               Boolean            @default(false)
+  official_name              String? // Nom officiel de l'entreprise depuis l'INSEE
+  ape_code                   String? // Code APE (activité principale exercée)
+  legal_form                 String?
+  slogan                     String?
+  transport_info             String?
+  treatment_keywords         String[]           @default([])
+  youtube_videos             String[]           @default([])
+  appointments               appointments[]
+  booking_clicks             booking_clicks[]
+  favorites                  favorites[]
+  invoices                   invoices[]
+  payouts                    payouts[]
+  refunds                    refunds[]
+  professions                professions?       @relation(fields: [profession_id], references: [id])
+  users                      users?             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  profile_views              profile_views[]
+  qualifications             qualifications[]
+  reviews                    reviews[]
+  search_positions           search_positions[]
+  services                   services[]
+  working_hours              working_hours[]
+  client_documents           client_documents[]
+  gift_cards                 gift_cards[]
+  reminder_sent              reminder_sent[]
+  external_events            external_events[]
+  events                     events[]
+  products                   products[]
+  practitioner_updates       practitioner_updates[]
+  marketing_posts            marketing_posts[]
+  // Stripe Connect & Billing
+  stripe_account_id          String?
+  stripe_onboarding_complete Boolean            @default(false)
+  // Settings
+  auto_accept_appointments   Boolean            @default(false)
+  allow_deferred_payment     Boolean            @default(false) // Permet le paiement au RDV (Premium uniquement)
+  subscription_status        String             @default("free") // 'active', 'past_due', 'canceled', 'free'
+  stripe_customer_id         String?
+  stripe_subscription_id     String?
+  video_link                 String? // Lien visio permanent (Zoom/Meet/Skype)
+  enable_followup_reminders  Boolean            @default(true) // Rappels automatiques clients inactifs
+  // Google Calendar
+  google_calendar_block_slots Boolean           @default(true) // Bloquer créneaux via busy Google
+  google_calendar_sync_out   Boolean            @default(true) // Envoyer RDV Holia → Google
+  last_google_sync           DateTime?          // Dernière synchronisation Google Calendar (pour optimiser les appels API)
+  // Cartes Cadeaux
+  accepts_gift_cards         Boolean            @default(false) // Accepte les cartes cadeaux
+  // Scraping & Claiming
+  is_claimed                 Boolean            @default(false) // Profil réclamé par le praticien
+  source_url                 String? // URL source du scraping (Google Maps, etc.)
+  contact_email              String? // Email scrapé (pour notifier les praticiens non réclamés)
+  acquisition_invitation_sent_at DateTime?       @db.Timestamp(6) // Date d'envoi de l'invitation acquisition
+  charter_accepted_at            DateTime?       @db.Timestamp(6) // Date d'engagement à la charte déontologique Holia
+  // Enrichissement (Google Maps, réseaux sociaux)
+  enrichment_status          EnrichmentStatus   @default(PENDING)
+  last_enriched_at           DateTime?          @db.Timestamp(6) // Dernière mise à jour des données enrichies
+  google_rating              Float?             // Note Google Maps
+  google_review_count        Int?               // Nombre d'avis Google Maps
+  facebook_url               String?            // Lien Facebook (instagram_url, linked_in_url déjà dans le modèle)
+
+  @@unique([siret]) // Un SIRET = une fiche (relances import INSEE sans doublon ; plusieurs lignes peuvent avoir siret null)
+}
+
+model profile_views {
+  id              String        @id
+  practitioner_id String
+  user_id         String?
+  ip_address      String?
+  user_agent      String?
+  viewed_at       DateTime      @default(now()) @db.Timestamp(6)
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users           users?        @relation(fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([practitioner_id], map: "idx_profile_views_practitioner")
+  @@index([viewed_at], map: "idx_profile_views_viewed_at")
+}
+
+model qualifications {
+  id              String        @id
+  practitioner_id String
+  title           String
+  institution     String
+  discipline      String?
+  obtained_year   Int?
+  duration        String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime
+  certificate_url String?
+  description     String?
+  skills          String[]      @default([])
+  is_verified     Boolean       @default(false)
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+}
+
+model reviews {
+  id              String           @id
+  appointment_id  String?          @unique
+  user_id         String
+  practitioner_id String
+  rating          Int
+  comment         String?
+  response        String?
+  is_hidden       Boolean          @default(false)
+  needs_review    Boolean          @default(false)
+  is_flagged      Boolean          @default(false)
+  flag_reason     String?
+  flag_count      Int              @default(0)
+  created_at      DateTime         @default(now())
+  updated_at      DateTime
+  appointments    appointments?    @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+  practitioners   practitioners    @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  users           users            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  review_reports  review_reports[]
+}
+
+model review_reports {
+  id          String   @id @default(cuid())
+  review_id   String
+  reporter_key String  // "user:userId" ou "ip:hash" pour éviter les doublons
+  created_at  DateTime @default(now())
+  reviews     reviews  @relation(fields: [review_id], references: [id], onDelete: Cascade)
+
+  @@unique([review_id, reporter_key])
+  @@index([review_id], map: "idx_review_reports_review")
+}
+
+model search_positions {
+  id              String        @id
+  practitioner_id String
+  search_query    String?
+  filters         Json?
+  position        Int
+  user_id         String?
+  clicked         Boolean?      @default(false)
+  searched_at     DateTime      @default(now()) @db.Timestamp(6)
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users           users?        @relation(fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([practitioner_id], map: "idx_search_positions_practitioner")
+  @@index([searched_at], map: "idx_search_positions_searched_at")
+}
+
+model services {
+  id              String           @id
+  practitioner_id String
+  name            String
+  duration_min    Int
+  price_cents     Int
+  description     String?
+  location_type   LocationType    @default(PRESENTIAL_ONLY) // Type de localisation du service
+  created_at      DateTime         @default(now())
+  updated_at      DateTime
+  appointments    appointments[]
+  booking_clicks  booking_clicks[]
+  practitioners   practitioners    @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  marketing_posts marketing_posts[]
+}
+
+model sessions {
+  id            String   @id
+  session_token String   @unique
+  user_id       String
+  expires       DateTime
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id                        String                  @id
+  email                     String                  @unique
+  hashed_password           String?
+  name                      String?
+  role                      Role                    @default(CLIENT)
+  phone                     String?
+  email_verified            DateTime?
+  image                     String?
+  date_of_birth             DateTime?               // Date de naissance (optionnel)
+  gender                    String?                 // Genre : MALE, FEMALE, OTHER (optionnel)
+  created_at                DateTime                @default(now())
+  updated_at                DateTime
+  accounts                  accounts[]
+  appointments              appointments[]
+  booking_clicks            booking_clicks[]
+  favorites                 favorites[]
+  messages                  messages[]
+  practitioners             practitioners?
+  profile_views             profile_views[]
+  password_change_tokens    password_change_tokens?
+  reviews                   reviews[]
+  invoices                  invoices[]
+  search_positions          search_positions[]
+  sessions                  sessions[]
+  notifications             notifications[]
+  gift_cards_bought         gift_cards[]            @relation("GiftCardBuyer")
+  gift_cards_redeemed       gift_cards[]            @relation("GiftCardRedeemer")
+  reminder_sent             reminder_sent[]
+  client_documents_received client_documents[]
+  tickets                   tickets[]
+}
+
+model verification_tokens {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model working_hours {
+  id              String        @id
+  practitioner_id String
+  day_of_week     Int
+  start_time      String
+  end_time        String
+  is_active       Boolean       @default(true)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @default(now())
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+}
+
+model password_change_tokens {
+  id              String   @id
+  user_id         String   @unique
+  token           String   @unique
+  hashed_password String
+  expires_at      DateTime
+  created_at      DateTime @default(now())
+  users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token], map: "idx_password_change_tokens_token")
+  @@index([user_id], map: "idx_password_change_tokens_user")
+}
+
+enum LocationType {
+  PRESENTIAL_ONLY
+  VIDEO_ONLY
+  HYBRID
+}
+
+enum EventType {
+  CONFERENCE
+  ATELIER
+  STAGE
+}
+
+enum EventConfirmationStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
+enum AppointmentLocationChoice {
+  PRESENTIAL
+  VIDEO
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  CANCELED
+  DONE
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  OFFLINE
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EnrichmentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum Role {
+  CLIENT
+  PRACTITIONER
+  ADMIN
+}
+
+enum NotificationType {
+  MESSAGE_RECEIVED
+  BOOKING_NEW
+  BOOKING_CONFIRMED
+  BOOKING_CANCELED
+  REVIEW_RECEIVED
+  DOCUMENT_VERIFIED
+  SUBSCRIPTION_ISSUE
+  SYSTEM_INFO
+  PAYMENT_RECEIVED
+}
+
+model notifications {
+  id         String           @id @default(cuid())
+  user_id    String
+  type       NotificationType
+  title      String
+  message    String           @db.Text
+  read       Boolean          @default(false)
+  link       String? // URL vers la page concernée (ex: /pro/appointments/123)
+  metadata   Json? // Données supplémentaires (ex: { appointmentId: "...", practitionerName: "..." })
+  created_at DateTime         @default(now()) @db.Timestamp(6)
+  read_at    DateTime?        @db.Timestamp(6)
+  users      users            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, read], map: "idx_notifications_user_read")
+  @@index([created_at], map: "idx_notifications_created_at")
+  @@map("notifications")
+}
+
+// 🥇 Dossier de Suivi Client - Notes de séance (privées, non visibles par le patient)
+model appointment_notes {
+  id             String       @id @default(cuid())
+  appointment_id String       @unique
+  notes          String       @db.Text // Notes privées du praticien
+  created_at     DateTime     @default(now()) @db.Timestamp(6)
+  updated_at     DateTime     @updatedAt @db.Timestamp(6)
+  appointments   appointments @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+
+  @@index([appointment_id], map: "idx_appointment_notes_appointment")
+  @@map("appointment_notes")
+}
+
+// 🥇 Dossier de Suivi Client - Documents partagés (visibles par le patient)
+model client_documents {
+  id              String        @id @default(cuid())
+  appointment_id  String
+  user_id         String // Client qui reçoit le document
+  practitioner_id String
+  file_url        String // URL du fichier uploadé
+  file_name       String // Nom original du fichier
+  file_type       String? // Type MIME (pdf, jpg, etc.)
+  file_size       Int? // Taille en bytes
+  description     String?       @db.Text // Description optionnelle
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  appointments    appointments  @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+  users           users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+
+  @@index([appointment_id], map: "idx_client_documents_appointment")
+  @@index([user_id], map: "idx_client_documents_user")
+  @@index([practitioner_id], map: "idx_client_documents_practitioner")
+  @@map("client_documents")
+}
+
+// 🥉 Cartes Cadeaux
+model gift_cards {
+  id                      String        @id @default(cuid())
+  code                    String        @unique // Code unique (ex: HOLIA-XXXX-XXXX)
+  practitioner_id         String
+  buyer_user_id           String? // Utilisateur qui a acheté (peut être null si achat anonyme)
+  recipient_email         String? // Email du bénéficiaire (si connu)
+  recipient_name          String? // Nom du bénéficiaire
+  amount_cents            Int // Montant en centimes
+  status                  String        @default("pending") // pending, redeemed, expired, canceled
+  purchased_at            DateTime      @default(now()) @db.Timestamp(6)
+  redeemed_at             DateTime?     @db.Timestamp(6)
+  redeemed_by_user_id     String? // Utilisateur qui a utilisé le code
+  redeemed_appointment_id String? // RDV pour lequel le code a été utilisé
+  expires_at              DateTime?     @db.Timestamp(6) // Date d'expiration (optionnelle)
+  pdf_url                 String? // URL du PDF généré
+  message                 String?       @db.Text // Message personnalisé du donneur
+  practitioners           practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  users                   users?        @relation("GiftCardBuyer", fields: [buyer_user_id], references: [id], onDelete: SetNull)
+  redeemed_by             users?        @relation("GiftCardRedeemer", fields: [redeemed_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([code], map: "idx_gift_cards_code")
+  @@index([practitioner_id], map: "idx_gift_cards_practitioner")
+  @@index([status], map: "idx_gift_cards_status")
+  @@index([buyer_user_id], map: "idx_gift_cards_buyer")
+  @@map("gift_cards")
+}
+
+// 🏅 Rappels Marketing - Tracking des rappels envoyés
+model reminder_sent {
+  id                    String        @id @default(cuid())
+  practitioner_id       String
+  user_id               String // Client à qui le rappel a été envoyé
+  appointment_id        String? // Dernier RDV avec ce praticien
+  reminder_type         String // "followup" (suivi), "renewal" (renouvellement), etc.
+  sent_at               DateTime      @default(now()) @db.Timestamp(6)
+  last_appointment_date DateTime? // Date du dernier RDV
+  clicked               Boolean       @default(false) // Si le client a cliqué sur le lien
+  booked                Boolean       @default(false) // Si le client a réservé après le rappel
+  practitioners         practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  users                 users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([practitioner_id, user_id, reminder_type]) // Un seul rappel de chaque type par client/praticien
+  @@index([practitioner_id], map: "idx_reminder_sent_practitioner")
+  @@index([user_id], map: "idx_reminder_sent_user")
+  @@index([sent_at], map: "idx_reminder_sent_sent_at")
+  @@map("reminder_sent")
+}
+
+// 📣 Actualités marketing - Posts courts (Promotion / Nouveauté) affichés sur la fiche publique
+model practitioner_updates {
+  id              String   @id @default(cuid())
+  practitioner_id String
+  title           String   // Titre court
+  text            String   @db.Text // Texte de l'actualité
+  type            String   // "promotion" | "nouveaute"
+  promo_text      String?  // Badge promo (ex: "-20% séance découverte") - affiché sur le bouton de réservation
+  is_active       Boolean  @default(true)
+  starts_at       DateTime @default(now())
+  ends_at         DateTime?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  practitioners    practitioners     @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  marketing_posts  marketing_posts[]
+
+  @@index([practitioner_id])
+  @@index([practitioner_id, is_active, ends_at])
+  @@map("practitioner_updates")
+}
+
+// 📢 Promotions marketing - Réduction par service avec dates de validité
+model marketing_posts {
+  id                     String    @id @default(cuid())
+  practitioner_id        String
+  practitioner_update_id String?   @unique // Lie à une actualité promotion (pour édition)
+  service_id             String?   // Optionnel : null = tous les services du praticien
+  discount_percentage    Int?      // Ex: 20 pour -20%
+  start_date             DateTime  @db.Timestamp(6)
+  end_date               DateTime  @db.Timestamp(6)
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+
+  practitioners        practitioners        @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  practitioner_updates practitioner_updates? @relation(fields: [practitioner_update_id], references: [id], onDelete: Cascade)
+  services             services?            @relation(fields: [service_id], references: [id], onDelete: SetNull)
+
+  @@index([practitioner_id])
+  @@index([service_id])
+  @@index([practitioner_id, start_date, end_date])
+  @@map("marketing_posts")
+}
+
+// 🏢 Professions - Liste des métiers des praticiens
+model professions {
+  id                  String                  @id
+  name                String                  @unique
+  slug                String                  @unique
+  description_pseo     String?                 @db.Text
+  practitioners       practitioners[]
+  subjects            subject_professions[]
+  profession_mutuelles profession_mutuelles[]
+
+  @@map("professions")
+}
+
+// 🏛️ Mutuelles - Mutuelles qui remboursent certaines professions
+model mutuelles {
+  id                  String                  @id @default(cuid())
+  name                String                  @unique
+  slug                String                  @unique
+  profession_mutuelles profession_mutuelles[]
+
+  @@map("mutuelles")
+}
+
+// 🔗 Table de liaison Many-to-Many entre Professions et Mutuelles (remboursement mutuelle)
+model profession_mutuelles {
+  id            String   @id @default(cuid())
+  profession_id String
+  mutuelle_id   String
+  created_at    DateTime @default(now())
+
+  profession professions @relation(fields: [profession_id], references: [id], onDelete: Cascade)
+  mutuelle   mutuelles   @relation(fields: [mutuelle_id], references: [id], onDelete: Cascade)
+
+  @@unique([profession_id, mutuelle_id])
+  @@index([profession_id])
+  @@index([mutuelle_id])
+  @@map("profession_mutuelles")
+}
+
+// 🏙️ Cities - Liste des villes disponibles
+model cities {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  @@map("cities")
+}
+
+// 📚 Subjects - Sujets de soin/bien-être
+model subjects {
+  id              String                @id // Utilise le slug comme ID (ex: "stress-anxiete")
+  name            String                @unique
+  slug            String                @unique
+  emoji           String?
+  metaDescription String?               @db.Text
+  keywords        String[]              @default([])
+  icon            String?
+  professions     subject_professions[]
+
+  @@map("subjects")
+}
+
+// 🔗 Table de liaison Many-to-Many entre Subjects et Professions
+model subject_professions {
+  id            String   @id @default(cuid())
+  subject_id    String
+  profession_id String
+  created_at    DateTime @default(now())
+
+  subject    subjects    @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+  profession professions @relation(fields: [profession_id], references: [id], onDelete: Cascade)
+
+  @@unique([subject_id, profession_id])
+  @@index([subject_id])
+  @@index([profession_id])
+  @@map("subject_professions")
+}
+
+// Événements externes (Google Calendar, etc.) pour affichage dans l'agenda
+model external_events {
+  id                String   @id @default(cuid())
+  practitioner_id   String
+  external_id       String   // ID de l'événement dans le calendrier externe (ex: Google event ID)
+  provider          String   @default("google-calendar") // google-calendar, outlook, etc.
+  title             String
+  description       String?
+  starts_at         DateTime
+  ends_at           DateTime
+  location          String?
+  synced_at         DateTime @default(now())
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  practitioners     practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+
+  @@unique([practitioner_id, provider, external_id])
+  @@index([practitioner_id])
+  @@index([starts_at])
+  @@index([provider])
+  @@map("external_events")
+}
+
+// 🎫 Événementiel - Ateliers, stages, séances en groupe
+model events {
+  id               String       @id @default(cuid())
+  slug             String       @unique
+  practitioner_id  String
+  title            String
+  event_type       EventType    @default(CONFERENCE) // Conférence, Atelier, Stage
+  description      String?      @db.Text
+  banner_url       String?      // Bannière paysage (hero)
+  poster_url       String?      // Programme / affiche (image ou PDF)
+  date             DateTime     @db.Timestamp(6)
+  price_cents       Int
+  price_visio_cents Int?       // Tarif visio si hybride (optionnel)
+  capacity          Int
+  remaining_places  Int
+  status            String     @default("active") // active, canceled
+  location_type     LocationType @default(PRESENTIAL_ONLY) // Visio ou Présentiel
+  address          String?
+  lat              Float?       // Coordonnées du lieu (API Adresse)
+  lng              Float?
+  level            String?      // Débutant, Intermédiaire, Tous niveaux
+  material_required String?     @db.Text  // Matériel à prévoir (ex: tapis de yoga)
+  accessibility    String?      @db.Text  // PMR, parking, etc.
+  allow_on_site_payment Boolean @default(false) // Paiement sur place (espèces/chèque) - Premium uniquement
+  min_participants      Int     @default(1) // Minimum de participants pour maintenir l'événement
+  confirmation_status   EventConfirmationStatus @default(PENDING) // PENDING, CONFIRMED, CANCELED
+  confirmation_deadline DateTime? // Date limite pour atteindre le minimum de participants
+  auto_confirm_on_min   Boolean @default(false) // Capture auto dès que min_participants atteint
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  practitioners    practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+  tickets          tickets[]
+
+  @@index([practitioner_id])
+  @@index([date])
+  @@index([event_type])
+  @@index([slug])
+}
+
+// 🛒 Boutique - Produits du praticien
+model products {
+  id              String       @id @default(cuid())
+  practitioner_id String
+  name            String
+  description     String?      @db.Text
+  price_cents     Int
+  stock           Int
+  image_url       String?
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  practitioners   practitioners @relation(fields: [practitioner_id], references: [id], onDelete: Cascade)
+
+  @@index([practitioner_id])
+}
+
+// 🎟️ Tickets - Achats d'utilisateurs pour les événements
+model tickets {
+  id                     String   @id @default(cuid())
+  event_id               String
+  user_id                String
+  quantity               Int      @default(1)
+  amount_cents           Int?     // Montant payé (pour remboursement)
+  stripe_payment_intent_id String? // Pour stripe.refunds.create et capture différée (min participants)
+  purchased_at           DateTime @default(now())
+  status                 String   @default("confirmed") // confirmed, canceled, refunded
+
+  events      events    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  invoices    invoices[]
+
+  @@index([event_id])
+  @@index([user_id])
+}
+
+// Logs applicatifs (admin) - level: INFO, WARN, ERROR
+model logs {
+  id        String   @id @default(cuid())
+  level     LogLevel
+  message   String   @db.Text
+  context   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([level])
+  @@map("logs")
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+// URLs de sites personnels de praticiens collectées par le harvester (recherche SearXNG)
+// profession/city = contexte de la recherche ; processed = traité par un job downstream
+model pending_discovery {
+  id         String   @id @default(cuid())
+  url        String   @unique
+  profession String   // slug ou id de la profession (contexte recherche)
+  city       String
+  processed  Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@index([processed])
+  @@index([profession, city])
+  @@map("pending_discovery")
+}

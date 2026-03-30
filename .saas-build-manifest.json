@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-03-14T16:58:55.198Z",
+  "modules": [
+    {
+      "name": "notes",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": true,
+      "api": false
+    },
+    {
+      "name": "stripe",
+      "version": "1.0.0",
+      "dependencies": {
+        "stripe": "^17.0.0"
+      },
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "directory",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "booking",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "billing",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "artisan-quotes",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": true,
+      "api": true
+    },
+    {
+      "name": "lodging",
+      "version": "1.0.0",
+      "dependencies": {
+        "stripe": "^17.0.0"
+      },
+      "routes": true,
+      "api": true
+    },
+    {
+      "name": "restaurant",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": true,
+      "api": true
+    },
+    {
+      "name": "events",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "blog",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "notifications",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "gift-cards",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    },
+    {
+      "name": "chat",
+      "version": "1.0.0",
+      "dependencies": {},
+      "routes": false,
+      "api": true
+    }
+  ],
+  "conflicts": [
+    {
+      "package": "stripe",
+      "kept": "^17.4.0",
+      "skipped": "^17.0.0",
+      "module": "stripe"
+    },
+    {
+      "package": "stripe",
+      "kept": "^17.4.0",
+      "skipped": "^17.0.0",
+      "module": "lodging"
+    }
+  ]
+}

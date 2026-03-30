@@ -1,0 +1,56 @@
+{
+  "id": "praticien",
+  "label": "Praticien de santé (kiné, ostéo, médecin, psy…)",
+  "summary": "Vitrine + agenda en ligne, prise de RDV, fiche patient, anamnèse pré-consultation, facturation conforme.",
+  "business": {
+    "needs": [
+      {
+        "need": "Identité & présentation du cabinet",
+        "admin": "Fiche praticien : nom, spécialité, adresse, photo, bio",
+        "modules": ["directory"]
+      },
+      {
+        "need": "Prise de RDV en ligne",
+        "admin": "Créneaux, durée de consultation, gestion absences",
+        "modules": ["booking"]
+      },
+      {
+        "need": "Formulaire d'anamnèse pré-consultation",
+        "admin": "Questionnaire personnalisable envoyé au patient avant le premier RDV",
+        "modules": ["anamnese"]
+      },
+      {
+        "need": "Notes & suivi patient",
+        "admin": "Historique consultations, notes SOAP, documents attachés",
+        "modules": ["notes"]
+      },
+      {
+        "need": "Facturation & encaissements",
+        "admin": "Factures PDF conformes, suivi impayés, export comptable",
+        "modules": ["billing", "stripe"]
+      },
+      {
+        "need": "Rappels & confirmations automatiques",
+        "admin": "Notifications email / SMS (confirmation RDV, rappel J-1)",
+        "modules": ["notifications"]
+      },
+      {
+        "need": "Messagerie patient",
+        "admin": "Canal de communication sécurisé praticien ↔ patient",
+        "modules": ["chat"]
+      }
+    ],
+    "modulesOn": [
+      "notes",
+      "stripe",
+      "directory",
+      "booking",
+      "billing",
+      "anamnese",
+      "notifications",
+      "chat"
+    ],
+    "modulesOff": ["events", "blog", "gift-cards", "artisan-quotes", "lodging", "restaurant", "click-collect"]
+  },
+  "frontendTemplate": "praticien"
+}

@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fallbacks si theme DB pas encore charge */
+:root {
+  --color-foreground: #0a0a0a;
+  --color-background: #fafafa;
+  --color-muted: #737373;
+  --color-border: #e5e5e5;
+  --color-primary: #171717;
+  --color-primary-foreground: #fafafa;
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-heading: ui-sans-serif, system-ui, sans-serif;
+  --space-base: 0.25rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --focus-ring: #3b82f6;
+  --focus-ring-width: 2px;
+  --hover-opacity: 0.92;
+  --disabled-opacity: 0.5;
+  --color-success: #15803d;
+  --color-error: #b91c1c;
+}
+
+body {
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-family: var(--font-sans);
+}

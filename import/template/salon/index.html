@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_SALON}} — {{SPECIALITE}} à {{VILLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: {{COLOR_PRIMARY}};
+  --primary-dark: {{COLOR_PRIMARY_DARK}};
+  --accent: {{COLOR_ACCENT}};
+  --cream: {{COLOR_BG}};
+  --dark: #1a1a1a;
+  --text: #333;
+  --text-light: #777;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--cream); overflow-x: hidden; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1920&q=80') center/cover;
+  filter: brightness(0.3);
+  transform: scale(1.1);
+  transition: transform 0.5s;
+}
+.hero:hover::before { transform: scale(1.05); }
+.hero-content { position: relative; z-index: 2; color: white; padding: 2rem; }
+.hero-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.5rem 2rem;
+  margin-bottom: 2rem;
+  opacity: 0; animation: fadeUp 1s 0.3s forwards;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  opacity: 0; animation: fadeUp 1s 0.5s forwards;
+}
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub {
+  font-size: 1.05rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  opacity: 0; animation: fadeUp 1s 0.7s forwards;
+}
+.hero-cta {
+  margin-top: 2.5rem;
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp 1s 0.9s forwards;
+}
+.hero-cta a {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.hero-cta .cta-primary { background: var(--accent); color: white; }
+.hero-cta .cta-primary:hover { background: white; color: var(--dark); transform: translateY(-2px); }
+.hero-cta .cta-secondary { border: 1.5px solid rgba(255,255,255,0.5); color: white; }
+.hero-cta .cta-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===== NAV ===== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.5rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: all 0.4s;
+}
+.nav.scrolled { background: rgba(26,26,26,0.95); backdrop-filter: blur(10px); padding: 1rem 3rem; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+.nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: white; text-decoration: none; font-weight: 300; letter-spacing: 2px; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+
+/* ===== SECTIONS ===== */
+section { padding: 7rem 2rem; }
+.container { max-width: 1200px; margin: 0 auto; }
+.section-label { font-size: 0.7rem; letter-spacing: 5px; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; margin-bottom: 1.5rem; line-height: 1.2; }
+.section-desc { font-size: 1rem; line-height: 1.8; color: var(--text-light); max-width: 600px; }
+
+/* ===== ABOUT ===== */
+.about { background: var(--cream); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.about-img { position: relative; overflow: hidden; aspect-ratio: 3/4; }
+.about-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s; }
+.about-img:hover img { transform: scale(1.05); }
+.about-img::after { content: ''; position: absolute; bottom: -15px; right: -15px; width: 50%; height: 50%; border: 1.5px solid var(--accent); z-index: -1; }
+
+/* ===== SERVICES ===== */
+.services { background: white; text-align: center; }
+.services-subtitle { color: var(--text-light); letter-spacing: 3px; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 3rem; }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; max-width: 900px; margin: 0 auto; text-align: left; }
+.service-card { padding: 2rem; border: 1px solid rgba(0,0,0,0.06); transition: all 0.3s; }
+.service-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.service-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.8rem; }
+.service-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; }
+.service-card-price { color: var(--accent); font-weight: 600; font-size: 1.1rem; }
+.service-card-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+.service-card-duration { font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.3rem; }
+
+/* ===== TEAM ===== */
+.team { background: var(--cream); text-align: center; }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
+.team-member { text-align: center; }
+.team-photo { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin: 0 auto 1.5rem; border: 3px solid var(--accent); padding: 4px; transition: transform 0.3s; }
+.team-photo:hover { transform: scale(1.05); }
+.team-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; margin-bottom: 0.3rem; }
+.team-role { font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.8rem; }
+.team-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+/* ===== GALLERY ===== */
+.gallery { background: white; text-align: center; }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 3rem; }
+.gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; transition: all 0.5s; cursor: pointer; filter: grayscale(20%); }
+.gallery-grid img:hover { filter: grayscale(0%); transform: scale(1.03); z-index: 2; }
+
+/* ===== TESTIMONIALS ===== */
+.testimonials { background: var(--dark); color: white; text-align: center; }
+.testimonials .section-desc { color: rgba(255,255,255,0.5); margin: 0 auto 3rem; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.testimonial { padding: 2.5rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); position: relative; }
+.testimonial::before { content: '"'; font-family: 'Cormorant Garamond', serif; font-size: 5rem; color: var(--accent); opacity: 0.3; position: absolute; top: 5px; left: 15px; line-height: 1; }
+.testimonial p { font-style: italic; line-height: 1.8; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; position: relative; }
+.testimonial-author { font-weight: 600; font-size: 0.9rem; }
+.testimonial-stars { color: var(--accent); margin-bottom: 1rem; font-size: 1.1rem; letter-spacing: 2px; }
+
+/* ===== FAQ ===== */
+.faq { background: var(--cream); }
+.faq .container { max-width: 800px; }
+.faq-list { margin-top: 3rem; }
+.faq-item { border-bottom: 1px solid rgba(0,0,0,0.08); }
+.faq-question {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 1.5rem 0; background: none; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 500; color: var(--dark); text-align: left; transition: color 0.3s;
+}
+.faq-question:hover { color: var(--accent); }
+.faq-icon { font-size: 1.5rem; font-weight: 300; color: var(--accent); transition: transform 0.3s; flex-shrink: 0; margin-left: 1rem; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.faq-item.open .faq-answer { max-height: 300px; }
+.faq-answer p { padding: 0 0 1.5rem; line-height: 1.8; color: var(--text-light); font-size: 0.95rem; }
+
+/* ===== BOOKING WIDGET ===== */
+.booking-widget { background: white; text-align: center; }
+.booking-steps {
+  display: flex; justify-content: center; gap: 0; margin-bottom: 3rem;
+  max-width: 700px; margin-left: auto; margin-right: auto;
+}
+.booking-step-indicator {
+  flex: 1; text-align: center; position: relative; padding: 0 0.5rem;
+}
+.booking-step-indicator .step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 600;
+  background: #eee; color: var(--text-light);
+  transition: all 0.3s; margin-bottom: 0.5rem;
+}
+.booking-step-indicator.active .step-num { background: var(--accent); color: white; }
+.booking-step-indicator.done .step-num { background: var(--primary); color: white; }
+.booking-step-indicator .step-label { font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-light); display: block; }
+.booking-step-indicator.active .step-label { color: var(--accent); font-weight: 600; }
+.booking-step-indicator::after {
+  content: ''; position: absolute; top: 18px; left: 60%; width: 80%; height: 2px;
+  background: #eee; z-index: 0;
+}
+.booking-step-indicator:last-child::after { display: none; }
+.booking-step-indicator.done::after { background: var(--primary); }
+
+.booking-panel { display: none; max-width: 800px; margin: 0 auto; }
+.booking-panel.active { display: block; }
+
+/* Step 1: Services */
+.booking-services { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left; }
+.booking-service-card {
+  padding: 1.2rem 1.5rem; border: 2px solid #eee; border-radius: 8px;
+  cursor: pointer; transition: all 0.3s; display: flex; justify-content: space-between; align-items: center;
+}
+.booking-service-card:hover { border-color: var(--accent); }
+.booking-service-card.selected { border-color: var(--accent); background: rgba(196,149,106,0.06); }
+.booking-service-card .svc-name { font-weight: 500; font-size: 0.95rem; }
+.booking-service-card .svc-meta { font-size: 0.8rem; color: var(--text-light); margin-top: 0.2rem; }
+.booking-service-card .svc-price { font-weight: 600; color: var(--accent); font-size: 1rem; white-space: nowrap; }
+
+/* Step 2: Stylists */
+.booking-stylists { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+.booking-stylist-card {
+  text-align: center; padding: 1.5rem; border: 2px solid #eee; border-radius: 12px;
+  cursor: pointer; transition: all 0.3s; width: 180px;
+}
+.booking-stylist-card:hover { border-color: var(--accent); }
+.booking-stylist-card.selected { border-color: var(--accent); background: rgba(196,149,106,0.06); }
+.booking-stylist-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 0.8rem; }
+.booking-stylist-card .stylist-name { font-weight: 500; font-size: 0.95rem; }
+.booking-stylist-card .stylist-role { font-size: 0.75rem; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-top: 0.2rem; }
+
+/* Step 3: Calendar */
+.booking-calendar { max-width: 500px; margin: 0 auto; }
+.cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.cal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; }
+.cal-nav { background: none; border: 1.5px solid #ddd; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem; transition: all 0.3s; color: var(--text); }
+.cal-nav:hover { border-color: var(--accent); color: var(--accent); }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; margin-bottom: 0.5rem; }
+.cal-weekday { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); text-align: center; padding: 0.5rem 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; }
+.cal-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  border: none; background: none; color: var(--text);
+}
+.cal-day:hover:not(.disabled):not(.empty) { background: rgba(196,149,106,0.15); }
+.cal-day.selected { background: var(--accent); color: white; font-weight: 600; }
+.cal-day.disabled { color: #ccc; cursor: default; }
+.cal-day.today { border: 2px solid var(--accent); }
+.cal-day.empty { cursor: default; }
+
+/* Step 3b: Time slots */
+.booking-slots { margin-top: 2rem; }
+.booking-slots h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 1rem; color: var(--text-light); }
+.slots-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.slot {
+  padding: 0.6rem 1.2rem; border: 1.5px solid #ddd; border-radius: 50px;
+  font-size: 0.85rem; cursor: pointer; transition: all 0.3s; background: none; color: var(--text);
+}
+.slot:hover { border-color: var(--accent); }
+.slot.selected { background: var(--accent); color: white; border-color: var(--accent); }
+.slot.taken { color: #ccc; border-color: #eee; cursor: default; text-decoration: line-through; }
+
+/* Step 4: Confirm */
+.booking-confirm { max-width: 500px; margin: 0 auto; text-align: left; }
+.confirm-summary {
+  padding: 2rem; background: var(--cream); border-radius: 8px; margin-bottom: 2rem;
+}
+.confirm-row { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.confirm-row:last-child { border-bottom: none; }
+.confirm-label { font-size: 0.85rem; color: var(--text-light); }
+.confirm-value { font-weight: 500; }
+.confirm-form input {
+  width: 100%; padding: 1rem; border: 1.5px solid #ddd; font-family: 'Inter', sans-serif;
+  font-size: 0.9rem; margin-bottom: 0.8rem; outline: none; transition: border-color 0.3s;
+}
+.confirm-form input:focus { border-color: var(--accent); }
+
+/* Booking nav buttons */
+.booking-nav { margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; }
+.booking-btn {
+  padding: 0.8rem 2.5rem; font-family: 'Inter', sans-serif; font-size: 0.8rem;
+  font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer; transition: all 0.3s;
+}
+.booking-btn-next { background: var(--accent); color: white; }
+.booking-btn-next:hover { opacity: 0.9; transform: translateY(-2px); }
+.booking-btn-next:disabled { opacity: 0.4; cursor: default; transform: none; }
+.booking-btn-back { background: none; border: 1.5px solid #ddd; color: var(--text); }
+.booking-btn-back:hover { border-color: var(--text); }
+.booking-btn-confirm { background: var(--primary); color: white; }
+.booking-btn-confirm:hover { opacity: 0.9; }
+
+/* Booking success */
+.booking-success { text-align: center; padding: 3rem 0; }
+.booking-success .check { font-size: 4rem; margin-bottom: 1rem; }
+.booking-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 1rem; }
+.booking-success p { color: var(--text-light); line-height: 1.8; }
+
+/* Dark mode for booking */
+html.dark-mode .booking-widget { background: #151515; }
+html.dark-mode .booking-step-indicator .step-num { background: #333; }
+html.dark-mode .booking-service-card { border-color: #333; }
+html.dark-mode .booking-service-card.selected { border-color: var(--accent); background: rgba(196,149,106,0.1); }
+html.dark-mode .booking-service-card .svc-name { color: #f0f0f0; }
+html.dark-mode .booking-stylist-card { border-color: #333; }
+html.dark-mode .booking-stylist-card.selected { border-color: var(--accent); background: rgba(196,149,106,0.1); }
+html.dark-mode .booking-stylist-card .stylist-name { color: #f0f0f0; }
+html.dark-mode .cal-nav { border-color: #444; color: #ccc; }
+html.dark-mode .cal-day { color: #ccc; }
+html.dark-mode .cal-day.disabled { color: #444; }
+html.dark-mode .slot { border-color: #444; color: #ccc; }
+html.dark-mode .slot.taken { color: #444; border-color: #333; }
+html.dark-mode .confirm-summary { background: #1a1a1a; }
+html.dark-mode .confirm-form input { background: #1a1a1a; border-color: #333; color: #f0f0f0; }
+html.dark-mode .booking-btn-back { border-color: #444; color: #ccc; }
+html.dark-mode .booking-step-indicator::after { background: #333; }
+
+@media (max-width: 768px) {
+  .booking-services { grid-template-columns: 1fr; }
+  .booking-stylists { gap: 1rem; }
+  .booking-stylist-card { width: 140px; }
+}
+
+/* ===== CTA BOOKING ===== */
+.booking {
+  background: var(--primary);
+  text-align: center;
+  padding: 5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.booking::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+.booking .container { position: relative; z-index: 2; }
+.booking h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 300; color: white; margin-bottom: 1rem; }
+.booking p { color: rgba(255,255,255,0.8); margin-bottom: 2rem; font-size: 1.05rem; }
+.booking-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.booking-cta a {
+  display: inline-block; padding: 1rem 2.5rem;
+  font-weight: 600; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none; transition: all 0.3s;
+}
+.booking-cta .cta-white { background: white; color: var(--primary); }
+.booking-cta .cta-white:hover { background: var(--dark); color: white; transform: translateY(-2px); }
+.booking-cta .cta-outline { border: 1.5px solid rgba(255,255,255,0.5); color: white; }
+.booking-cta .cta-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+/* ===== FOOTER ===== */
+footer { background: #111; color: rgba(255,255,255,0.5); padding: 4rem 2rem; text-align: center; }
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: white; margin-bottom: 1.5rem; font-weight: 300; letter-spacing: 2px; }
+.footer-info { line-height: 2; font-size: 0.9rem; margin-bottom: 2rem; }
+.footer-social { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; }
+.footer-social a { width: 45px; height: 45px; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); text-decoration: none; transition: all 0.3s; font-size: 0.8rem; }
+.footer-social a:hover { border-color: var(--accent); color: var(--accent); }
+.footer-bottom { font-size: 0.8rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.footer-credit { margin-top: 0.5rem; }
+.footer-credit a { color: var(--accent); text-decoration: none; }
+
+/* ===== SCROLL ANIMATIONS ===== */
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== DARK/LIGHT TOGGLE ===== */
+.theme-toggle {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+  display: flex; align-items: center; gap: 0.6rem;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+  padding: 0.6rem 1.2rem; border-radius: 50px; cursor: pointer;
+  transition: all 0.3s; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.theme-toggle:hover { transform: translateY(-2px); }
+.theme-toggle-icon { font-size: 1.1rem; }
+.theme-toggle-label { font-size: 0.75rem; color: white; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ===== DARK MODE ===== */
+html.dark-mode { --cream: #1a1a1a; --dark: #f5f5f5; --text: #e0e0e0; --text-light: #999; }
+html.dark-mode body { background: #111; }
+html.dark-mode .about { background: #1a1a1a; }
+html.dark-mode .services { background: #151515; }
+html.dark-mode .service-card { border-color: rgba(255,255,255,0.08); }
+html.dark-mode .service-card:hover { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+html.dark-mode .service-card-name { color: #f0f0f0; }
+html.dark-mode .team { background: #1a1a1a; }
+html.dark-mode .gallery { background: #151515; }
+html.dark-mode .testimonials { background: #0d0d0d; }
+html.dark-mode .faq { background: #1a1a1a; }
+html.dark-mode .faq-question { color: #e0e0e0; }
+html.dark-mode .faq-item { border-bottom-color: rgba(255,255,255,0.08); }
+html.dark-mode .faq-answer p { color: #999; }
+html.dark-mode .section-title { color: #f0f0f0; }
+html.dark-mode footer { background: #0a0a0a; }
+html.dark-mode .nav.scrolled { background: rgba(17,17,17,0.95); }
+html.dark-mode .theme-toggle { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+html.dark-mode .theme-toggle-label { color: #111; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-links { display: none; }
+  .services-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- THEME TOGGLE -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Basculer mode sombre / clair">
+  <span class="theme-toggle-icon">🌙</span>
+  <span class="theme-toggle-label">Dark</span>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">{{NOM_SALON}}</a>
+  <ul class="nav-links">
+    <li><a href="#about">Le Salon</a></li>
+    <li><a href="#services">Prestations</a></li>
+    <li><a href="#equipe">L'Équipe</a></li>
+    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#avis">Avis</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#rdv">Réserver</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">{{SPECIALITE}} — {{VILLE}}</div>
+    <h1>{{NOM_SALON}}</h1>
+    <p class="hero-sub">{{SLOGAN}}</p>
+    <div class="hero-cta">
+      <a href="#services" class="cta-primary">Nos Prestations</a>
+      <a href="{{LIEN_RDV}}" class="cta-secondary">Prendre Rendez-vous</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img reveal">
+        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=80" alt="Salon" loading="lazy">
+      </div>
+      <div class="reveal">
+        <p class="section-label">Le Salon</p>
+        <h2 class="section-title">{{ACCROCHE}}</h2>
+        <p class="section-desc">{{TEXTE_ABOUT}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="container">
+    <p class="section-label reveal">Prestations</p>
+    <h2 class="section-title reveal">Nos Soins & Coiffures</h2>
+    <p class="services-subtitle reveal">{{SPECIALITE}}</p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_1_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_1_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_1_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_1_DUREE}}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_2_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_2_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_2_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_2_DUREE}}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_3_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_3_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_3_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_3_DUREE}}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_4_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_4_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_4_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_4_DUREE}}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_5_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_5_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_5_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_5_DUREE}}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-card-header">
+          <span class="service-card-name">{{SERVICE_6_NOM}}</span>
+          <span class="service-card-price">{{SERVICE_6_PRIX}}</span>
+        </div>
+        <p class="service-card-desc">{{SERVICE_6_DESC}}</p>
+        <p class="service-card-duration"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_6_DUREE}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="equipe">
+  <div class="container">
+    <p class="section-label reveal">L'Équipe</p>
+    <h2 class="section-title reveal">Des Passionnés à Votre Service</h2>
+    <div class="team-grid">
+      <div class="team-member reveal">
+        <img class="team-photo" src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&q=80" alt="{{TEAM_1_NOM}}" loading="lazy">
+        <h3 class="team-name">{{TEAM_1_NOM}}</h3>
+        <p class="team-role">{{TEAM_1_ROLE}}</p>
+        <p class="team-desc">{{TEAM_1_DESC}}</p>
+      </div>
+      <div class="team-member reveal">
+        <img class="team-photo" src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" alt="{{TEAM_2_NOM}}" loading="lazy">
+        <h3 class="team-name">{{TEAM_2_NOM}}</h3>
+        <p class="team-role">{{TEAM_2_ROLE}}</p>
+        <p class="team-desc">{{TEAM_2_DESC}}</p>
+      </div>
+      <div class="team-member reveal">
+        <img class="team-photo" src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&q=80" alt="{{TEAM_3_NOM}}" loading="lazy">
+        <h3 class="team-name">{{TEAM_3_NOM}}</h3>
+        <p class="team-role">{{TEAM_3_ROLE}}</p>
+        <p class="team-desc">{{TEAM_3_DESC}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="galerie">
+  <div class="container">
+    <p class="section-label reveal">Galerie</p>
+    <h2 class="section-title reveal">Nos Réalisations</h2>
+    <div class="gallery-grid reveal">
+      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80" alt="Coiffure 1" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=500&q=80" alt="Coiffure 2" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=500&q=80" alt="Coiffure 3" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=500&q=80" alt="Coiffure 4" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1559599101-f09722fb4948?w=500&q=80" alt="Coloration" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&q=80" alt="Soin" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=500&q=80" alt="Ambiance" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1633681926035-ec1ac984418a?w=500&q=80" alt="Résultat" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="avis">
+  <div class="container">
+    <p class="section-label reveal">Avis Clients</p>
+    <h2 class="section-title reveal" style="color: white;">Ce qu'elles en disent</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★ ★ ★ ★ ★</div>
+        <p>{{AVIS_1_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_1_AUTEUR}}</div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★ ★ ★ ★ ★</div>
+        <p>{{AVIS_2_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_2_AUTEUR}}</div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★ ★ ★ ★ ★</div>
+        <p>{{AVIS_3_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_3_AUTEUR}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <p class="section-label reveal">Questions Fréquentes</p>
+    <h2 class="section-title reveal">Tout savoir avant votre visite</h2>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">{{FAQ_1_Q}}<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>{{FAQ_1_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">{{FAQ_2_Q}}<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>{{FAQ_2_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">{{FAQ_3_Q}}<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>{{FAQ_3_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">{{FAQ_4_Q}}<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>{{FAQ_4_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">{{FAQ_5_Q}}<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>{{FAQ_5_A}}</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING WIDGET -->
+<section class="booking-widget" id="rdv">
+  <div class="container">
+    <p class="section-label reveal">Réservation en ligne</p>
+    <h2 class="section-title reveal">Prendre Rendez-vous</h2>
+
+    <!-- Steps indicator -->
+    <div class="booking-steps reveal">
+      <div class="booking-step-indicator active" data-step="1">
+        <span class="step-num">1</span>
+        <span class="step-label">Prestation</span>
+      </div>
+      <div class="booking-step-indicator" data-step="2">
+        <span class="step-num">2</span>
+        <span class="step-label">Coiffeur</span>
+      </div>
+      <div class="booking-step-indicator" data-step="3">
+        <span class="step-num">3</span>
+        <span class="step-label">Date & Heure</span>
+      </div>
+      <div class="booking-step-indicator" data-step="4">
+        <span class="step-num">4</span>
+        <span class="step-label">Confirmer</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Choose service -->
+    <div class="booking-panel active" id="bk-step-1">
+      <div class="booking-services">
+        <div class="booking-service-card" data-svc="{{SERVICE_1_NOM}}" data-price="{{SERVICE_1_PRIX}}" data-dur="{{SERVICE_1_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_1_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_1_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_1_PRIX}}</span>
+        </div>
+        <div class="booking-service-card" data-svc="{{SERVICE_2_NOM}}" data-price="{{SERVICE_2_PRIX}}" data-dur="{{SERVICE_2_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_2_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_2_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_2_PRIX}}</span>
+        </div>
+        <div class="booking-service-card" data-svc="{{SERVICE_3_NOM}}" data-price="{{SERVICE_3_PRIX}}" data-dur="{{SERVICE_3_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_3_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_3_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_3_PRIX}}</span>
+        </div>
+        <div class="booking-service-card" data-svc="{{SERVICE_4_NOM}}" data-price="{{SERVICE_4_PRIX}}" data-dur="{{SERVICE_4_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_4_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_4_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_4_PRIX}}</span>
+        </div>
+        <div class="booking-service-card" data-svc="{{SERVICE_5_NOM}}" data-price="{{SERVICE_5_PRIX}}" data-dur="{{SERVICE_5_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_5_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_5_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_5_PRIX}}</span>
+        </div>
+        <div class="booking-service-card" data-svc="{{SERVICE_6_NOM}}" data-price="{{SERVICE_6_PRIX}}" data-dur="{{SERVICE_6_DUREE}}">
+          <div><div class="svc-name">{{SERVICE_6_NOM}}</div><div class="svc-meta"><i data-lucide="clock" style="width:12px;height:12px;"></i> {{SERVICE_6_DUREE}}</div></div>
+          <span class="svc-price">{{SERVICE_6_PRIX}}</span>
+        </div>
+      </div>
+      <div class="booking-nav">
+        <button class="booking-btn booking-btn-next" disabled onclick="bkNext()">Choisir le Coiffeur →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Choose stylist -->
+    <div class="booking-panel" id="bk-step-2">
+      <div class="booking-stylists">
+        <div class="booking-stylist-card" data-stylist="{{TEAM_1_NOM}}">
+          <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&q=80" alt="{{TEAM_1_NOM}}">
+          <div class="stylist-name">{{TEAM_1_NOM}}</div>
+          <div class="stylist-role">{{TEAM_1_ROLE}}</div>
+        </div>
+        <div class="booking-stylist-card" data-stylist="{{TEAM_2_NOM}}">
+          <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&q=80" alt="{{TEAM_2_NOM}}">
+          <div class="stylist-name">{{TEAM_2_NOM}}</div>
+          <div class="stylist-role">{{TEAM_2_ROLE}}</div>
+        </div>
+        <div class="booking-stylist-card" data-stylist="{{TEAM_3_NOM}}">
+          <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=200&q=80" alt="{{TEAM_3_NOM}}">
+          <div class="stylist-name">{{TEAM_3_NOM}}</div>
+          <div class="stylist-role">{{TEAM_3_ROLE}}</div>
+        </div>
+      </div>
+      <div class="booking-nav">
+        <button class="booking-btn booking-btn-back" onclick="bkBack()">← Retour</button>
+        <button class="booking-btn booking-btn-next" disabled onclick="bkNext()">Choisir la Date →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Calendar + time -->
+    <div class="booking-panel" id="bk-step-3">
+      <div class="booking-calendar">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calNav(-1)">‹</button>
+          <h3 id="cal-month-label"></h3>
+          <button class="cal-nav" onclick="calNav(1)">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div>
+          <div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div>
+          <div class="cal-weekday">Dim</div>
+        </div>
+        <div class="cal-days" id="cal-days"></div>
+      </div>
+      <div class="booking-slots" id="slots-container" style="display:none;">
+        <h4 id="slots-label">Créneaux disponibles</h4>
+        <div class="slots-grid" id="slots-grid"></div>
+      </div>
+      <div class="booking-nav">
+        <button class="booking-btn booking-btn-back" onclick="bkBack()">← Retour</button>
+        <button class="booking-btn booking-btn-next" disabled onclick="bkNext()" id="btn-to-confirm">Confirmer →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Confirm -->
+    <div class="booking-panel" id="bk-step-4">
+      <div class="booking-confirm">
+        <div class="confirm-summary" id="confirm-summary"></div>
+        <div class="confirm-form">
+          <input type="text" placeholder="Votre prénom" id="bk-firstname" required>
+          <input type="tel" placeholder="Téléphone" id="bk-phone" required>
+          <input type="email" placeholder="Email (optionnel)" id="bk-email">
+        </div>
+      </div>
+      <div class="booking-nav">
+        <button class="booking-btn booking-btn-back" onclick="bkBack()">← Retour</button>
+        <button class="booking-btn booking-btn-confirm" onclick="bkConfirm()">Confirmer le Rendez-vous ✓</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="booking-panel" id="bk-success">
+      <div class="booking-success">
+        <div class="check"><i data-lucide="check-circle" style="width:64px;height:64px;color:var(--accent);"></i></div>
+        <h3>Rendez-vous Confirmé !</h3>
+        <p>Vous recevrez un SMS de confirmation sous peu.<br>À très bientôt au salon !</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BOOKING CTA -->
+<section class="booking">
+  <div class="container">
+    <h2 class="reveal">Prête pour un Nouveau Look ?</h2>
+    <p class="reveal">Réservez votre créneau en ligne ou appelez-nous au {{TELEPHONE}}</p>
+    <div class="booking-cta reveal">
+      <a href="{{LIEN_RDV}}" class="cta-white">Prendre Rendez-vous</a>
+      <a href="tel:{{TELEPHONE_RAW}}" class="cta-outline">Appeler le Salon</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">{{NOM_SALON}}</div>
+    <div class="footer-info">
+      {{ADRESSE}}<br>
+      {{TELEPHONE}}<br>
+      {{HORAIRES}}
+    </div>
+    <div class="footer-social">
+      <a href="#">FB</a>
+      <a href="#">IG</a>
+      <a href="#">TK</a>
+    </div>
+    <div class="footer-bottom">
+      © 2026 {{NOM_SALON}} — Tous droits réservés
+      <div class="footer-credit">Site réalisé par <a href="https://websual.fr" target="_blank">Websual</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Theme toggle
+function toggleTheme() {
+  const html = document.documentElement;
+  const toggle = document.querySelector('.theme-toggle');
+  html.classList.toggle('dark-mode');
+  const isDark = html.classList.contains('dark-mode');
+  toggle.querySelector('.theme-toggle-icon').textContent = isDark ? '☀️' : '🌙';
+  toggle.querySelector('.theme-toggle-label').textContent = isDark ? 'Light' : 'Dark';
+}
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 80); });
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== BOOKING WIDGET =====
+const bk = { step: 1, service: null, price: null, duration: null, stylist: null, date: null, time: null };
+let calDate = new Date();
+const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+// Service selection
+document.querySelectorAll('.booking-service-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.booking-service-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    bk.service = card.dataset.svc;
+    bk.price = card.dataset.price;
+    bk.duration = card.dataset.dur;
+    document.querySelector('#bk-step-1 .booking-btn-next').disabled = false;
+  });
+});
+
+// Stylist selection
+document.querySelectorAll('.booking-stylist-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.booking-stylist-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    bk.stylist = card.dataset.stylist;
+    document.querySelector('#bk-step-2 .booking-btn-next').disabled = false;
+  });
+});
+
+function bkGoTo(step) {
+  bk.step = step;
+  document.querySelectorAll('.booking-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.booking-step-indicator').forEach((ind, i) => {
+    ind.classList.remove('active', 'done');
+    if (i + 1 < step) ind.classList.add('done');
+    if (i + 1 === step) ind.classList.add('active');
+  });
+  const panel = document.getElementById('bk-step-' + step);
+  if (panel) panel.classList.add('active');
+  if (step === 3) renderCalendar();
+  if (step === 4) renderConfirm();
+}
+
+function bkNext() { bkGoTo(bk.step + 1); }
+function bkBack() { bkGoTo(bk.step - 1); }
+
+// Calendar
+function renderCalendar() {
+  const year = calDate.getFullYear(), month = calDate.getMonth();
+  document.getElementById('cal-month-label').textContent = months[month] + ' ' + year;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const grid = document.getElementById('cal-days');
+  grid.innerHTML = '';
+
+  // Empty cells for days before first
+  const offset = (firstDay + 6) % 7; // Monday = 0
+  for (let i = 0; i < offset; i++) {
+    const d = document.createElement('button');
+    d.className = 'cal-day empty';
+    grid.appendChild(d);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = document.createElement('button');
+    d.className = 'cal-day';
+    d.textContent = day;
+    const thisDate = new Date(year, month, day);
+    const dayOfWeek = thisDate.getDay();
+
+    // Disable past days, Sundays (0) and Mondays (1)
+    if (thisDate < new Date(today.getFullYear(), today.getMonth(), today.getDate()) || dayOfWeek === 0 || dayOfWeek === 1) {
+      d.classList.add('disabled');
+    } else {
+      d.addEventListener('click', () => selectDay(day));
+    }
+    if (thisDate.toDateString() === today.toDateString()) d.classList.add('today');
+    if (bk.date && bk.date.getDate() === day && bk.date.getMonth() === month && bk.date.getFullYear() === year) {
+      d.classList.add('selected');
+    }
+    grid.appendChild(d);
+  }
+}
+
+function calNav(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function selectDay(day) {
+  bk.date = new Date(calDate.getFullYear(), calDate.getMonth(), day);
+  bk.time = null;
+  document.getElementById('btn-to-confirm').disabled = true;
+  renderCalendar();
+  showSlots();
+}
+
+function showSlots() {
+  const container = document.getElementById('slots-container');
+  const grid = document.getElementById('slots-grid');
+  const label = document.getElementById('slots-label');
+  container.style.display = 'block';
+
+  const dayNum = bk.date.getDate();
+  const dayName = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][bk.date.getDay()];
+  label.textContent = `${dayName} ${dayNum} ${months[bk.date.getMonth()]}`;
+
+  // Generate realistic slots (some taken based on pseudo-random)
+  const slots = [];
+  for (let h = 9; h <= 18; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      if (h === 18 && m > 0) continue;
+      if (h === 12 && m === 30) continue; // lunch break
+      if (h === 13 && m === 0) continue;
+      slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
+  }
+
+  grid.innerHTML = '';
+  slots.forEach(time => {
+    const btn = document.createElement('button');
+    btn.className = 'slot';
+    btn.textContent = time;
+    // Pseudo-random "taken" slots based on date + time hash
+    const hash = (bk.date.getDate() * 7 + parseInt(time.replace(':','')) + (bk.stylist||'').length) % 5;
+    if (hash === 0 || hash === 3) {
+      btn.classList.add('taken');
+    } else {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+        btn.classList.add('selected');
+        bk.time = time;
+        document.getElementById('btn-to-confirm').disabled = false;
+      });
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function renderConfirm() {
+  const dayName = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][bk.date.getDay()];
+  const dateStr = `${dayName} ${bk.date.getDate()} ${months[bk.date.getMonth()]} ${bk.date.getFullYear()}`;
+  document.getElementById('confirm-summary').innerHTML = `
+    <div class="confirm-row"><span class="confirm-label">Prestation</span><span class="confirm-value">${bk.service}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Coiffeur</span><span class="confirm-value">${bk.stylist}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Date</span><span class="confirm-value">${dateStr}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Heure</span><span class="confirm-value">${bk.time}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Durée</span><span class="confirm-value">${bk.duration}</span></div>
+    <div class="confirm-row" style="border-bottom:none"><span class="confirm-label">Prix</span><span class="confirm-value" style="color:var(--accent);font-size:1.1rem">${bk.price}</span></div>
+  `;
+}
+
+function bkConfirm() {
+  const name = document.getElementById('bk-firstname').value;
+  const phone = document.getElementById('bk-phone').value;
+  if (!name || !phone) { alert('Merci de renseigner votre prénom et téléphone.'); return; }
+  document.querySelectorAll('.booking-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('bk-success').classList.add('active');
+  document.querySelectorAll('.booking-step-indicator').forEach(ind => ind.classList.add('done'));
+}
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+</body>
+</html>

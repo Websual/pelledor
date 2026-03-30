@@ -1,0 +1,10 @@
+{
+  "modules": [
+    "notes",
+    "stripe",
+    "directory",
+    "restaurant",
+    "click-collect",
+    "notifications"
+  ]
+}

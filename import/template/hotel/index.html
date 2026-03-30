@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_HOTEL}} — {{CATEGORIE}} à {{VILLE}}</title>
+<meta name="description" content="{{NOM_HOTEL}}, {{CATEGORIE}} à {{VILLE}}. {{ACCROCHE_META}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+:root {
+  --accent: {{COLOR_ACCENT}};
+  --accent-dark: {{COLOR_ACCENT_DARK}};
+  --gold: #C4A265;
+  --cream: {{COLOR_BG}};
+  --dark: #1B1B1B;
+  --text: #1B1B1B;
+  --text-light: #6B6B6B;
+  --card-bg: #fff;
+  --border: rgba(0,0,0,0.06);
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
+}
+[data-theme="dark"] {
+  --cream: #141414;
+  --dark: #F0EDE8;
+  --text: #E0DDD6;
+  --text-light: #8A8580;
+  --card-bg: #1E1E1E;
+  --border: rgba(240,237,232,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); color: var(--text); background: var(--cream); overflow-x: hidden; transition: background 0.5s, color 0.5s; }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 3rem; background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(15px); border-bottom: 1px solid var(--border);
+  transition: background 0.5s;
+}
+[data-theme="dark"] .nav { background: rgba(20,20,20,0.95); }
+.nav-logo { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; }
+.nav-logo span { color: var(--gold); }
+.nav-stars { font-size: 0.7rem; letter-spacing: 3px; color: var(--gold); display: block; margin-top: -2px; }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a { font-size: 0.8rem; font-weight: 500; color: var(--text-light); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.nav-cta {
+  padding: 0.7rem 2rem; background: var(--accent); color: #fff !important;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; border-radius: 0; transition: all 0.3s;
+}
+.nav-cta:hover { background: var(--accent-dark); }
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: all 0.3s;
+}
+
+/* HERO — cinematic split */
+.hero {
+  position: relative; height: 100vh; min-height: 700px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: url('{{HERO_IMAGE}}') center/cover no-repeat;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(27,27,27,0.1) 0%, rgba(27,27,27,0.6) 100%);
+}
+.hero-content {
+  position: relative; z-index: 2; text-align: center; color: white;
+  max-width: 800px; padding: 0 2rem;
+}
+.hero-stars { font-size: 1rem; letter-spacing: 6px; color: var(--gold); margin-bottom: 1.5rem; }
+.hero h1 {
+  font-family: var(--serif); font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 500; line-height: 1.1; margin-bottom: 1rem;
+}
+.hero h1 em { font-style: italic; }
+.hero p {
+  font-size: 1.05rem; font-weight: 300; line-height: 1.8;
+  max-width: 550px; margin: 0 auto 2.5rem; opacity: 0.85;
+}
+.hero-cta {
+  display: inline-flex; padding: 1rem 3rem;
+  background: var(--accent); color: white;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; transition: all 0.3s;
+}
+.hero-cta:hover { background: var(--accent-dark); transform: translateY(-2px); }
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  color: white; opacity: 0.5; font-size: 0.7rem; letter-spacing: 0.15em;
+  text-transform: uppercase; animation: bounce 2s infinite;
+}
+@keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+/* SECTIONS */
+section { padding: 6rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  display: inline-block; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+.section-title {
+  font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 500; line-height: 1.15; margin-bottom: 1rem;
+}
+.section-desc {
+  font-size: 1rem; color: var(--text-light); line-height: 1.8;
+  max-width: 600px;
+}
+.section-desc.centered { margin: 0 auto; text-align: center; }
+
+/* STATS BAR */
+.stats {
+  background: var(--accent); color: white; padding: 3rem 2rem;
+}
+.stats-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center;
+}
+.stat-val { font-family: var(--serif); font-size: 2.5rem; font-weight: 600; }
+.stat-label { font-size: 0.8rem; opacity: 0.8; margin-top: 0.3rem; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* HISTOIRE */
+.histoire { background: var(--cream); }
+.histoire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.histoire-img { border-radius: 4px; overflow: hidden; aspect-ratio: 4/5; }
+.histoire-img img { width: 100%; height: 100%; object-fit: cover; }
+.histoire-text blockquote {
+  font-family: var(--serif); font-size: 1.3rem; font-style: italic;
+  line-height: 1.6; color: var(--text); margin-top: 1.5rem;
+  padding-left: 1.5rem; border-left: 3px solid var(--gold);
+}
+
+/* BOOKING WIDGET */
+.booking { background: var(--card-bg); transition: background 0.5s; }
+.booking-form {
+  max-width: 1000px; margin: 3rem auto 0; padding: 2.5rem;
+  background: var(--cream); border-radius: 4px; border: 1px solid var(--border);
+  transition: background 0.5s;
+}
+.booking-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; align-items: end; }
+.booking-field label {
+  display: block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-light); margin-bottom: 0.5rem;
+}
+.booking-field select,
+.booking-field input {
+  width: 100%; padding: 0.75rem 0.8rem; border: 1px solid var(--border);
+  border-radius: 0; font-family: var(--sans); font-size: 0.85rem;
+  background: var(--card-bg); color: var(--text); transition: border 0.3s;
+}
+.booking-field select:focus,
+.booking-field input:focus { border-color: var(--accent); outline: none; }
+.booking-submit {
+  padding: 0.75rem 1.5rem; background: var(--accent); color: white;
+  border: none; font-family: var(--sans); font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s; white-space: nowrap;
+}
+.booking-submit:hover { background: var(--accent-dark); }
+.booking-note { text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-light); }
+
+/* CHAMBRES */
+.chambres { background: var(--card-bg); transition: background 0.5s; }
+.chambres-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+.chambre-card {
+  position: relative; border-radius: 4px; overflow: hidden;
+  background: var(--cream); transition: all 0.4s;
+}
+.chambre-card:hover { transform: translateY(-6px); box-shadow: 0 25px 60px rgba(0,0,0,0.1); }
+.chambre-badge {
+  position: absolute; top: 1rem; left: 1rem; z-index: 2;
+  padding: 0.3rem 0.8rem; background: var(--gold); color: white;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.chambre-img { aspect-ratio: 16/10; overflow: hidden; }
+.chambre-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+.chambre-card:hover .chambre-img img { transform: scale(1.05); }
+.chambre-body { padding: 1.5rem; }
+.chambre-name { font-family: var(--serif); font-size: 1.3rem; font-weight: 500; margin-bottom: 0.4rem; }
+.chambre-specs { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem; }
+.chambre-specs span { display: flex; align-items: center; gap: 0.3rem; }
+.chambre-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 0.8rem; border-top: 1px solid var(--border); }
+.chambre-price { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; color: var(--accent); }
+.chambre-price span { font-size: 0.75rem; font-weight: 400; color: var(--text-light); }
+.chambre-btn {
+  padding: 0.5rem 1.2rem; font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  border: 1px solid var(--accent); color: var(--accent); transition: all 0.3s;
+}
+.chambre-btn:hover { background: var(--accent); color: white; }
+
+/* SERVICES */
+.services { background: var(--cream); }
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+.service-card {
+  padding: 2rem; background: var(--card-bg); border-radius: 4px;
+  border: 1px solid var(--border); transition: all 0.3s;
+}
+.service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); border-color: var(--accent); }
+.service-icon { margin-bottom: 1rem; color: var(--accent); } .service-icon i { width: 28px; height: 28px; }
+.service-name { font-family: var(--serif); font-size: 1.2rem; font-weight: 500; margin-bottom: 0.5rem; }
+.service-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.7; }
+
+/* GALLERY — mosaic */
+.gallery { background: var(--card-bg); transition: background 0.5s; }
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 250px);
+  gap: 0.5rem; margin-top: 3rem;
+}
+.gallery-item { overflow: hidden; border-radius: 4px; }
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.gallery-item:hover img { transform: scale(1.08); }
+.gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+
+/* AVIS */
+.avis { background: var(--cream); }
+.avis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
+.avis-card {
+  padding: 2rem; background: var(--card-bg); border-radius: 4px;
+  border: 1px solid var(--border); transition: all 0.3s;
+}
+.avis-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+.avis-rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+.avis-score { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; color: var(--gold); }
+.avis-platform { font-size: 0.75rem; color: var(--text-light); letter-spacing: 0.05em; text-transform: uppercase; }
+.avis-text { font-size: 0.9rem; line-height: 1.7; color: var(--text); margin-bottom: 1rem; font-style: italic; }
+.avis-author { font-weight: 600; font-size: 0.85rem; }
+.avis-date { font-size: 0.75rem; color: var(--text-light); }
+
+/* CTA */
+.cta-section {
+  position: relative; padding: 8rem 2rem; text-align: center;
+  background: url('{{IMAGE_CTA}}') center/cover no-repeat;
+}
+.cta-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(27,27,27,0.7);
+}
+.cta-section .section-inner { position: relative; z-index: 2; }
+.cta-section .section-title { color: white; }
+.cta-section .section-desc { color: rgba(255,255,255,0.8); margin: 0 auto; }
+.cta-buttons { display: flex; justify-content: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2.5rem; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.3s;
+}
+.cta-btn-primary { background: var(--accent); color: white; }
+.cta-btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+.cta-btn-secondary { border: 2px solid rgba(255,255,255,0.4); color: white; background: transparent; }
+.cta-btn-secondary:hover { border-color: white; }
+
+/* FOOTER */
+footer {
+  padding: 4rem 2rem 2rem; background: var(--dark); text-align: center;
+  transition: background 0.5s;
+}
+[data-theme="dark"] footer { background: #0A0A0A; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-logo { font-family: var(--serif); font-size: 1.6rem; font-weight: 500; color: white; }
+.footer-stars { color: var(--gold); font-size: 0.7rem; letter-spacing: 4px; margin-top: 0.3rem; }
+.footer-desc { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 1rem 0; max-width: 400px; margin-left: auto; margin-right: auto; }
+.footer-contact { margin: 1.5rem 0; }
+.footer-contact a { display: inline-block; margin: 0 1rem; color: rgba(255,255,255,0.6); font-size: 0.85rem; transition: color 0.3s; }
+.footer-contact a:hover { color: var(--gold); }
+.footer-legal { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+.footer-legal a { color: var(--gold); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  section { padding: 4rem 1.5rem; }
+  .stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 200px); }
+  .gallery-item:first-child { grid-column: span 2; grid-row: span 1; }
+  .chambres-grid { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .histoire-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .booking-row { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .booking-submit { margin-top: 1rem; }
+}
+
+/* SCROLL ANIMATIONS */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div>
+    <a href="#" class="nav-logo">{{NOM_HOTEL_COURT}}<span>.</span></a>
+    <div class="nav-stars">{{ETOILES_DISPLAY}}</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#histoire">Histoire</a></li>
+    <li><a href="#chambres">Chambres</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#avis">Avis</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer le thème">🌙</button>
+    <a href="#reserver" class="nav-cta">Réserver</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-stars">{{ETOILES_DISPLAY}}</div>
+    <h1>{{TITRE_HERO}}</h1>
+    <p>{{SOUS_TITRE_HERO}}</p>
+    <a href="#reserver" class="hero-cta">Réserver votre séjour</a>
+  </div>
+  <div class="scroll-hint">Découvrir ↓</div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div><div class="stat-val">{{STAT_1_VAL}}</div><div class="stat-label">{{STAT_1_LABEL}}</div></div>
+    <div><div class="stat-val">{{STAT_2_VAL}}</div><div class="stat-label">{{STAT_2_LABEL}}</div></div>
+    <div><div class="stat-val">{{STAT_3_VAL}}</div><div class="stat-label">{{STAT_3_LABEL}}</div></div>
+    <div><div class="stat-val">{{STAT_4_VAL}}</div><div class="stat-label">{{STAT_4_LABEL}}</div></div>
+  </div>
+</div>
+
+<!-- HISTOIRE -->
+<section class="histoire" id="histoire">
+  <div class="section-inner">
+    <div class="histoire-grid reveal">
+      <div class="histoire-img">
+        <img src="{{IMAGE_HISTOIRE}}" alt="{{NOM_HOTEL}}">
+      </div>
+      <div class="histoire-text">
+        <span class="section-label">Notre histoire</span>
+        <h2 class="section-title">{{TITRE_HISTOIRE}}</h2>
+        <p class="section-desc">{{DESC_HISTOIRE}}</p>
+        <blockquote>{{CITATION}}</blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="reserver">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Réservation</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">Réservez en direct</h2>
+      <p class="section-desc centered">Meilleur tarif garanti — sans commission Booking ni Expedia.</p>
+    </div>
+    <div class="booking-form reveal">
+      <div class="booking-row">
+        <div class="booking-field">
+          <label>Arrivée</label>
+          <input type="date">
+        </div>
+        <div class="booking-field">
+          <label>Départ</label>
+          <input type="date">
+        </div>
+        <div class="booking-field">
+          <label>Chambre</label>
+          <select>
+            <option>{{CHAMBRE_1_NOM}}</option>
+            <option>{{CHAMBRE_2_NOM}}</option>
+            <option>{{CHAMBRE_3_NOM}}</option>
+          </select>
+        </div>
+        <div class="booking-field">
+          <label>Voyageurs</label>
+          <select>
+            <option>1 adulte</option>
+            <option>2 adultes</option>
+            <option>3 adultes</option>
+            <option>4 adultes</option>
+          </select>
+        </div>
+        <div class="booking-field" style="display:flex;align-items:end;">
+          <button class="booking-submit" style="width:100%;">Rechercher</button>
+        </div>
+      </div>
+      <p class="booking-note">Annulation gratuite · Confirmation immédiate · Paiement à l'arrivée</p>
+    </div>
+  </div>
+</section>
+
+<!-- CHAMBRES -->
+<section class="chambres" id="chambres">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Nos chambres</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_CHAMBRES}}</h2>
+      <p class="section-desc centered">{{DESC_CHAMBRES}}</p>
+    </div>
+    <div class="chambres-grid">
+      <div class="chambre-card reveal">
+        <div class="chambre-badge">{{CHAMBRE_1_TYPE}}</div>
+        <div class="chambre-img"><img src="{{CHAMBRE_1_IMAGE}}" alt="{{CHAMBRE_1_NOM}}"></div>
+        <div class="chambre-body">
+          <div class="chambre-name">{{CHAMBRE_1_NOM}}</div>
+          <div class="chambre-specs">
+            <span><i data-lucide="users" style="width:14px;height:14px;"></i> {{CHAMBRE_1_CAPACITE}}</span>
+            <span><i data-lucide="home" style="width:14px;height:14px;"></i> {{CHAMBRE_1_SURFACE}}</span>
+          </div>
+          <div class="chambre-footer">
+            <div class="chambre-price">{{CHAMBRE_1_PRIX}} <span>/ nuit</span></div>
+            <a href="#reserver" class="chambre-btn">Réserver</a>
+          </div>
+        </div>
+      </div>
+      <div class="chambre-card reveal">
+        <div class="chambre-badge">{{CHAMBRE_2_TYPE}}</div>
+        <div class="chambre-img"><img src="{{CHAMBRE_2_IMAGE}}" alt="{{CHAMBRE_2_NOM}}"></div>
+        <div class="chambre-body">
+          <div class="chambre-name">{{CHAMBRE_2_NOM}}</div>
+          <div class="chambre-specs">
+            <span><i data-lucide="users" style="width:14px;height:14px;"></i> {{CHAMBRE_2_CAPACITE}}</span>
+            <span><i data-lucide="home" style="width:14px;height:14px;"></i> {{CHAMBRE_2_SURFACE}}</span>
+          </div>
+          <div class="chambre-footer">
+            <div class="chambre-price">{{CHAMBRE_2_PRIX}} <span>/ nuit</span></div>
+            <a href="#reserver" class="chambre-btn">Réserver</a>
+          </div>
+        </div>
+      </div>
+      <div class="chambre-card reveal">
+        <div class="chambre-badge">{{CHAMBRE_3_TYPE}}</div>
+        <div class="chambre-img"><img src="{{CHAMBRE_3_IMAGE}}" alt="{{CHAMBRE_3_NOM}}"></div>
+        <div class="chambre-body">
+          <div class="chambre-name">{{CHAMBRE_3_NOM}}</div>
+          <div class="chambre-specs">
+            <span><i data-lucide="users" style="width:14px;height:14px;"></i> {{CHAMBRE_3_CAPACITE}}</span>
+            <span><i data-lucide="home" style="width:14px;height:14px;"></i> {{CHAMBRE_3_SURFACE}}</span>
+          </div>
+          <div class="chambre-footer">
+            <div class="chambre-price">{{CHAMBRE_3_PRIX}} <span>/ nuit</span></div>
+            <a href="#reserver" class="chambre-btn">Réserver</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Services & prestations</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_SERVICES}}</h2>
+      <p class="section-desc centered">{{DESC_SERVICES}}</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_1_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_1_NOM}}</div>
+        <div class="service-desc">{{SERVICE_1_DESC}}</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_2_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_2_NOM}}</div>
+        <div class="service-desc">{{SERVICE_2_DESC}}</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_3_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_3_NOM}}</div>
+        <div class="service-desc">{{SERVICE_3_DESC}}</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_4_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_4_NOM}}</div>
+        <div class="service-desc">{{SERVICE_4_DESC}}</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_5_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_5_NOM}}</div>
+        <div class="service-desc">{{SERVICE_5_DESC}}</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon"><i data-lucide="{{SERVICE_6_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="service-name">{{SERVICE_6_NOM}}</div>
+        <div class="service-desc">{{SERVICE_6_DESC}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="galerie">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Galerie</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_GALERIE}}</h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item"><img src="{{GALERIE_1}}" alt=""></div>
+      <div class="gallery-item"><img src="{{GALERIE_2}}" alt=""></div>
+      <div class="gallery-item"><img src="{{GALERIE_3}}" alt=""></div>
+      <div class="gallery-item"><img src="{{GALERIE_4}}" alt=""></div>
+      <div class="gallery-item"><img src="{{GALERIE_5}}" alt=""></div>
+    </div>
+  </div>
+</section>
+
+<!-- AVIS -->
+<section class="avis" id="avis">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Avis clients</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_AVIS}}</h2>
+    </div>
+    <div class="avis-grid">
+      <div class="avis-card reveal">
+        <div class="avis-rating">
+          <span class="avis-score">{{AVIS_1_NOTE}}</span>
+          <span class="avis-platform">{{AVIS_1_PLATEFORME}}</span>
+        </div>
+        <p class="avis-text">«&nbsp;{{AVIS_1_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_1_AUTEUR}}</div>
+        <div class="avis-date">{{AVIS_1_DATE}}</div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-rating">
+          <span class="avis-score">{{AVIS_2_NOTE}}</span>
+          <span class="avis-platform">{{AVIS_2_PLATEFORME}}</span>
+        </div>
+        <p class="avis-text">«&nbsp;{{AVIS_2_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_2_AUTEUR}}</div>
+        <div class="avis-date">{{AVIS_2_DATE}}</div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-rating">
+          <span class="avis-score">{{AVIS_3_NOTE}}</span>
+          <span class="avis-platform">{{AVIS_3_PLATEFORME}}</span>
+        </div>
+        <p class="avis-text">«&nbsp;{{AVIS_3_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_3_AUTEUR}}</div>
+        <div class="avis-date">{{AVIS_3_DATE}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="reserver">
+  <div class="section-inner">
+    <span class="section-label" style="color:var(--gold);">Réservation</span>
+    <h2 class="section-title">{{CTA_TITRE}}</h2>
+    <p class="section-desc centered">{{CTA_DESC}}</p>
+    <div class="cta-buttons">
+      <a href="tel:{{TELEPHONE_RAW}}" class="cta-btn cta-btn-primary"><i data-lucide="phone" style="width:16px;height:16px;"></i> {{TELEPHONE}}</a>
+      <a href="mailto:{{EMAIL}}" class="cta-btn cta-btn-secondary"><i data-lucide="mail" style="width:16px;height:16px;"></i> Nous écrire</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">{{NOM_HOTEL}}</div>
+    <div class="footer-stars">{{ETOILES_DISPLAY}}</div>
+    <p class="footer-desc">{{FOOTER_DESC}}</p>
+    <div class="footer-contact">
+      <a href="tel:{{TELEPHONE_RAW}}">{{TELEPHONE}}</a>
+      <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+      <a>{{ADRESSE}}</a>
+    </div>
+    <div class="footer-legal">© 2026 {{NOM_HOTEL}} — Tous droits réservés<br>Maquette réalisée par <a href="https://websual.fr" target="_blank">Websual</a></div>
+  </div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const body = document.body;
+  const btn = document.querySelector('.theme-toggle');
+  if (body.getAttribute('data-theme') === 'dark') {
+    body.removeAttribute('data-theme');
+    btn.textContent = '🌙';
+  } else {
+    body.setAttribute('data-theme', 'dark');
+    btn.textContent = '☀️';
+  }
+}
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+window.addEventListener('scroll', () => {
+  const hero = document.querySelector('.hero-bg');
+  if (hero) hero.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+});
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+
+</body>
+</html>

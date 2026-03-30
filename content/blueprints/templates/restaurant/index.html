@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_RESTAURANT}} — Restaurant {{CUISINE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: {{COLOR_PRIMARY}};
+  --primary-dark: {{COLOR_PRIMARY_DARK}};
+  --cream: {{COLOR_BG}};
+  --dark: #1a1a1a;
+  --text: #333;
+  --text-light: #777;
+  --gold: {{COLOR_ACCENT}};
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--cream); overflow-x: hidden; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&q=80') center/cover;
+  filter: brightness(0.35);
+  transform: scale(1.1);
+  transition: transform 0.5s;
+}
+.hero:hover::before { transform: scale(1.05); }
+.hero-content { position: relative; z-index: 2; color: white; padding: 2rem; }
+.hero-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.3s forwards;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.5s forwards;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: fadeUp 1s 0.7s forwards;
+}
+.hero-cta {
+  margin-top: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.9s forwards;
+}
+.hero-cta a {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background: var(--gold);
+  color: var(--dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.hero-cta a:hover { background: white; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+/* ===== NAV FIXED ===== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.5rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.4s;
+}
+.nav.scrolled {
+  background: rgba(26,26,26,0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 3rem;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+}
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+/* ===== SECTIONS ===== */
+section { padding: 8rem 2rem; }
+.container { max-width: 1200px; margin: 0 auto; }
+
+.section-label {
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+.section-desc {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-light);
+  max-width: 600px;
+}
+
+/* ===== ABOUT ===== */
+.about { background: var(--cream); }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+.about-img {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/5;
+}
+.about-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s;
+}
+.about-img:hover img { transform: scale(1.05); }
+.about-img::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 60%;
+  height: 60%;
+  border: 2px solid var(--gold);
+  z-index: -1;
+}
+
+/* ===== MENU (Section 76 style) ===== */
+.menu { background: white; text-align: center; }
+.menu .section-desc { margin: 0 auto 2.5rem; color: var(--text-light); }
+.menu-ornament {
+  width: 60px; height: 30px; margin: 0 auto 1.5rem;
+  background: none; position: relative;
+}
+.menu-ornament::before, .menu-ornament::after {
+  content: ''; position: absolute; top: 50%;
+  width: 24px; height: 1px; background: var(--gold);
+}
+.menu-ornament::before { left: 0; transform: rotate(-20deg); }
+.menu-ornament::after { right: 0; transform: rotate(20deg); }
+.menu-ornament span {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem; color: var(--gold);
+}
+
+/* Tabs */
+.menu-tabs {
+  display: flex; justify-content: center; gap: 0.5rem;
+  margin-bottom: 3rem; flex-wrap: wrap;
+}
+.menu-tab {
+  padding: 0.7rem 1.8rem;
+  border: 1.5px solid #ddd;
+  border-radius: 50px;
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.menu-tab:hover { border-color: var(--text); }
+.menu-tab.active {
+  background: var(--dark);
+  color: white;
+  border-color: var(--dark);
+}
+
+/* Grid 2 columns */
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem 4rem;
+  text-align: left;
+  max-width: 900px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) { .menu-grid { grid-template-columns: 1fr; } }
+
+/* Menu panel (tab content) */
+.menu-panel { display: none; }
+.menu-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 4rem; max-width: 900px; margin: 0 auto; }
+@media (max-width: 768px) { .menu-panel.active { grid-template-columns: 1fr; } }
+
+/* Item with dotted line to price */
+.menu-item { padding: 1.2rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.menu-item-header {
+  display: flex; align-items: baseline; gap: 0.5rem;
+}
+.menu-item-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--dark);
+  white-space: nowrap;
+}
+.menu-item-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+.menu-item-dots {
+  flex: 1;
+  border-bottom: 2px dotted rgba(0,0,0,0.15);
+  min-width: 30px;
+  margin: 0 0.5rem;
+  position: relative;
+  top: -4px;
+}
+.menu-item-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.menu-item-desc {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+.menu-item-tags {
+  display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;
+}
+.menu-item-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  color: var(--text-light);
+  background: white;
+}
+
+/* ===== GALLERY ===== */
+.gallery { background: var(--cream); text-align: center; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 300px);
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.gallery-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+.gallery-grid img:hover { filter: brightness(1.1); transform: scale(1.02); }
+.gallery-grid img:first-child { grid-row: span 2; }
+
+/* ===== TESTIMONIALS ===== */
+.testimonials { background: white; text-align: center; }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.testimonial {
+  padding: 2.5rem;
+  background: var(--cream);
+  position: relative;
+}
+.testimonial::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 5rem;
+  color: var(--gold);
+  opacity: 0.3;
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  line-height: 1;
+}
+.testimonial p {
+  font-style: italic;
+  line-height: 1.8;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.testimonial-author { font-weight: 600; font-size: 0.9rem; }
+.testimonial-stars { color: var(--gold); margin-bottom: 1rem; font-size: 1.2rem; }
+
+/* ===== RESERVATION ===== */
+.reservation {
+  background: var(--dark);
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.reservation::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80') center/cover;
+  opacity: 0.15;
+}
+.reservation .container { position: relative; z-index: 2; }
+.reservation .section-desc { margin: 0 auto 3rem; color: rgba(255,255,255,0.6); }
+.reservation-form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.reservation-form input,
+.reservation-form select {
+  padding: 1rem 1.5rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.3s;
+  outline: none;
+}
+.reservation-form input::placeholder { color: rgba(255,255,255,0.4); }
+.reservation-form select { color-scheme: dark; }
+.reservation-form select option { background: #1a1a1a; color: #f0f0f0; }
+.reservation-form input:focus,
+.reservation-form select:focus { border-color: var(--gold); }
+.reservation-form .full { grid-column: span 2; }
+.reservation-btn {
+  grid-column: span 2;
+  padding: 1.2rem;
+  background: var(--gold);
+  color: var(--dark);
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.reservation-btn:hover { background: white; transform: translateY(-2px); }
+
+/* ===== FAQ ===== */
+.faq { background: var(--cream); }
+.faq .container { max-width: 800px; }
+.faq-list { margin-top: 3rem; }
+.faq-item {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.faq-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--dark);
+  text-align: left;
+  transition: color 0.3s;
+}
+.faq-question:hover { color: var(--gold); }
+.faq-icon {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--gold);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+.faq-item.open .faq-answer { max-height: 300px; }
+.faq-answer p {
+  padding: 0 0 1.5rem;
+  line-height: 1.8;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: #111;
+  color: rgba(255,255,255,0.5);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+.footer-info { line-height: 2; font-size: 0.9rem; margin-bottom: 2rem; }
+.footer-social { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; }
+.footer-social a {
+  width: 45px;
+  height: 45px;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  transition: all 0.3s;
+  font-size: 0.8rem;
+}
+.footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+.footer-bottom { font-size: 0.8rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.footer-credit { margin-top: 0.5rem; }
+.footer-credit a { color: var(--gold); text-decoration: none; }
+
+/* ===== SCROLL ANIMATIONS ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .gallery-grid img:first-child { grid-row: auto; }
+  .nav-links { display: none; }
+  .reservation-form { grid-template-columns: 1fr; }
+  .reservation-form .full { grid-column: auto; }
+  .reservation-btn { grid-column: auto; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ===== DARK/LIGHT TOGGLE ===== */
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.theme-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,0,0,0.3); }
+.theme-toggle-icon { font-size: 1.1rem; transition: transform 0.3s; }
+.theme-toggle-label { font-size: 0.75rem; color: white; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ===== DARK MODE ===== */
+html.dark-mode { --cream: #1a1a1a; --dark: #f5f5f5; --text: #e0e0e0; --text-light: #999; }
+html.dark-mode body { background: #111; color: #e0e0e0; }
+html.dark-mode .about { background: #1a1a1a; }
+html.dark-mode .menu { background: #151515; }
+html.dark-mode .menu-tab { border-color: #333; color: #ccc; }
+html.dark-mode .menu-tab:hover { border-color: #666; }
+html.dark-mode .menu-tab.active { background: var(--gold); color: #111; border-color: var(--gold); }
+html.dark-mode .menu-item { border-bottom-color: rgba(255,255,255,0.08); }
+html.dark-mode .menu-item-name { color: #f0f0f0; }
+html.dark-mode .menu-item-dots { border-bottom-color: rgba(255,255,255,0.15); }
+html.dark-mode .menu-item-tag { background: #222; border-color: #333; color: #999; }
+html.dark-mode .gallery { background: #1a1a1a; }
+html.dark-mode .testimonials { background: #111; }
+html.dark-mode .testimonial { background: #1a1a1a; }
+html.dark-mode .testimonial p { color: #999; }
+html.dark-mode .testimonial-author { color: #e0e0e0; }
+html.dark-mode .faq { background: #1a1a1a; }
+html.dark-mode .faq-question { color: #e0e0e0; }
+html.dark-mode .faq-item { border-bottom-color: rgba(255,255,255,0.08); }
+html.dark-mode .faq-answer p { color: #999; }
+html.dark-mode footer { background: #0a0a0a; }
+html.dark-mode .section-title { color: #f0f0f0; }
+html.dark-mode .about-img::after { border-color: var(--gold); }
+html.dark-mode .theme-toggle { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+html.dark-mode .theme-toggle-label { color: #111; }
+html.dark-mode .nav.scrolled { background: rgba(17,17,17,0.95); }
+html.dark-mode .reservation::before { opacity: 0.08; }
+html.dark-mode .reservation { background: #111; }
+html.dark-mode .reservation .section-title { color: #f0f0f0; }
+html.dark-mode .reservation .section-desc { color: rgba(255,255,255,0.6); }
+html.dark-mode .reservation-form input,
+html.dark-mode .reservation-form select {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.2);
+  color: #f0f0f0;
+}
+html.dark-mode .reservation-form input::placeholder { color: rgba(255,255,255,0.4); }
+html.dark-mode .reservation-form select { color-scheme: dark; }
+html.dark-mode .reservation-form select option { background: #1a1a1a; color: #f0f0f0; }
+
+</style>
+</head>
+<body>
+
+<!-- THEME TOGGLE -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Basculer mode sombre / clair">
+  <span class="theme-toggle-icon">🌙</span>
+  <span class="theme-toggle-label">Dark</span>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">{{NOM_RESTAURANT}}</a>
+  <ul class="nav-links">
+    <li><a href="#about">Notre Histoire</a></li>
+    <li><a href="#menu">La Carte</a></li>
+    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#avis">Avis</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#reservation">Réserver</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">{{CUISINE}} — {{VILLE}}</div>
+    <h1>{{NOM_RESTAURANT}}</h1>
+    <p class="hero-sub">{{SLOGAN}}</p>
+    <div class="hero-cta">
+      <a href="#reservation">Réserver une table</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img reveal">
+        <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80" alt="Chef" loading="lazy">
+      </div>
+      <div class="reveal">
+        <p class="section-label">Notre Histoire</p>
+        <h2 class="section-title">{{ACCROCHE_HISTOIRE}}</h2>
+        <p class="section-desc">{{TEXTE_HISTOIRE}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu" id="menu">
+  <div class="container">
+    <div class="menu-ornament reveal"><span><i data-lucide="star"></i></span></div>
+    <h2 class="section-title reveal" style="font-size: clamp(2.5rem, 5vw, 3.5rem);">Notre Carte</h2>
+    <p class="section-desc reveal">{{CUISINE}} — {{VILLE}}</p>
+
+    <div class="menu-tabs reveal">
+      <button class="menu-tab active" onclick="showMenuTab('entrees')">Entrées</button>
+      <button class="menu-tab" onclick="showMenuTab('plats')">Plats</button>
+      <button class="menu-tab" onclick="showMenuTab('desserts')">Desserts</button>
+    </div>
+
+    <!-- ENTRÉES -->
+    <div class="menu-panel active reveal" id="tab-entrees">
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{ENTREE_1_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{ENTREE_1_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{ENTREE_1_DESC}}</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{ENTREE_2_NOM}}</span>
+          <span class="menu-item-badge">Best-seller</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{ENTREE_2_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{ENTREE_2_DESC}}</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{ENTREE_3_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{ENTREE_3_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{ENTREE_3_DESC}}</div>
+      </div>
+    </div>
+
+    <!-- PLATS -->
+    <div class="menu-panel reveal" id="tab-plats">
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{PLAT_1_NOM}}</span>
+          <span class="menu-item-badge">Best-seller</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{PLAT_1_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{PLAT_1_DESC}}</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{PLAT_2_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{PLAT_2_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{PLAT_2_DESC}}</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{PLAT_3_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{PLAT_3_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{PLAT_3_DESC}}</div>
+      </div>
+    </div>
+
+    <!-- DESSERTS -->
+    <div class="menu-panel reveal" id="tab-desserts">
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{DESSERT_1_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{DESSERT_1_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{DESSERT_1_DESC}}</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-header">
+          <span class="menu-item-name">{{DESSERT_2_NOM}}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">{{DESSERT_2_PRIX}}</span>
+        </div>
+        <div class="menu-item-desc">{{DESSERT_2_DESC}}</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="galerie">
+  <div class="container">
+    <p class="section-label reveal">Galerie</p>
+    <h2 class="section-title reveal">L'Ambiance</h2>
+    <div class="gallery-grid reveal">
+      <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80" alt="Intérieur" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&q=80" alt="Plat signature" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600&q=80" alt="Bar" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" alt="Plat" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=600&q=80" alt="Terrasse" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="avis">
+  <div class="container">
+    <p class="section-label reveal">Avis Clients</p>
+    <h2 class="section-title reveal">Ce qu'ils en disent</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>{{AVIS_1_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_1_AUTEUR}}</div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>{{AVIS_2_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_2_AUTEUR}}</div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>{{AVIS_3_TEXTE}}</p>
+        <div class="testimonial-author">{{AVIS_3_AUTEUR}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="reservation" id="reservation">
+  <div class="container">
+    <p class="section-label reveal">Réservation</p>
+    <h2 class="section-title reveal">Votre Table vous Attend</h2>
+    <p class="section-desc reveal">Réservez en ligne ou appelez-nous au {{TELEPHONE}}</p>
+    <form class="reservation-form reveal" onsubmit="event.preventDefault(); alert('Merci ! Votre réservation a été envoyée.');">
+      <input type="text" placeholder="Nom" required>
+      <input type="email" placeholder="Email" required>
+      <input type="date" required>
+      <select>
+        <option>Nombre de convives</option>
+        <option>2 personnes</option>
+        <option>3 personnes</option>
+        <option>4 personnes</option>
+        <option>5+ personnes</option>
+      </select>
+      <input type="text" placeholder="Demandes spéciales (allergies, occasion...)" class="full">
+      <button type="submit" class="reservation-btn">Réserver</button>
+    </form>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <p class="section-label reveal">Questions Fréquentes</p>
+    <h2 class="section-title reveal">Tout savoir avant votre venue</h2>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{FAQ_1_Q}}
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer"><p>{{FAQ_1_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{FAQ_2_Q}}
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer"><p>{{FAQ_2_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{FAQ_3_Q}}
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer"><p>{{FAQ_3_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{FAQ_4_Q}}
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer"><p>{{FAQ_4_A}}</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{FAQ_5_Q}}
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer"><p>{{FAQ_5_A}}</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">{{NOM_RESTAURANT}}</div>
+    <div class="footer-info">
+      {{ADRESSE}}<br>
+      {{TELEPHONE}}<br>
+      {{HORAIRES}}
+    </div>
+    <div class="footer-social">
+      <a href="#">FB</a>
+      <a href="#">IG</a>
+      <a href="#">TK</a>
+    </div>
+    <div class="footer-bottom">
+      © 2026 {{NOM_RESTAURANT}} — Tous droits réservés
+      <div class="footer-credit">Site réalisé par <a href="https://websual.fr" target="_blank">Websual</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 80);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Theme toggle
+function toggleTheme() {
+  const html = document.documentElement;
+  const toggle = document.querySelector('.theme-toggle');
+  html.classList.toggle('dark-mode');
+  const isDark = html.classList.contains('dark-mode');
+  toggle.querySelector('.theme-toggle-icon').textContent = isDark ? '☀️' : '🌙';
+  toggle.querySelector('.theme-toggle-label').textContent = isDark ? 'Light' : 'Dark';
+}
+
+// Menu tabs
+function showMenuTab(tab) {
+  document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Smooth parallax on hero
+window.addEventListener('scroll', () => {
+  const hero = document.querySelector('.hero::before');
+  const scroll = window.scrollY;
+  document.querySelector('.hero').style.setProperty('--scroll', scroll * 0.5 + 'px');
+});
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+</body>
+</html>

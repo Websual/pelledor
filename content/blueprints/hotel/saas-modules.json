@@ -1,0 +1,9 @@
+{
+  "modules": [
+    "notes",
+    "stripe",
+    "directory",
+    "lodging",
+    "notifications"
+  ]
+}

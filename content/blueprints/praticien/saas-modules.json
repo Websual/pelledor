@@ -1,0 +1,12 @@
+{
+  "modules": [
+    "notes",
+    "stripe",
+    "directory",
+    "booking",
+    "billing",
+    "anamnese",
+    "notifications",
+    "chat"
+  ]
+}

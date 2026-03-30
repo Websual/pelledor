@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_BOUTIQUE}} — {{SPECIALITE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: {{COLOR_PRIMARY}};
+  --primary-dark: {{COLOR_PRIMARY_DARK}};
+  --bg: #f9f9f7;
+  --dark: #111;
+  --text: #333;
+  --text-light: #666;
+  --border: rgba(0,0,0,0.08);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; color: var(--text); background: #fff; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 64px;
+  background: #fff; border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-size: 20px; font-weight: 800; color: var(--dark); letter-spacing: -0.03em; }
+.nav-links { display: flex; align-items: center; gap: 24px; }
+.nav-links a { font-size: 14px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+.nav-links a:hover { color: var(--dark); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; border-radius: 8px;
+  background: var(--primary); color: #fff;
+  font-size: 14px; font-weight: 600;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--primary-dark); }
+
+/* HERO */
+.hero {
+  padding: 80px 32px 72px;
+  text-align: center;
+  background: var(--bg);
+}
+.hero-badge {
+  display: inline-block; padding: 5px 14px; border-radius: 100px;
+  background: #fff; border: 1px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--text-light);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(32px, 6vw, 64px); font-weight: 800;
+  color: var(--dark); line-height: 1.1; letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+.hero h1 span { color: var(--primary); }
+.hero p {
+  font-size: clamp(15px, 2vw, 18px); color: var(--text-light);
+  max-width: 520px; margin: 0 auto 32px; line-height: 1.6;
+}
+.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 10px;
+  background: var(--primary); color: #fff;
+  font-size: 15px; font-weight: 600;
+  transition: background 0.2s; cursor: pointer;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 10px;
+  background: #fff; color: var(--dark);
+  border: 1px solid var(--border);
+  font-size: 15px; font-weight: 600;
+  transition: border-color 0.2s; cursor: pointer;
+}
+.btn-secondary:hover { border-color: rgba(0,0,0,0.18); }
+
+/* FEATURES */
+.features {
+  padding: 80px 32px;
+  max-width: 1100px; margin: 0 auto;
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;
+  margin-top: 48px;
+}
+.feature-card {
+  padding: 28px; border-radius: 14px;
+  border: 1px solid var(--border); background: #fff;
+}
+.feature-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 16px;
+}
+.feature-card h3 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.feature-card p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+
+/* CATEGORIES */
+.categories {
+  padding: 80px 32px;
+  background: var(--bg);
+}
+.categories-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(24px, 4vw, 40px); font-weight: 800;
+  color: var(--dark); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px;
+}
+.section-subtitle {
+  font-size: 16px; color: var(--text-light); max-width: 500px; line-height: 1.5;
+}
+.cats-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
+  margin-top: 40px;
+}
+.cat-card {
+  padding: 22px; border-radius: 14px;
+  background: #fff; border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s;
+}
+.cat-card:hover { border-color: var(--primary); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.cat-card .cat-icon { font-size: 28px; }
+.cat-card h4 { font-size: 15px; font-weight: 700; color: var(--dark); }
+.cat-card span { font-size: 13px; color: var(--text-light); }
+
+/* REASSURANCE */
+.reassurance {
+  padding: 80px 32px;
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px;
+  text-align: center;
+}
+.reassurance-item { }
+.reassurance-item .icon { font-size: 32px; margin-bottom: 12px; }
+.reassurance-item h4 { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.reassurance-item p { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+
+/* CTA BANNER */
+.cta-banner {
+  margin: 0 32px 80px;
+  padding: 48px 40px;
+  border-radius: 20px;
+  background: var(--primary);
+  color: #fff;
+  text-align: center;
+}
+.cta-banner h2 { font-size: clamp(22px, 4vw, 36px); font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+.cta-banner p { font-size: 16px; opacity: 0.85; margin-bottom: 28px; max-width: 500px; margin-left: auto; margin-right: auto; }
+.cta-banner .btn-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 10px;
+  background: #fff; color: var(--primary);
+  font-size: 15px; font-weight: 700;
+  transition: opacity 0.2s;
+}
+.cta-banner .btn-white:hover { opacity: 0.9; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px; text-align: center;
+  font-size: 13px; color: var(--text-light);
+  display: flex; align-items: center; justify-content: center; gap: 24px;
+  flex-wrap: wrap;
+}
+footer a { color: var(--text-light); transition: color 0.2s; }
+footer a:hover { color: var(--dark); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">{{NOM_BOUTIQUE}}</a>
+  <div class="nav-links">
+    <a href="/boutique">Catalogue</a>
+    <a href="/boutique#categories">Catégories</a>
+    <a href="/boutique/panier">Panier</a>
+    <a href="/login" class="nav-cta">Mon compte →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">{{SPECIALITE}}</div>
+    <h1>{{ACCROCHE_H1}}<br /><span>{{NOM_BOUTIQUE}}</span></h1>
+    <p>{{DESCRIPTION}}</p>
+    <div class="hero-actions">
+      <a href="/boutique" class="btn-primary">Voir le catalogue →</a>
+      <a href="/boutique#categories" class="btn-secondary">Explorer les catégories</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">Pourquoi nous choisir</div>
+  <div class="section-title">Simple. Rapide. Fiable.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <h3>Livraison rapide</h3>
+      <p>Commande expédiée sous 24–48h. Suivi en temps réel inclus.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Paiement sécurisé</h3>
+      <p>Transactions sécurisées par Stripe. Vos données sont protégées.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3>Retours faciles</h3>
+      <p>{{POLITIQUE_RETOURS}}</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <h3>Support client</h3>
+      <p>Une question ? Notre équipe répond sous 24h par email ou téléphone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories" id="categories">
+  <div class="categories-inner">
+    <div class="section-label">Notre sélection</div>
+    <div class="section-title">Explorez nos catégories</div>
+    <p class="section-subtitle">Des produits soigneusement sélectionnés pour répondre à vos besoins.</p>
+    <div class="cats-grid">
+      <a href="/boutique?categorie={{CAT1_SLUG}}" class="cat-card">
+        <span class="cat-icon">{{CAT1_ICON}}</span>
+        <h4>{{CAT1_NOM}}</h4>
+        <span>Voir les produits →</span>
+      </a>
+      <a href="/boutique?categorie={{CAT2_SLUG}}" class="cat-card">
+        <span class="cat-icon">{{CAT2_ICON}}</span>
+        <h4>{{CAT2_NOM}}</h4>
+        <span>Voir les produits →</span>
+      </a>
+      <a href="/boutique?categorie={{CAT3_SLUG}}" class="cat-card">
+        <span class="cat-icon">{{CAT3_ICON}}</span>
+        <h4>{{CAT3_NOM}}</h4>
+        <span>Voir les produits →</span>
+      </a>
+      <a href="/boutique" class="cat-card">
+        <span class="cat-icon">🛍️</span>
+        <h4>Tout voir</h4>
+        <span>Catalogue complet →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- REASSURANCE -->
+<div class="reassurance">
+  <div class="reassurance-item">
+    <div class="icon">📦</div>
+    <h4>Livraison gratuite</h4>
+    <p>À partir de {{LIVRAISON_GRATUITE_SEUIL}}€ d'achat</p>
+  </div>
+  <div class="reassurance-item">
+    <div class="icon">⭐</div>
+    <h4>Qualité garantie</h4>
+    <p>Chaque produit est soigneusement contrôlé</p>
+  </div>
+  <div class="reassurance-item">
+    <div class="icon">🛡️</div>
+    <h4>Satisfaction garantie</h4>
+    <p>{{POLITIQUE_RETOURS}}</p>
+  </div>
+  <div class="reassurance-item">
+    <div class="icon">📞</div>
+    <h4>Contact direct</h4>
+    <p>{{TELEPHONE}}</p>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <h2>Découvrez notre catalogue complet</h2>
+  <p>{{NB_PRODUITS}} produits disponibles. Paiement sécurisé, livraison rapide.</p>
+  <a href="/boutique" class="btn-white">Voir tous les produits →</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© {{ANNEE}} {{NOM_BOUTIQUE}}</span>
+  <a href="/boutique">Catalogue</a>
+  <a href="/boutique/panier">Panier</a>
+  <a href="/mentions-legales">Mentions légales</a>
+  <a href="/login">Mon compte</a>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const year = new Date().getFullYear();
+  document.querySelectorAll('.footer-year').forEach(el => el.textContent = year);
+});
+</script>
+</body>
+</html>

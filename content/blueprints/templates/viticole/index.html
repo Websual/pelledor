@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NOM_DOMAINE}} — {{APPELLATION}} | {{VILLE}}</title>
+<meta name="description" content="{{NOM_DOMAINE}}, {{APPELLATION}}. {{ACCROCHE_META}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="/lucide.min.js"></script>
+<style>
+:root {
+  --accent: {{COLOR_ACCENT}};
+  --accent-dark: {{COLOR_ACCENT_DARK}};
+  --wine: #722F37;
+  --gold: #C4A265;
+  --cream: {{COLOR_BG}};
+  --dark: #1E1A16;
+  --text: #1E1A16;
+  --text-light: #6B6358;
+  --card-bg: #fff;
+  --border: rgba(30,26,22,0.08);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
+}
+[data-theme="dark"] {
+  --cream: #151210;
+  --dark: #F0EAE0;
+  --text: #E0D8CC;
+  --text-light: #958A7C;
+  --card-bg: #1E1A16;
+  --border: rgba(240,234,224,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); color: var(--text); background: var(--cream); overflow-x: hidden; transition: background 0.5s, color 0.5s; }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 3rem; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+  transition: background 0.5s;
+}
+[data-theme="dark"] .nav { background: rgba(21,18,16,0.92); }
+.nav-logo { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { font-size: 0.8rem; font-weight: 500; color: var(--text-light); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.nav-cta {
+  padding: 0.7rem 1.8rem; background: var(--accent); color: #fff !important;
+  font-size: 0.8rem; font-weight: 600; border-radius: 2px;
+  letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.3s;
+}
+.nav-cta:hover { background: var(--accent-dark); }
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: all 0.3s;
+}
+
+/* HERO */
+.hero {
+  position: relative; height: 100vh; min-height: 700px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.hero-bg { position: absolute; inset: 0; background: url('{{HERO_IMAGE}}') center/cover no-repeat; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(30,26,22,0.15) 0%, rgba(30,26,22,0.6) 100%); }
+.hero-content { position: relative; z-index: 2; text-align: center; color: white; max-width: 800px; padding: 0 2rem; }
+.hero-badge {
+  display: inline-block; padding: 0.4rem 1.5rem; border: 1px solid rgba(255,255,255,0.35);
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.hero h1 { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 500; line-height: 1.1; margin-bottom: 1rem; }
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero p { font-size: 1.05rem; font-weight: 300; line-height: 1.8; max-width: 580px; margin: 0 auto 2.5rem; opacity: 0.9; }
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.hero-btn {
+  padding: 0.9rem 2.2rem; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.3s;
+}
+.hero-btn-primary { background: var(--accent); color: white; }
+.hero-btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+.hero-btn-secondary { border: 2px solid rgba(255,255,255,0.4); color: white; background: transparent; }
+.hero-btn-secondary:hover { border-color: white; }
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  color: white; opacity: 0.5; font-size: 0.7rem; letter-spacing: 0.15em;
+  text-transform: uppercase; animation: bounce 2s infinite;
+}
+@keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+/* SECTIONS */
+section { padding: 6rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+.section-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 500; line-height: 1.15; margin-bottom: 1rem; }
+.section-desc { font-size: 1rem; color: var(--text-light); line-height: 1.8; max-width: 600px; }
+.section-desc.centered { margin: 0 auto; text-align: center; }
+
+/* HISTOIRE */
+.histoire { background: var(--cream); }
+.histoire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.histoire-img { border-radius: 4px; overflow: hidden; aspect-ratio: 4/5; }
+.histoire-img img { width: 100%; height: 100%; object-fit: cover; }
+.histoire-text blockquote {
+  font-family: var(--serif); font-size: 1.3rem; font-style: italic; line-height: 1.6;
+  margin-top: 1.5rem; padding-left: 1.5rem; border-left: 3px solid var(--accent);
+}
+
+/* VINS */
+.vins { background: var(--card-bg); transition: background 0.5s; }
+.vins-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+.vin-card {
+  text-align: center; padding: 2.5rem 1.5rem; background: var(--cream);
+  border-radius: 6px; transition: all 0.4s;
+}
+.vin-card:hover { transform: translateY(-8px); box-shadow: 0 25px 60px rgba(30,26,22,0.1); }
+.vin-img { width: 100px; height: 280px; margin: 0 auto 1.5rem; object-fit: contain; }
+.vin-type { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+.vin-name { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; margin-bottom: 0.5rem; }
+.vin-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.7; margin-bottom: 1rem; }
+.vin-price { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--accent); }
+
+/* TERROIR — full-width */
+.terroir {
+  position: relative; min-height: 500px; display: flex; align-items: center;
+  background: url('{{IMAGE_TERROIR}}') center/cover no-repeat;
+}
+.terroir::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(30,26,22,0.85) 0%, rgba(30,26,22,0.3) 100%); }
+.terroir .section-inner { position: relative; z-index: 2; color: white; max-width: 600px; }
+.terroir .section-label { color: var(--gold); }
+.terroir .section-title { color: white; }
+.terroir .section-desc { color: rgba(255,255,255,0.85); }
+.terroir-details { list-style: none; margin-top: 2rem; }
+.terroir-details li { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0; font-size: 1rem; color: rgba(255,255,255,0.9); }
+/* Pseudo-element removed - using Lucide icons instead */
+
+/* VISITE / DEGUSTATION */
+.visite { background: var(--cream); }
+.visite-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+.visite-card {
+  padding: 2rem; background: var(--card-bg); border-radius: 6px;
+  border: 1px solid var(--border); transition: all 0.3s; text-align: center;
+}
+.visite-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(30,26,22,0.06); border-color: var(--accent); }
+.visite-icon { margin-bottom: 1rem; color: var(--accent); } .visite-icon i { width: 32px; height: 32px; }
+.visite-name { font-family: var(--serif); font-size: 1.2rem; font-weight: 500; margin-bottom: 0.5rem; }
+.visite-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.7; margin-bottom: 1rem; }
+.visite-info { font-size: 0.8rem; font-weight: 600; color: var(--accent); }
+
+/* AVIS */
+.avis { background: var(--card-bg); transition: background 0.5s; }
+.avis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+.avis-card { padding: 2rem; background: var(--cream); border-radius: 6px; transition: all 0.3s; }
+.avis-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(30,26,22,0.08); }
+.avis-stars { color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem; }
+.avis-text { font-size: 0.9rem; line-height: 1.7; font-style: italic; margin-bottom: 1rem; }
+.avis-author { font-weight: 600; font-size: 0.85rem; }
+.avis-source { font-size: 0.75rem; color: var(--text-light); }
+
+/* BOUTIQUE CTA */
+.boutique {
+  padding: 6rem 2rem; text-align: center;
+  background: var(--accent); color: white;
+}
+.boutique .section-title { color: white; }
+.boutique .section-desc { color: rgba(255,255,255,0.85); margin: 0 auto; }
+.boutique-buttons { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+.boutique-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2.5rem; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.3s;
+}
+.boutique-btn-primary { background: white; color: var(--accent); }
+.boutique-btn-primary:hover { background: var(--cream); transform: translateY(-2px); }
+.boutique-btn-secondary { border: 2px solid rgba(255,255,255,0.4); color: white; background: transparent; }
+.boutique-btn-secondary:hover { border-color: white; }
+
+/* FOOTER */
+footer { padding: 3rem 2rem; background: var(--dark); text-align: center; transition: background 0.5s; }
+[data-theme="dark"] footer { background: #0A0908; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-name { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; color: white; }
+.footer-appellation { font-size: 0.8rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.3rem; }
+.footer-desc { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 1rem auto; max-width: 400px; }
+.footer-contact { margin: 1.5rem 0; }
+.footer-contact a { display: inline-block; margin: 0 1rem; color: rgba(255,255,255,0.6); font-size: 0.85rem; transition: color 0.3s; }
+.footer-contact a:hover { color: var(--gold); }
+.footer-legal { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+.footer-legal a { color: var(--gold); }
+.footer-abus { display: block; margin-top: 0.8rem; font-size: 0.65rem; color: rgba(255,255,255,0.25); font-style: italic; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  section { padding: 4rem 1.5rem; }
+  .histoire-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .vins-grid, .visite-grid, .avis-grid { grid-template-columns: 1fr; }
+}
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-logo">{{NOM_DOMAINE_COURT}}<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#histoire">Histoire</a></li>
+    <li><a href="#vins">Nos vins</a></li>
+    <li><a href="#terroir">Terroir</a></li>
+    <li><a href="#visite">Visites</a></li>
+    <li><a href="#avis">Avis</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Thème">🌙</button>
+    <a href="#boutique" class="nav-cta">Commander</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">{{APPELLATION}}</div>
+    <h1>{{TITRE_HERO}}</h1>
+    <p>{{SOUS_TITRE_HERO}}</p>
+    <div class="hero-buttons">
+      <a href="#vins" class="hero-btn hero-btn-primary">Découvrir nos vins</a>
+      <a href="#visite" class="hero-btn hero-btn-secondary">Réserver une visite</a>
+    </div>
+  </div>
+  <div class="scroll-hint">Découvrir ↓</div>
+</section>
+
+<section class="histoire" id="histoire">
+  <div class="section-inner">
+    <div class="histoire-grid reveal">
+      <div class="histoire-img"><img src="{{IMAGE_HISTOIRE}}" alt="{{NOM_DOMAINE}}"></div>
+      <div class="histoire-text">
+        <span class="section-label">Notre histoire</span>
+        <h2 class="section-title">{{TITRE_HISTOIRE}}</h2>
+        <p class="section-desc">{{DESC_HISTOIRE}}</p>
+        <blockquote>{{CITATION}}</blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="vins" id="vins">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Nos vins</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_VINS}}</h2>
+      <p class="section-desc centered">{{DESC_VINS}}</p>
+    </div>
+    <div class="vins-grid">
+      <div class="vin-card reveal">
+        <img class="vin-img" src="{{VIN_1_IMAGE}}" alt="{{VIN_1_NOM}}">
+        <div class="vin-type">{{VIN_1_TYPE}}</div>
+        <div class="vin-name">{{VIN_1_NOM}}</div>
+        <div class="vin-desc">{{VIN_1_DESC}}</div>
+        <div class="vin-price">{{VIN_1_PRIX}}</div>
+      </div>
+      <div class="vin-card reveal">
+        <img class="vin-img" src="{{VIN_2_IMAGE}}" alt="{{VIN_2_NOM}}">
+        <div class="vin-type">{{VIN_2_TYPE}}</div>
+        <div class="vin-name">{{VIN_2_NOM}}</div>
+        <div class="vin-desc">{{VIN_2_DESC}}</div>
+        <div class="vin-price">{{VIN_2_PRIX}}</div>
+      </div>
+      <div class="vin-card reveal">
+        <img class="vin-img" src="{{VIN_3_IMAGE}}" alt="{{VIN_3_NOM}}">
+        <div class="vin-type">{{VIN_3_TYPE}}</div>
+        <div class="vin-name">{{VIN_3_NOM}}</div>
+        <div class="vin-desc">{{VIN_3_DESC}}</div>
+        <div class="vin-price">{{VIN_3_PRIX}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="terroir" id="terroir">
+  <div class="section-inner">
+    <span class="section-label">Le terroir</span>
+    <h2 class="section-title">{{TITRE_TERROIR}}</h2>
+    <p class="section-desc">{{DESC_TERROIR}}</p>
+    <ul class="terroir-details">
+      <li><i data-lucide="star" style="width:16px;height:16px;color:var(--gold);"></i> {{TERROIR_1}}</li>
+      <li><i data-lucide="star" style="width:16px;height:16px;color:var(--gold);"></i> {{TERROIR_2}}</li>
+      <li><i data-lucide="star" style="width:16px;height:16px;color:var(--gold);"></i> {{TERROIR_3}}</li>
+      <li><i data-lucide="star" style="width:16px;height:16px;color:var(--gold);"></i> {{TERROIR_4}}</li>
+    </ul>
+  </div>
+</section>
+
+<section class="visite" id="visite">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Visites & dégustations</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_VISITE}}</h2>
+      <p class="section-desc centered">{{DESC_VISITE}}</p>
+    </div>
+    <div class="visite-grid">
+      <div class="visite-card reveal">
+        <div class="visite-icon"><i data-lucide="{{VISITE_1_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="visite-name">{{VISITE_1_NOM}}</div>
+        <div class="visite-desc">{{VISITE_1_DESC}}</div>
+        <div class="visite-info">{{VISITE_1_INFO}}</div>
+      </div>
+      <div class="visite-card reveal">
+        <div class="visite-icon"><i data-lucide="{{VISITE_2_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="visite-name">{{VISITE_2_NOM}}</div>
+        <div class="visite-desc">{{VISITE_2_DESC}}</div>
+        <div class="visite-info">{{VISITE_2_INFO}}</div>
+      </div>
+      <div class="visite-card reveal">
+        <div class="visite-icon"><i data-lucide="{{VISITE_3_LUCIDE}}" style="width:24px;height:24px;"></i></div>
+        <div class="visite-name">{{VISITE_3_NOM}}</div>
+        <div class="visite-desc">{{VISITE_3_DESC}}</div>
+        <div class="visite-info">{{VISITE_3_INFO}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="avis" id="avis">
+  <div class="section-inner">
+    <div style="text-align:center;" class="reveal">
+      <span class="section-label">Témoignages</span>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 0.5rem;">{{TITRE_AVIS}}</h2>
+    </div>
+    <div class="avis-grid">
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">«&nbsp;{{AVIS_1_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_1_AUTEUR}}</div>
+        <div class="avis-source">{{AVIS_1_SOURCE}}</div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">«&nbsp;{{AVIS_2_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_2_AUTEUR}}</div>
+        <div class="avis-source">{{AVIS_2_SOURCE}}</div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">«&nbsp;{{AVIS_3_TEXTE}}&nbsp;»</p>
+        <div class="avis-author">{{AVIS_3_AUTEUR}}</div>
+        <div class="avis-source">{{AVIS_3_SOURCE}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="boutique" id="boutique">
+  <div class="section-inner">
+    <span class="section-label" style="color:var(--gold);">Boutique</span>
+    <h2 class="section-title">{{CTA_TITRE}}</h2>
+    <p class="section-desc centered">{{CTA_DESC}}</p>
+    <div class="boutique-buttons">
+      <a href="tel:{{TELEPHONE_RAW}}" class="boutique-btn boutique-btn-primary"><i data-lucide="phone" style="width:16px;height:16px;"></i> {{TELEPHONE}}</a>
+      <a href="mailto:{{EMAIL}}" class="boutique-btn boutique-btn-secondary"><i data-lucide="mail" style="width:16px;height:16px;"></i> Commander par email</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-name">{{NOM_DOMAINE}}</div>
+    <div class="footer-appellation">{{APPELLATION}}</div>
+    <p class="footer-desc">{{FOOTER_DESC}}</p>
+    <div class="footer-contact">
+      <a href="tel:{{TELEPHONE_RAW}}">{{TELEPHONE}}</a>
+      <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+      <a>{{ADRESSE}}</a>
+    </div>
+    <div class="footer-legal">
+      © 2026 {{NOM_DOMAINE}} — Tous droits réservés<br>
+      Maquette réalisée par <a href="https://websual.fr" target="_blank">Websual</a>
+      <span class="footer-abus">L'abus d'alcool est dangereux pour la santé. À consommer avec modération.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const b = document.body, t = document.querySelector('.theme-toggle');
+  if (b.getAttribute('data-theme')==='dark') { b.removeAttribute('data-theme'); t.textContent='🌙'; }
+  else { b.setAttribute('data-theme','dark'); t.textContent='☀️'; }
+}
+const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+window.addEventListener('scroll', () => { const h=document.querySelector('.hero-bg'); if(h) h.style.transform=`translateY(${window.scrollY*0.3}px)`; });
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{
+  "id": "artisan",
+  "label": "Artisan (BTP, dépannage, services)",
+  "summary": "Vitrine + profil entreprise, prestations, planning interventions, devis/factures, encaissements.",
+  "business": {
+    "needs": [
+      {
+        "need": "Identité & zone d’intervention",
+        "admin": "Fiche entreprise (équivalent praticien), ville, bio",
+        "modules": ["directory"]
+      },
+      {
+        "need": "Catalogue prestations (durée, tarif)",
+        "admin": "Prestations / forfaits",
+        "modules": ["directory", "booking"]
+      },
+      {
+        "need": "Agenda & demandes clients",
+        "admin": "Liste RDV, statuts, créneaux",
+        "modules": ["booking"]
+      },
+      {
+        "need": "Demandes de devis (web)",
+        "admin": "Liste demandes, statut, facture brouillon",
+        "modules": ["artisan-quotes", "billing"]
+      },
+      {
+        "need": "Facturation & suivi",
+        "admin": "Factures, statuts payé / envoyé",
+        "modules": ["billing"]
+      },
+      {
+        "need": "Paiement en ligne (acompte, solde)",
+        "admin": "Clés Stripe chiffrées + liens de paiement",
+        "modules": ["stripe"]
+      },
+      {
+        "need": "Site vitrine one-page",
+        "admin": "Blueprint + textes / couleurs",
+        "modules": []
+      },
+      {
+        "need": "Rappels / file client",
+        "admin": "Notifications (optionnel)",
+        "modules": ["notifications"]
+      }
+    ],
+    "modulesOn": [
+      "notes",
+      "stripe",
+      "directory",
+      "booking",
+      "billing",
+      "artisan-quotes",
+      "notifications"
+    ],
+    "modulesOff": ["events", "blog", "gift-cards", "chat"]
+  },
+  "frontendTemplate": "artisan"
+}

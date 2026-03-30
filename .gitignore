@@ -1,0 +1,46 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# build
+/.next/
+/out/
+build
+dist
+
+# env
+.env
+.env.local
+.env.*.local
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+
+# IDE
+.idea
+.vscode
+
+# drizzle (retirer cette ligne si vous versionnez les migrations pour open source)
+# drizzle/*.sql
+
+# Snapshot vendeur / legacy optionnel — non versionné (déplacer le dossier local ici si besoin)
+import/legacy-saas/_vendor_snapshot/
+
+# OS
+.DS_Store
+
+# env files (local secrets)
+.env*.local
+.env.local
+.env.test
+
+# build output
+/.next
+/out
+
+# misc
+.DS_Store
+*.log

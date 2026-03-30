@@ -1,0 +1,546 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { MapPin, Star, Verified, ChevronLeft, ChevronRight, Clock, Euro, Phone, Globe, Languages as LanguagesIcon } from "lucide-react";
+import { FavoriteButton } from "@/components/favorite-button";
+import { PractitionersMap } from "@/components/practitioners-map";
+import { SimpleAvailability } from "@/components/simple-availability";
+import { SearchFilters } from "@/components/search-filters";
+import Image from "next/image";
+
+interface Practitioner {
+  id: string;
+  slug: string;
+  title: string;
+  bio: string;
+  address: string | null;
+  locationCity: string;
+  ratingAvg: number;
+  isVerified: boolean;
+  photoUrl: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  distance?: number;
+  phone?: string | null;
+  website?: string | null;
+  languages?: string[];
+  paymentMethods?: string[];
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+  services: Array<{
+    id: string;
+    name: string;
+    priceCents: number;
+    durationMin: number;
+  }>;
+  _count: {
+    reviews: number;
+  };
+}
+
+function SearchPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // États stables (pas dérivés de l'URL)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [professions, setProfessions] = useState<Array<{ id: string; name: string; slug: string }>>([]);
+  const [selectedPractitionerId, setSelectedPractitionerId] = useState<string | undefined>();
+  const [mapBounds, setMapBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null);
+
+  // Valeurs dérivées de l'URL uniquement (pas d'état local)
+  const searchQuery = searchParams.get("q") || "";
+  const searchCity = searchParams.get("city") || "";
+  const professionId = searchParams.get("professionId") || "";
+  const subjectId = searchParams.get("subjectId") || "";
+  const minRating = searchParams.get("minRating") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const sortBy = (searchParams.get("sortBy") as "rating" | "price" | "distance") || "rating";
+
+  // Fonction debounced pour la recherche dans les bounds (500ms)
+  const debouncedSearchInBounds = useCallback(
+    debounce((bounds: { north: number; south: number; east: number; west: number }) => {
+      // Mettre à jour l'URL - la seule source de vérité
+      const params = new URLSearchParams(window.location.search);
+      params.set('bounds', `${bounds.north},${bounds.south},${bounds.east},${bounds.west}`);
+      params.set('sortBy', 'distance');
+      params.delete('city');
+      params.set('page', '1');
+
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+    }, 500),
+    []
+  );
+
+  // Gérer la recherche dans les bounds de la carte
+  const handleSearchInBounds = (bounds: { north: number; south: number; east: number; west: number }) => {
+    debouncedSearchInBounds(bounds);
+  };
+
+
+  // Fonction utilitaire pour debounce
+  function debounce<T extends (...args: any[]) => any>(func: T, delay: number): T {
+    let timeoutId: NodeJS.Timeout;
+    return ((...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(null, args), delay);
+    }) as T;
+  }
+
+  // Fetch professions
+  useEffect(() => {
+    fetch("/api/professions")
+      .then((res) => res.json())
+      .then((data) => setProfessions(data))
+      .catch((err) => console.error("Error fetching professions:", err));
+  }, []);
+
+  // PILOTAGE CARTE : Dispatch événement global quand ville change
+  useEffect(() => {
+    const city = searchParams.get('city');
+    if (city && city.length >= 3) {
+      // Géocoder et dispatcher événement
+      fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(city)}&type=municipality&limit=1`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.features && data.features.length > 0) {
+            const [lng, lat] = data.features[0].geometry.coordinates;
+            // Dispatch événement global pour faire bouger la carte
+            window.dispatchEvent(new CustomEvent('map-fly-to', {
+              detail: { lat, lng, zoom: 12 }
+            }));
+            console.log(`🗺️ Ville ${city} détectée - événement dispatché`);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur géocodage ville:', error);
+        });
+    }
+  }, [searchParams]); // Réagit aux changements d'URL
+
+  // Gérer les bounds depuis l'URL
+  useEffect(() => {
+    const bounds = searchParams.get("bounds");
+    if (bounds) {
+      const boundsArray = bounds.split(',').map(coord => parseFloat(coord.trim()));
+      if (boundsArray.length === 4 && boundsArray.every(coord => !isNaN(coord))) {
+        const [north, south, east, west] = boundsArray;
+        setMapBounds({ north, south, east, west });
+      }
+    } else {
+      setMapBounds(null);
+    }
+  }, [searchParams]);
+
+  // Get user location - seulement si on n'utilise pas les bounds
+  useEffect(() => {
+    if (navigator.geolocation && sortBy === "distance" && !mapBounds) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          // Fallback to city search if geolocation fails
+        }
+      );
+    }
+  }, [sortBy, mapBounds]);
+
+
+  const [page, setPage] = useState(1);
+  const limit = 40;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, searchCity, professionId, minRating, maxPrice, sortBy]);
+
+  // Fetch practitioners with pagination
+  const { data: searchData, isLoading, refetch } = useQuery<{
+    practitioners: Practitioner[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+  }>({
+    queryKey: [
+      "practitioners",
+      searchQuery,
+      searchCity || (mapBounds ? "bounds" : "Paris"), // Utiliser "bounds" pour le cache quand on filtre par zone
+      professionId,
+      minRating,
+      maxPrice,
+      sortBy,
+      page,
+      userLocation?.lat,
+      userLocation?.lng,
+      mapBounds ? `${mapBounds.north}-${mapBounds.south}-${mapBounds.east}-${mapBounds.west}` : null,
+    ],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("q", searchQuery);
+
+      // Utiliser les bounds si disponibles, sinon la ville ou Paris par défaut
+      if (mapBounds) {
+        params.append("bounds", `${mapBounds.north},${mapBounds.south},${mapBounds.east},${mapBounds.west}`);
+        params.append("sortBy", "distance");
+      } else {
+        const cityToSearch = searchCity || "Paris";
+        params.append("city", cityToSearch);
+      }
+
+      if (professionId) params.append("professionId", professionId);
+      if (minRating) params.append("minRating", minRating);
+      if (maxPrice) params.append("maxPrice", maxPrice);
+      // Gérer le tri par distance selon le contexte
+      if (sortBy === "distance") {
+        if (mapBounds) {
+          // Quand on utilise les bounds, calculer la distance par rapport au centre de la vue
+          const centerLat = (mapBounds.north + mapBounds.south) / 2;
+          const centerLng = (mapBounds.east + mapBounds.west) / 2;
+          params.append("lat", centerLat.toString());
+          params.append("lng", centerLng.toString());
+          params.append("sortBy", "distance");
+          // Étendre la zone de recherche pour couvrir toute la vue
+          const latDiff = Math.abs(mapBounds.north - mapBounds.south);
+          const lngDiff = Math.abs(mapBounds.east - mapBounds.west);
+          const searchRadius = Math.max(latDiff, lngDiff) * 111; // Approximation km
+          params.append("distance", Math.max(searchRadius, 10).toString());
+        } else if (userLocation) {
+          // Tri par distance par rapport à la position utilisateur
+          params.append("lat", userLocation.lat.toString());
+          params.append("lng", userLocation.lng.toString());
+          params.append("sortBy", "distance");
+          params.append("distance", "50"); // Default 50km
+        }
+      } else if (sortBy && !mapBounds) {
+        // Autres types de tri (rating, price) seulement si pas de bounds
+        params.append("sortBy", sortBy);
+      }
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+
+      const res = await fetch(`/api/practitioners?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch practitioners");
+      return res.json();
+    },
+    enabled: true, // Toujours activer la requête pour le moment
+  });
+
+  const practitioners = searchData?.practitioners || [];
+  const pagination = searchData?.pagination;
+
+
+
+  const formatPrice = (cents: number) => {
+    return (cents / 100).toFixed(2);
+  };
+
+  // Rendu conditionnel de la liste des praticiens
+  const renderPractitionersList = () => {
+    if (!practitioners || practitioners.length === 0) {
+      return (
+        <>
+          <div className="overflow-y-auto border-r-0 md:border-r border-sable order-1 md:order-1 bg-white">
+            <div className="p-4 md:p-6 pb-4 border-b border-sable bg-white">
+              <h1 className="text-xl md:text-2xl font-bold font-heading text-anthracite mb-2">
+                Sélectionnez un praticien
+              </h1>
+              <p className="text-sm md:text-base text-anthracite/70">
+                Les meilleurs praticiens en bien-être aux alentours : Réservation en ligne
+              </p>
+            </div>
+            <div className="flex items-center justify-center h-64">
+              <p className="text-anthracite/70">Aucun praticien trouvé.</p>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {/* Liste des praticiens à gauche (45%) */}
+        <div className="overflow-y-auto border-r-0 md:border-r border-sable order-1 md:order-1 bg-white">
+          {/* Titre et texte */}
+          <div className="p-4 md:p-6 pb-4 border-b border-sable bg-white">
+            <h1 className="text-xl md:text-2xl font-bold font-heading text-anthracite mb-2">
+              Sélectionnez un praticien
+            </h1>
+            <p className="text-sm md:text-base text-anthracite/70">
+              Les meilleurs praticiens en bien-être aux alentours : Réservation en ligne
+            </p>
+          </div>
+
+          {/* Liste des praticiens */}
+          <div>
+            {practitioners.map((practitioner) => {
+              const minServicePrice = practitioner.services.length > 0
+                ? Math.min(...practitioner.services.map((s) => s.priceCents))
+                : null;
+
+              return (
+                <div
+                  key={practitioner.id}
+                  id={`practitioner-${practitioner.id}`}
+                  className={`flex flex-col md:flex-row border-b border-sable ${
+                    selectedPractitionerId === practitioner.id ? "bg-sauge/5" : ""
+                  }`}
+                >
+                  {/* Image à gauche (30-35%) */}
+                  <div className="w-full md:w-[32%] flex-shrink-0 relative self-stretch">
+                    {practitioner.photoUrl ? (
+                      <Image
+                        src={practitioner.photoUrl}
+                        alt={practitioner.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 32vw"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="absolute inset-0 w-full h-full bg-[#9bb49b]/10 flex items-center justify-center">
+                        <div className="text-[#9bb49b] font-bold text-lg">
+                          {practitioner.title
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase())
+                            .slice(0, 2)
+                            .join('')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Contenu à droite */}
+                  <div className="flex-1 p-4 md:p-6">
+                    {/* Nom du praticien */}
+                    <Link
+                      href={`/praticien/${practitioner.slug}`}
+                      className="hover:text-sauge transition-colors"
+                    >
+                      <h3 className="text-lg md:text-xl font-bold font-heading text-anthracite mb-2 hover:underline">
+                        {practitioner.title}
+                      </h3>
+                    </Link>
+
+                    {/* Adresse */}
+                    <div className="flex items-center gap-1 text-xs md:text-sm text-anthracite/70 mb-3">
+                      <MapPin className="h-3 w-3 md:h-4 md:w-4 text-anthracite/60" />
+                      <span>
+                        {practitioner.address && `${practitioner.address}, `}
+                        {practitioner.locationCity}
+                      </span>
+                      {practitioner.distance !== undefined && (
+                        <>
+                          <span className="text-anthracite/50">•</span>
+                          <span>
+                            {practitioner.distance < 1
+                              ? `${Math.round(practitioner.distance * 1000)} m`
+                              : `${practitioner.distance.toFixed(1)} km`}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Avis + Prix */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-xs md:text-sm font-semibold text-anthracite">
+                          {practitioner.ratingAvg?.toFixed(1).replace(".", ",") || "0,0"} ({(practitioner._count?.reviews || 0)} avis)
+                        </span>
+                      </div>
+                      {minServicePrice && !isNaN(minServicePrice) && (
+                        <span className="text-xs md:text-sm font-semibold text-anthracite">
+                          À partir de {formatPrice(minServicePrice).replace(".", ",")} €
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Calendrier simplifié */}
+                    <div className="mb-4">
+                      <SimpleAvailability
+                        practitionerId={practitioner.id}
+                        serviceId={practitioner.services[0]?.id || null}
+                      />
+                    </div>
+
+                    {/* Lien plus d'informations */}
+                    <Link
+                      href={`/praticien/${practitioner.slug}`}
+                      className="text-xs md:text-sm text-sauge hover:underline"
+                    >
+                      Plus d&apos;informations
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // Rendu final avec carte isolée
+  const renderWithMap = () => (
+    <>
+      {/* Liste conditionnelle */}
+      {renderPractitionersList()}
+
+      {/* Carte ISOLÉE - jamais re-render à cause des changements de liste */}
+        <MapContainer
+          onSearchInBounds={handleSearchInBounds}
+        />
+    </>
+  );
+
+  // Conteneur isolé pour la carte
+  const MapContainer = React.memo(function MapContainer({ onSearchInBounds }: {
+    onSearchInBounds: (bounds: { north: number; south: number; east: number; west: number }) => void;
+  }) {
+    return (
+      <div className="h-[400px] md:h-full order-2 md:order-2" style={{ pointerEvents: "auto", position: "relative", zIndex: 10 }}>
+        <PractitionersMap
+          onSearchInBounds={onSearchInBounds}
+        />
+      </div>
+    );
+  });
+
+  return (
+    <main className="bg-[#f7f7f7] min-h-screen pt-24">
+      <div className="min-h-screen md:h-screen flex flex-col">
+        {/* Barre des filtres Premium */}
+        <SearchFilters
+          searchCity={searchCity}
+          professionId={professionId}
+          subjectId={subjectId}
+          minRating={minRating}
+          maxPrice={maxPrice}
+          sortBy={sortBy}
+          professions={professions}
+        />
+
+        {/* Content scrollable avec carte */}
+        <div className="flex-1 overflow-y-auto md:overflow-hidden grid grid-cols-1 md:grid-cols-[45%_55%]" style={{ pointerEvents: "auto" }}>
+          {/* Results */}
+          {isLoading ? (
+            <div className="col-span-1 md:col-span-2 text-center py-12">
+              <p className="text-anthracite/70">Chargement...</p>
+            </div>
+          ) : sortBy === "distance" && !userLocation && !mapBounds ? (
+            <div className="col-span-1 md:col-span-2 text-center py-12">
+              <p className="text-anthracite/70 mb-4">
+                Autorisez l&apos;accès à votre localisation pour trier par distance.
+              </p>
+              <Button
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                        setUserLocation({
+                          lat: position.coords.latitude,
+                          lng: position.coords.longitude,
+                        });
+                      },
+                      (error) => {
+                        console.error("Error getting location:", error);
+                        alert("Impossible d'accéder à votre localisation. Veuillez vérifier les permissions de votre navigateur.");
+                      }
+                    );
+                  }
+                }}
+              >
+                Autoriser la localisation
+              </Button>
+            </div>
+          ) : (
+            renderWithMap()
+          )}
+        </div>
+
+        {/* Pagination en bas */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 py-4 border-t border-sable bg-white shadow-sm">
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(page - 1)}
+                disabled={!pagination.hasPreviousPage}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Précédent
+              </Button>
+              <div className="flex items-center gap-2">
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  let pageNum: number;
+                  if (pagination.totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (page <= 3) {
+                    pageNum = i + 1;
+                  } else if (page >= pagination.totalPages - 2) {
+                    pageNum = pagination.totalPages - 4 + i;
+                  } else {
+                    pageNum = page - 2 + i;
+                  }
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={pageNum === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(page + 1)}
+                disabled={!pagination.hasNextPage}
+              >
+                Suivant
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+
+            {/* Results count */}
+            {pagination && (
+              <div className="mt-4 text-center text-sm text-anthracite/60">
+                Affichage de {practitioners.length} sur {pagination.total} praticiens
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
+}

@@ -1,0 +1,162 @@
+/* Manrope font */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+/* Inter font */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* Playfair Display — titres dépliant (style Orne.io) */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 248 244;
+    --foreground: 47 47 47;
+    --card: 250 248 244;
+    --card-foreground: 47 47 47;
+    --popover: 250 248 244;
+    --popover-foreground: 47 47 47;
+    --primary: 155 180 155;
+    --primary-foreground: 255 255 255;
+    --secondary: 232 225 212;
+    --secondary-foreground: 47 47 47;
+    --muted: 232 225 212;
+    --muted-foreground: 107 114 128;
+    --accent: 232 225 212;
+    --accent-foreground: 47 47 47;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 232 225 212;
+    --input: 232 225 212;
+    --ring: 155 180 155;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-white text-anthracite;
+    font-family: "Inter", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Manrope", sans-serif;
+  }
+
+  /* Espace avant le footer : padding sur la dernière section du main */
+  main > section:last-child {
+    padding-bottom: 5rem; /* 16 */
+  }
+  @media (min-width: 768px) {
+    main > section:last-child {
+      padding-bottom: 6rem; /* 20 */
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Lenis smooth scroll (SmoothScroll provider) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ========== Dépliant A5 — style Orne.io ========== */
+.flyer-final-only {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 148mm;
+  overflow: visible;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.flyer-final-only *,
+.flyer-final-only *::before,
+.flyer-final-only *::after {
+  box-sizing: border-box;
+}
+
+@media print {
+  @page {
+    size: A5 portrait;
+    margin: 0mm;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Masquer absolument tout le site ; seul #flyer-final reste visible */
+  body > * {
+    display: none !important;
+  }
+  body > #flyer-final {
+    display: block !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Grille : deux pages 148×210mm, flex column, padding 20mm */
+  #recto,
+  #verso {
+    width: 148mm !important;
+    height: 210mm !important;
+    max-height: 210mm !important;
+    overflow: hidden !important;
+    page-break-after: always !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20mm !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #verso {
+    page-break-after: auto !important;
+  }
+}
+
