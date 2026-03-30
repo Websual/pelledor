@@ -18,7 +18,8 @@ export async function GET(
   if (!row)
     return NextResponse.json({ error: "Produit introuvable" }, { status: 404 });
   const session = await auth();
-  if (!row.published && !session?.user)
+  if (!row.published && session?.user?.role !== "admin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
   return NextResponse.json({ product: row });
 }

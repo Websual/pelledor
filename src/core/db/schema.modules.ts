@@ -35,6 +35,10 @@ export const practitioners = pgTable("practitioners", {
   bio: text("bio").notNull().default(""),
   city: varchar("city", { length: 128 }).notNull().default(""),
   isActive: boolean("is_active").notNull().default(true),
+  /** URL publique de référence (canonical absolus, partage). */
+  publicSiteUrl: varchar("public_site_url", { length: 2048 }),
+  /** robots.txt personnalisé ; si vide, généré par défaut + lien sitemap. */
+  seoRobotsTxt: text("seo_robots_txt"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
@@ -468,6 +472,14 @@ export const pageBlocks = pgTable(
       .references(() => practitioners.id, { onDelete: "cascade" }),
     pageSlug: varchar("page_slug", { length: 128 }).notNull().default("home"),
     blocks: jsonb("blocks").notNull().default([]),
+    metaTitle: varchar("meta_title", { length: 512 }),
+    metaDescription: text("meta_description"),
+    canonicalUrl: varchar("canonical_url", { length: 2048 }),
+    ogTitle: varchar("og_title", { length: 512 }),
+    ogDescription: text("og_description"),
+    ogImageUrl: varchar("og_image_url", { length: 2048 }),
+    noindex: boolean("noindex").notNull().default(false),
+    targetKeyword: varchar("target_keyword", { length: 255 }),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
@@ -476,3 +488,103 @@ export const pageBlocks = pgTable(
   },
   (t) => ({ uniq: { columns: [t.practitionerId, t.pageSlug] } })
 );
+
+// ─── CMS Phase C — blog / portfolio / menu (par praticien) ───────────────────
+
+export const cmsBlogCategories = pgTable(
+  "cms_blog_categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    practitionerId: uuid("practitioner_id")
+      .notNull()
+      .references(() => practitioners.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 160 }).notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({ uniq: { columns: [t.practitionerId, t.slug] } })
+);
+
+export const cmsBlogPosts = pgTable(
+  "cms_blog_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    practitionerId: uuid("practitioner_id")
+      .notNull()
+      .references(() => practitioners.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id").references(() => cmsBlogCategories.id, {
+      onDelete: "set null",
+    }),
+    slug: varchar("slug", { length: 160 }).notNull(),
+    title: varchar("title", { length: 512 }).notNull(),
+    excerpt: text("excerpt").notNull().default(""),
+    bodyHtml: text("body_html").notNull().default(""),
+    bodyDocument: jsonb("body_document"),
+    coverImageUrl: varchar("cover_image_url", { length: 2048 }),
+    metaTitle: varchar("meta_title", { length: 512 }),
+    metaDescription: text("meta_description"),
+    canonicalUrl: varchar("canonical_url", { length: 2048 }),
+    ogTitle: varchar("og_title", { length: 512 }),
+    ogDescription: text("og_description"),
+    ogImageUrl: varchar("og_image_url", { length: 2048 }),
+    noindex: boolean("noindex").notNull().default(false),
+    targetKeyword: varchar("target_keyword", { length: 255 }),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => ({ uniq: { columns: [t.practitionerId, t.slug] } })
+);
+
+export const cmsPortfolioProjects = pgTable(
+  "cms_portfolio_projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    practitionerId: uuid("practitioner_id")
+      .notNull()
+      .references(() => practitioners.id, { onDelete: "cascade" }),
+    slug: varchar("slug", { length: 160 }).notNull(),
+    title: varchar("title", { length: 512 }).notNull(),
+    summary: text("summary").notNull().default(""),
+    descriptionHtml: text("description_html").notNull().default(""),
+    descriptionDocument: jsonb("description_document"),
+    coverImageUrl: varchar("cover_image_url", { length: 2048 }),
+    gallery: jsonb("gallery").notNull().default([]),
+    clientName: varchar("client_name", { length: 255 }).notNull().default(""),
+    roleLabel: varchar("role_label", { length: 255 }).notNull().default(""),
+    externalUrl: varchar("external_url", { length: 2048 }),
+    metaTitle: varchar("meta_title", { length: 512 }),
+    metaDescription: text("meta_description"),
+    canonicalUrl: varchar("canonical_url", { length: 2048 }),
+    ogTitle: varchar("og_title", { length: 512 }),
+    ogDescription: text("og_description"),
+    ogImageUrl: varchar("og_image_url", { length: 2048 }),
+    noindex: boolean("noindex").notNull().default(false),
+    targetKeyword: varchar("target_keyword", { length: 255 }),
+    sortOrder: integer("sort_order").notNull().default(0),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => ({ uniq: { columns: [t.practitionerId, t.slug] } })
+);
+
+/** Entrées de menu du site vitrine (liens page builder, blog, portfolio, externe). */
+export const siteNavItems = pgTable("site_nav_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  practitionerId: uuid("practitioner_id")
+    .notNull()
+    .references(() => practitioners.id, { onDelete: "cascade" }),
+  sortOrder: integer("sort_order").notNull().default(0),
+  label: varchar("label", { length: 255 }).notNull(),
+  linkType: varchar("link_type", { length: 32 }).notNull(),
+  linkTarget: varchar("link_target", { length: 512 }).notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});

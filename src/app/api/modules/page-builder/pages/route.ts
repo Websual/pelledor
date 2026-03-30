@@ -1,6 +1,11 @@
-import { auth } from "@/auth";
+import {
+  normalizeBlocksToDocument,
+  PageDocumentValidationError,
+} from "@/core/builder/page-document";
 import { getDb } from "@/core/db/server";
 import { pageBlocks, practitioners } from "@/core/db/schema.modules";
+import { mergePageBlockSeo } from "@/core/seo/seo-fields";
+import { requirePractitionerForCmsApi } from "@/core/security/agent-bearer";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -23,38 +28,51 @@ export async function GET(req: Request) {
     return NextResponse.json({ page });
   }
 
-  // Auth : liste des pages du praticien connecté
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const p = await db.query.practitioners.findFirst({ where: eq(practitioners.userId, session.user.id) });
-  if (!p) return NextResponse.json({ pages: [] });
-  const pages = await db.select().from(pageBlocks).where(eq(pageBlocks.practitionerId, p.id));
+  // Auth : liste des pages du praticien connecté (session ou Bearer agent)
+  const authz = await requirePractitionerForCmsApi(req);
+  if (!authz.ok) return NextResponse.json({ error: authz.error }, { status: authz.status });
+  const pages = await db
+    .select()
+    .from(pageBlocks)
+    .where(eq(pageBlocks.practitionerId, authz.practitioner.id));
   return NextResponse.json({ pages });
 }
 
 // POST /api/modules/page-builder/pages  — créer ou mettre à jour une page
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authz = await requirePractitionerForCmsApi(req);
+  if (!authz.ok) return NextResponse.json({ error: authz.error }, { status: authz.status });
   const body = await req.json().catch(() => ({}));
   const pageSlug = String(body.pageSlug ?? "home").trim().slice(0, 128);
-  const blocks = Array.isArray(body.blocks) ? body.blocks : [];
   const publish = body.publish === true;
+  const rawPayload = body.blocks ?? body.document;
+  let document;
+  try {
+    document = normalizeBlocksToDocument(
+      rawPayload === undefined ? [] : rawPayload
+    );
+  } catch (e) {
+    if (e instanceof PageDocumentValidationError) {
+      return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    throw e;
+  }
 
   const db = getDb();
-  const p = await db.query.practitioners.findFirst({ where: eq(practitioners.userId, session.user.id) });
-  if (!p) return NextResponse.json({ error: "Praticien introuvable" }, { status: 404 });
+  const p = authz.practitioner;
 
   const existing = await db.query.pageBlocks.findFirst({
     where: and(eq(pageBlocks.practitionerId, p.id), eq(pageBlocks.pageSlug, pageSlug)),
   });
 
+  const seo = mergePageBlockSeo(body as Record<string, unknown>, existing ?? undefined);
   const values = {
     practitionerId: p.id,
     pageSlug,
-    blocks,
+    blocks: document as unknown as Record<string, unknown>,
     publishedAt: publish ? new Date() : (existing?.publishedAt ?? null),
     updatedAt: new Date(),
+    ...seo,
   };
 
   if (existing) {

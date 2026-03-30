@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: SaaS OS — API CMS (agent & builder)
+  version: 0.1.0
+  description: |
+    Routes utilisées par le page builder, les exports CMS et les automates (Bearer).
+
+    **Authentification**
+    - **Session** : cookie NextAuth (navigateur).
+    - **Agent** : en-tête `Authorization: Bearer <SAAS_OS_AGENT_API_TOKEN>`.
+      Le périmètre est fixé côté serveur par `SAAS_OS_AGENT_PRACTITIONER_ID` (UUID du praticien).
+      La fusion du **thème global** via `POST /cms-bundle` avec un corps `theme` n’est autorisée pour l’agent
+      que si `SAAS_OS_AGENT_ALLOW_THEME=true`. Les administrateurs (session, `role === admin`) peuvent toujours fusionner le thème.
+
+    **Base path** : l’application est déployée sous `/saas-os` (voir `next.config.ts`). Préfixez tous les chemins ci-dessous.
+
+servers:
+  - url: https://votre-domaine.example/saas-os
+    description: Production
+  - url: http://localhost:3000/saas-os
+    description: Développement local
+
+tags:
+  - name: page-builder
+  - name: cms-bundle
+  - name: blog
+
+security:
+  - bearerAuth: []
+  - cookieAuth: []
+
+paths:
+  /api/modules/page-builder/pages:
+    get:
+      tags: [page-builder]
+      summary: Liste des pages (praticien courant / agent)
+      description: |
+        Sans paramètres de requête : retourne toutes les lignes `page_blocks` du praticien (auth requise).
+        Avec `?e={slug_établissement}&slug={page}` : lecture **publique** d’une page **publiée** (sans Bearer).
+      parameters:
+        - in: query
+          name: e
+          schema: { type: string }
+          description: Slug praticien (mode public)
+        - in: query
+          name: slug
+          schema: { type: string }
+          description: Slug de page (mode public)
+      responses:
+        "200":
+          description: OK — soit `{ pages: [...] }`, soit `{ page: {...}|null }`
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      pages:
+                        type: array
+                        items: { type: object }
+                  - type: object
+                    properties:
+                      page:
+                        nullable: true
+                        type: object
+        "401":
+          description: Non authentifié (mode liste)
+    post:
+      tags: [page-builder]
+      summary: Créer ou mettre à jour une page
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PageUpsert"
+      responses:
+        "200":
+          description: OK — `{ ok: true, id: string }`
+        "400":
+          description: Document invalide
+
+  /api/modules/page-builder/cms-bundle:
+    get:
+      tags: [cms-bundle]
+      summary: Export thème + pages (document v1 normalisé)
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CmsBundleExport"
+    post:
+      tags: [cms-bundle]
+      summary: Import pages (+ thème si autorisé)
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CmsBundleImport"
+      responses:
+        "200":
+          description: OK — `{ ok, importedPages }`
+
+  /api/modules/cms/blog/posts:
+    get:
+      tags: [blog]
+      summary: Liste des articles
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK — `{ posts: [...] }`
+    post:
+      tags: [blog]
+      summary: Créer un article
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostCreate"
+      responses:
+        "200":
+          description: OK — `{ post: {...} }`
+
+  /api/modules/cms/blog/posts/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      tags: [blog]
+      summary: Détail article
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK — `{ post: {...} }`
+        "404":
+          description: Introuvable
+    patch:
+      tags: [blog]
+      summary: Mise à jour article
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostPatch"
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags: [blog]
+      summary: Supprimer l’article
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK
+
+  /api/modules/cms/blog/categories:
+    get:
+      tags: [blog]
+      summary: Liste des catégories
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+    post:
+      tags: [blog]
+      summary: Créer une catégorie
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                slug: { type: string }
+                sortOrder: { type: number }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Jeton `SAAS_OS_AGENT_API_TOKEN` (mot de passe de l’instance).
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: authjs.session-token
+      description: Session NextAuth (nom exact du cookie selon configuration).
+
+  schemas:
+    PageUpsert:
+      type: object
+      properties:
+        pageSlug:
+          type: string
+          default: home
+        publish:
+          type: boolean
+        document:
+          description: PageDocumentV1
+          type: object
+        blocks:
+          description: Alias document ou liste plate (normalisé serveur)
+        metaTitle: { type: string, nullable: true }
+        metaDescription: { type: string, nullable: true }
+        canonicalUrl: { type: string, nullable: true }
+        ogTitle: { type: string, nullable: true }
+        ogDescription: { type: string, nullable: true }
+        ogImageUrl: { type: string, nullable: true }
+        noindex: { type: boolean }
+        targetKeyword: { type: string, nullable: true }
+
+    CmsBundleExport:
+      type: object
+      properties:
+        version: { type: integer }
+        exportedAt: { type: string, format: date-time }
+        theme:
+          type: object
+          description: ThemeTokens résolus
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              pageSlug: { type: string }
+              publishedAt: { nullable: true, type: string, format: date-time }
+              document: { type: object }
+
+    CmsBundleImport:
+      type: object
+      properties:
+        theme:
+          type: object
+          description: Réservé admin session ou agent avec SAAS_OS_AGENT_ALLOW_THEME
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              pageSlug: { type: string }
+              document: { type: object }
+              blocks: { type: array }
+              publish: { type: boolean }
+
+    BlogPostCreate:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        bodyHtml: { type: string }
+        bodyDocument: { type: object, description: PageDocumentV1 optionnel }
+        coverImageUrl: { type: string, nullable: true }
+        categoryId: { type: string, nullable: true }
+        publish: { type: boolean }
+        metaTitle: { type: string, nullable: true }
+        metaDescription: { type: string, nullable: true }
+        canonicalUrl: { type: string, nullable: true }
+        ogTitle: { type: string, nullable: true }
+        ogDescription: { type: string, nullable: true }
+        ogImageUrl: { type: string, nullable: true }
+        noindex: { type: boolean }
+        targetKeyword: { type: string, nullable: true }
+
+    BlogPostPatch:
+      type: object
+      description: Tous les champs optionnels ; mêmes noms que POST.
+      additionalProperties: true

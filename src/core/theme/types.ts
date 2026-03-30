@@ -31,6 +31,12 @@ export type ThemeTokens = {
     hoverOpacity: number;
     disabledOpacity: number;
   };
+  /** Phase A — mise en page globale (variante nav, conteneur, rythme vertical). Optionnel. */
+  layout?: {
+    navVariant?: string;
+    containerMaxWidth?: string;
+    sectionGap?: string;
+  };
 };
 
 export const defaultThemeTokens: ThemeTokens = {
@@ -103,7 +109,7 @@ export function mergeThemeTokens(
 }
 
 export function tokensToCssVariables(t: ThemeTokens): string {
-  const { colors, fonts, spacing, radius, interactive } = t;
+  const { colors, fonts, spacing, radius, interactive, layout } = t;
   return `
     --color-primary: ${colors.primary};
     --color-primary-foreground: ${colors.primaryForeground};
@@ -123,6 +129,9 @@ export function tokensToCssVariables(t: ThemeTokens): string {
     --focus-ring-width: ${interactive.focusRingWidth};
     --hover-opacity: ${interactive.hoverOpacity};
     --disabled-opacity: ${interactive.disabledOpacity};
+    ${layout?.containerMaxWidth ? `--layout-container-max: ${layout.containerMaxWidth};` : ""}
+    ${layout?.sectionGap ? `--layout-section-gap: ${layout.sectionGap};` : ""}
+    ${layout?.navVariant ? `--layout-nav-variant: ${layout.navVariant};` : ""}
   `
     .replace(/\s+/g, " ")
     .trim();

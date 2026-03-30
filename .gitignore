@@ -52,3 +52,4 @@ consignes/
 .cursor/
 .saas-build-manifest.json
 .env.localn#
+.pnpm-store/

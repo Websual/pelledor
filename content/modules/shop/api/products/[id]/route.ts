@@ -1,10 +1,11 @@
 import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { products } from "@/core/db/schema.modules";
+import { requireShopAdmin } from "@/core/shop/admin";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-/** GET : un produit par id (public si publié, admin toujours). */
+/** GET : un produit par id (public si publié, sinon admin uniquement). */
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,8 +16,9 @@ export async function GET(
   if (!row)
     return NextResponse.json({ error: "Produit introuvable" }, { status: 404 });
   const session = await auth();
-  if (!row.published && !session?.user)
+  if (!row.published && session?.user?.role !== "admin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
   return NextResponse.json({ product: row });
 }
 
@@ -26,8 +28,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = requireShopAdmin(session);
+  if (denied) return denied;
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
   const db = getDb();
@@ -68,8 +70,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = requireShopAdmin(session);
+  if (denied) return denied;
   const { id } = await params;
   const db = getDb();
   await db.delete(products).where(eq(products.id, id));

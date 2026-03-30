@@ -3,17 +3,43 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { Session } from "next-auth";
 
+/** Aligné sur `next.config.ts` — chemins internes sans basePath. */
+const BASE_PATH = "/saas-os";
+
+function routePath(pathname: string): string {
+  if (pathname.startsWith(`${BASE_PATH}/`)) {
+    return pathname.slice(BASE_PATH.length) || "/";
+  }
+  if (pathname === BASE_PATH) return "/";
+  return pathname;
+}
+
+function isInstallPath(pathname: string): boolean {
+  return routePath(pathname) === "/install" || pathname.includes("/saas-os/install");
+}
+
+function isAdminPath(pathname: string): boolean {
+  const p = routePath(pathname);
+  return p === "/admin" || p.startsWith("/admin/");
+}
+
 function preInstallMiddleware(request: NextRequest) {
   const installed = process.env.SAAS_INSTALLED === "true";
   const path = request.nextUrl.pathname;
-  // Support both /install and /saas-os/install (basePath prefix)
-  const isInstallPath = path.startsWith("/install") || path.includes("/saas-os/install");
-  if (isInstallPath) {
-    if (installed) return NextResponse.redirect(new URL("/", request.url));
+  if (isInstallPath(path)) {
+    if (installed) {
+      const home = request.nextUrl.clone();
+      home.pathname = `${BASE_PATH}/`;
+      home.search = "";
+      return NextResponse.redirect(home);
+    }
     return NextResponse.next();
   }
   if (!installed) {
-    return NextResponse.redirect(new URL("/install", request.url));
+    const install = request.nextUrl.clone();
+    install.pathname = `${BASE_PATH}/install`;
+    install.search = "";
+    return NextResponse.redirect(install);
   }
   return NextResponse.next();
 }
@@ -41,7 +67,18 @@ export default async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const secret = process.env.AUTH_SECRET;
-  if (!secret) return NextResponse.next();
+  if (!secret) {
+    if (process.env.NODE_ENV === "production" && isAdminPath(path)) {
+      return new NextResponse(
+        "Configuration serveur : AUTH_SECRET manquant. L administration n est pas accessible.",
+        {
+          status: 503,
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        }
+      );
+    }
+    return NextResponse.next();
+  }
   const token = await getToken({
     req: request,
     secret,
@@ -51,12 +88,17 @@ export default async function middleware(request: NextRequest) {
     token && typeof token === "object" ? (token as Record<string, unknown>) : null
   );
 
-  if (path.startsWith("/install") || path.includes("/saas-os/install")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (isInstallPath(path)) {
+    const home = request.nextUrl.clone();
+    home.pathname = `${BASE_PATH}/`;
+    home.search = "";
+    return NextResponse.redirect(home);
   }
 
-  if (path.startsWith("/admin") && !session) {
-    const login = new URL("/login", request.url);
+  if (isAdminPath(path) && !session) {
+    const login = request.nextUrl.clone();
+    login.pathname = `${BASE_PATH}/login`;
+    login.search = "";
     login.searchParams.set("callbackUrl", path);
     return NextResponse.redirect(login);
   }

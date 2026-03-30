@@ -1,9 +1,16 @@
 import { getDb } from "@/core/db/server";
 import { quoteRequests, practitioners, notifications } from "@/core/db/schema.modules";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  if (!(await rateLimitByIp("quote-sign", 30, 15 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de tentatives. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const token = String(body.token ?? "").trim();
   const signatureData = String(body.signatureData ?? "").trim();

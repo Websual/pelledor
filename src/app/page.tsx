@@ -42,6 +42,10 @@ export default async function HomePage() {
     const html = await renderCabinetHomeHtml();
     return <BlueprintHome html={html} />;
   }
+  if (blueprint === "avocat") {
+    const html = await renderCabinetHomeHtml();
+    return <BlueprintHome html={html} />;
+  }
   if (blueprint === "immobilier") {
     const html = await renderImmobilierHomeHtml();
     return <BlueprintHome html={html} />;

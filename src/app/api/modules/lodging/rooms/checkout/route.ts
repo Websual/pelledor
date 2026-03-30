@@ -1,5 +1,6 @@
 import { getDb } from "@/core/db/server";
 import { roomBookings, rooms } from "@/core/db/schema.modules";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { and, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getStripe } from "@/core/stripe";
@@ -12,6 +13,12 @@ function nightsBetween(checkIn: string, checkOut: string): number {
 }
 
 export async function POST(req: Request) {
+  if (!(await rateLimitByIp("lodging-checkout", 25, 10 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de demandes. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const roomId = String(body.roomId ?? "").trim();
   const checkIn = String(body.checkIn ?? "").trim();

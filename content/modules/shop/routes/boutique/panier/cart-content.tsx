@@ -20,7 +20,7 @@ export function CartContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/modules/shop/cart")
+    fetch("/api/modules/shop/cart", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         setCart(data.cart ?? []);
@@ -33,6 +33,7 @@ export function CartContent() {
     const res = await fetch("/api/modules/shop/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ productId, quantity }),
     });
     if (!res.ok) return;
@@ -41,7 +42,9 @@ export function CartContent() {
       setCart(data.cart);
       setSubtotalCents(data.subtotalCents ?? 0);
     } else {
-      const list = await fetch("/api/modules/shop/cart").then((r) => r.json());
+      const list = await fetch("/api/modules/shop/cart", {
+        credentials: "include",
+      }).then((r) => r.json());
       setCart(list.cart ?? []);
       setSubtotalCents(list.subtotalCents ?? 0);
     }

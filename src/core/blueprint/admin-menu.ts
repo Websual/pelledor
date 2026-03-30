@@ -2,12 +2,32 @@ import { getBlueprintActive } from "@/core/blueprint/server";
 
 export type AdminLink = { title: string; url: string };
 
+/** Liens CMS / builder insérés après « Site vitrine » dans les menus blueprint. */
+const CMS_VITRINE_URLS = [
+  "/admin/builder",
+  "/admin/cms/blog",
+  "/admin/cms/portfolio",
+  "/admin/cms/navigation",
+  "/admin/cms/seo",
+] as const;
+
+function withCmsAfterBlueprint(urls: readonly string[]): string[] {
+  const i = urls.indexOf("/admin/blueprint");
+  if (i === -1) return [...urls, ...CMS_VITRINE_URLS];
+  return [...urls.slice(0, i + 1), ...CMS_VITRINE_URLS, ...urls.slice(i + 1)];
+}
+
 const FULL_MENU: AdminLink[] = [
   { title: "Tableau de bord", url: "/admin" },
   { title: "🚀 Guide démarrage", url: "/onboarding" },
   { title: "Modules", url: "/admin/modules" },
   { title: "Apparence", url: "/admin/appearance" },
   { title: "Site vitrine (blueprint)", url: "/admin/blueprint" },
+  { title: "Page builder", url: "/admin/builder" },
+  { title: "Blog (site vitrine)", url: "/admin/cms/blog" },
+  { title: "Portfolio", url: "/admin/cms/portfolio" },
+  { title: "Menu vitrine", url: "/admin/cms/navigation" },
+  { title: "SEO vitrine", url: "/admin/cms/seo" },
   { title: "Notes", url: "/notes" },
   { title: "Paiement / Stripe", url: "/notes/billing" },
   { title: "Profil & prestations", url: "/admin/data" },
@@ -23,15 +43,15 @@ const FULL_MENU: AdminLink[] = [
   { title: "Devis (artisan)", url: "/admin/devis" },
   { title: "Boutique (e‑commerce)", url: "/admin/shop" },
 ];
-const BOUTIQUE_ORDER_URLS = [
+const BOUTIQUE_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/shop",
   "/notes/billing",
   "/notifications",
   "/admin/modules",
-];
-const RESTAURANT_ORDER_URLS = [
+]);
+const RESTAURANT_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/restaurant",
@@ -39,8 +59,8 @@ const RESTAURANT_ORDER_URLS = [
   "/notes/billing",
   "/notifications",
   "/admin/modules",
-];
-const HOTEL_ORDER_URLS = [
+]);
+const HOTEL_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/lodging",
@@ -50,8 +70,8 @@ const HOTEL_ORDER_URLS = [
   "/notifications",
   "/admin/modules",
   "/admin/appearance",
-];
-const GITE_ORDER_URLS = [
+]);
+const GITE_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/lodging",
@@ -61,8 +81,8 @@ const GITE_ORDER_URLS = [
   "/notifications",
   "/admin/modules",
   "/admin/appearance",
-];
-const PRATICIEN_ORDER_URLS = [
+]);
+const PRATICIEN_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/data",
@@ -71,10 +91,22 @@ const PRATICIEN_ORDER_URLS = [
   "/notes/billing",
   "/notifications",
   "/admin/modules",
-];
+]);
 const CABINET_ORDER_URLS = PRATICIEN_ORDER_URLS;
+const AVOCAT_ORDER_URLS = withCmsAfterBlueprint([
+  "/admin",
+  "/admin/blueprint",
+  "/admin/data",
+  "/admin/rdv",
+  "/admin/devis",
+  "/admin/factures",
+  "/notes/billing",
+  "/notifications",
+  "/annuaire",
+  "/admin/modules",
+]);
 const SALON_ORDER_URLS = PRATICIEN_ORDER_URLS;
-const IMMOBILIER_ORDER_URLS = [
+const IMMOBILIER_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/admin/blueprint",
   "/admin/data",
@@ -85,10 +117,10 @@ const IMMOBILIER_ORDER_URLS = [
   "/notifications",
   "/annuaire",
   "/admin/modules",
-];
+]);
 
 /** Ordre menu quand blueprint Artisan actif : métier d’abord. */
-const ARTISAN_ORDER_URLS = [
+const ARTISAN_ORDER_URLS = withCmsAfterBlueprint([
   "/admin",
   "/onboarding",
   "/admin/blueprint",
@@ -101,7 +133,7 @@ const ARTISAN_ORDER_URLS = [
   "/notifications",
   "/admin/modules",
   "/admin/appearance",
-];
+]);
 
 function orderMenu(urls: string[]): AdminLink[] {
   const byUrl = new Map(FULL_MENU.map((l) => [l.url, l]));
@@ -122,6 +154,7 @@ export async function buildAdminMenuForBlueprint(): Promise<AdminLink[]> {
   if (blueprint === "hotel") return orderMenu(HOTEL_ORDER_URLS);
   if (blueprint === "praticien") return orderMenu(PRATICIEN_ORDER_URLS);
   if (blueprint === "cabinet") return orderMenu(CABINET_ORDER_URLS);
+  if (blueprint === "avocat") return orderMenu(AVOCAT_ORDER_URLS);
   if (blueprint === "immobilier") return orderMenu(IMMOBILIER_ORDER_URLS);
   if (blueprint === "salon") return orderMenu(SALON_ORDER_URLS);
   if (blueprint === "restaurant") return orderMenu(RESTAURANT_ORDER_URLS);

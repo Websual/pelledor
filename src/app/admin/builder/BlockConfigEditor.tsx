@@ -1,6 +1,24 @@
 "use client";
 
-import type { PageBlock, HeroConfig, TextConfig, ImageConfig, GalleryConfig, CtaConfig, ServicesConfig, ContactInfoConfig, SeparatorConfig, EmbedConfig, BookingWidgetConfig, ClickCollectWidgetConfig, QuoteFormConfig } from "@/core/builder/block-types";
+import type {
+  PageBlock,
+  HeroConfig,
+  HeadingConfig,
+  TextConfig,
+  ImageConfig,
+  GalleryConfig,
+  CtaConfig,
+  ServicesConfig,
+  FaqConfig,
+  TestimonialsConfig,
+  ContactInfoConfig,
+  SeparatorConfig,
+  EmbedConfig,
+  BookingWidgetConfig,
+  ClickCollectWidgetConfig,
+  QuoteFormConfig,
+  RestaurantMenuConfig,
+} from "@/core/builder/block-types";
 
 type Props = {
   block: PageBlock;
@@ -22,6 +40,55 @@ const inp = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ou
 const sel = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 // ─── Éditeurs par type ────────────────────────────────────────────────────────
+
+function HeadingEditor({ config, onChange }: { config: HeadingConfig; onChange: (c: HeadingConfig) => void }) {
+  return (
+    <>
+      <Field label="Texte du titre">
+        <input className={inp} value={config.text} onChange={(e) => onChange({ ...config, text: e.target.value })} />
+      </Field>
+      <Field label="Niveau sémantique (SEO)">
+        <select
+          className={sel}
+          value={config.level ?? "h2"}
+          onChange={(e) =>
+            onChange({ ...config, level: e.target.value as HeadingConfig["level"] })
+          }
+        >
+          {(["h1", "h2", "h3", "h4", "h5", "h6"] as const).map((l) => (
+            <option key={l} value={l}>{l.toUpperCase()}</option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Taille visuelle">
+        <select
+          className={sel}
+          value={config.size ?? "lg"}
+          onChange={(e) =>
+            onChange({ ...config, size: e.target.value as HeadingConfig["size"] })
+          }
+        >
+          <option value="display">Très grand</option>
+          <option value="xl">XL</option>
+          <option value="lg">Grand</option>
+          <option value="md">Moyen</option>
+          <option value="sm">Petit</option>
+        </select>
+      </Field>
+      <Field label="Alignement">
+        <select
+          className={sel}
+          value={config.align ?? "left"}
+          onChange={(e) => onChange({ ...config, align: e.target.value as HeadingConfig["align"] })}
+        >
+          <option value="left">Gauche</option>
+          <option value="center">Centré</option>
+          <option value="right">Droite</option>
+        </select>
+      </Field>
+    </>
+  );
+}
 
 function HeroEditor({ config, onChange }: { config: HeroConfig; onChange: (c: HeroConfig) => void }) {
   return (
@@ -213,6 +280,154 @@ function CtaEditor({ config, onChange }: { config: CtaConfig; onChange: (c: CtaC
   );
 }
 
+function FaqEditor({ config, onChange }: { config: FaqConfig; onChange: (c: FaqConfig) => void }) {
+  const items = config.items ?? [];
+  return (
+    <>
+      <Field label="Titre au-dessus (optionnel)">
+        <input className={inp} value={config.title ?? ""} onChange={(e) => onChange({ ...config, title: e.target.value })} />
+      </Field>
+      <div className="space-y-3 mb-4">
+        {items.map((item, i) => (
+          <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-gray-500">Question {i + 1}</span>
+              <button
+                type="button"
+                onClick={() => onChange({ ...config, items: items.filter((_, idx) => idx !== i) })}
+                className="text-red-400 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+            <input
+              className={inp}
+              placeholder="Question"
+              value={item.question}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, question: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+            <textarea
+              className={`${inp} min-h-[80px] font-mono text-xs`}
+              placeholder="Réponse (HTML léger)"
+              value={item.answer}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, answer: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange({ ...config, items: [...items, { question: "Nouvelle question", answer: "<p>Réponse</p>" }] })}
+        className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-500 hover:border-blue-300 transition"
+      >
+        + Ajouter une entrée
+      </button>
+    </>
+  );
+}
+
+function TestimonialsEditor({
+  config,
+  onChange,
+}: {
+  config: TestimonialsConfig;
+  onChange: (c: TestimonialsConfig) => void;
+}) {
+  const items = config.items ?? [];
+  return (
+    <>
+      <Field label="Titre (optionnel)">
+        <input className={inp} value={config.title ?? ""} onChange={(e) => onChange({ ...config, title: e.target.value })} />
+      </Field>
+      <Field label="Colonnes">
+        <select
+          className={sel}
+          value={config.columns ?? 2}
+          onChange={(e) => onChange({ ...config, columns: parseInt(e.target.value, 10) as 1 | 2 | 3 })}
+        >
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+        </select>
+      </Field>
+      <div className="space-y-3 mb-4">
+        {items.map((item, i) => (
+          <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-gray-500">Témoignage {i + 1}</span>
+              <button
+                type="button"
+                onClick={() => onChange({ ...config, items: items.filter((_, idx) => idx !== i) })}
+                className="text-red-400 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+            <textarea
+              className={inp}
+              rows={2}
+              placeholder="Citation"
+              value={item.quote}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, quote: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+            <input
+              className={inp}
+              placeholder="Auteur"
+              value={item.author}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, author: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+            <input
+              className={inp}
+              placeholder="Rôle (optionnel)"
+              value={item.role ?? ""}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, role: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+            <input
+              className={inp}
+              placeholder="URL avatar (optionnel)"
+              value={item.avatarUrl ?? ""}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = { ...item, avatarUrl: e.target.value };
+                onChange({ ...config, items: next });
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() =>
+          onChange({ ...config, items: [...items, { quote: "", author: "" }] })
+        }
+        className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-500 hover:border-blue-300 transition"
+      >
+        + Ajouter un témoignage
+      </button>
+    </>
+  );
+}
+
 function ServicesEditor({ config, onChange }: { config: ServicesConfig; onChange: (c: ServicesConfig) => void }) {
   const items = config.items ?? [];
 
@@ -351,11 +566,15 @@ function WidgetEditor({ config, onChange, label }: { config: BookingWidgetConfig
 export function BlockConfigEditor({ block, onChange }: Props) {
   switch (block.type) {
     case "hero": return <HeroEditor config={block.config as HeroConfig} onChange={onChange} />;
+    case "heading": return <HeadingEditor config={block.config as HeadingConfig} onChange={onChange} />;
     case "text": return <TextEditor config={block.config as TextConfig} onChange={onChange} />;
     case "image": return <ImageEditor config={block.config as ImageConfig} onChange={onChange} />;
     case "gallery": return <GalleryEditor config={block.config as GalleryConfig} onChange={onChange} />;
     case "cta": return <CtaEditor config={block.config as CtaConfig} onChange={onChange} />;
     case "services": return <ServicesEditor config={block.config as ServicesConfig} onChange={onChange} />;
+    case "faq": return <FaqEditor config={block.config as FaqConfig} onChange={onChange} />;
+    case "testimonials":
+      return <TestimonialsEditor config={block.config as TestimonialsConfig} onChange={onChange} />;
     case "contact-info": return <ContactInfoEditor config={block.config as ContactInfoConfig} onChange={onChange} />;
     case "separator": return <SeparatorEditor config={block.config as SeparatorConfig} onChange={onChange} />;
     case "embed": return <EmbedEditor config={block.config as EmbedConfig} onChange={onChange} />;
@@ -363,6 +582,14 @@ export function BlockConfigEditor({ block, onChange }: Props) {
     case "click-collect-widget":
     case "quote-form":
       return <WidgetEditor config={block.config as BookingWidgetConfig} onChange={onChange} label={block.type} />;
+    case "restaurant-menu":
+      return (
+        <WidgetEditor
+          config={block.config as RestaurantMenuConfig}
+          onChange={onChange}
+          label="menu restaurant"
+        />
+      );
     default:
       return <p className="text-sm text-gray-400">Pas de configuration pour ce bloc.</p>;
   }

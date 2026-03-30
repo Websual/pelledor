@@ -1,17 +1,26 @@
+import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { orderItems, orders } from "@/core/db/schema.modules";
+import { verifyShopCheckoutToken } from "@/core/shop/checkout-token";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getStripe } from "@/core/stripe";
 
 /**
  * POST : créer une session Stripe Checkout pour une commande.
- * Body: { orderId: string }
- * Returns: { url: string }
+ * Body: { orderId: string, checkoutToken?: string } — jeton requis pour les commandes invité.
  */
 export async function POST(req: Request) {
+  if (!(await rateLimitByIp("shop-checkout", 25, 10 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de tentatives de paiement. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
-  const orderId = body.orderId;
+  const orderId = body.orderId as string | undefined;
+  const checkoutToken = body.checkoutToken as string | undefined;
   if (!orderId)
     return NextResponse.json(
       { error: "orderId requis" },
@@ -27,6 +36,33 @@ export async function POST(req: Request) {
       { error: "Commande introuvable ou déjà traitée" },
       { status: 400 }
     );
+
+  const session = await auth();
+  if (order.userId) {
+    if (!session?.user?.id || session.user.id !== order.userId) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+  } else {
+    if (
+      !checkoutToken ||
+      !verifyShopCheckoutToken(
+        {
+          orderId: order.id,
+          email: order.email,
+          subtotalCents: order.subtotalCents,
+          shippingCents: order.shippingCents,
+          totalCents: order.totalCents,
+        },
+        checkoutToken
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Jeton de paiement invalide ou manquant" },
+        { status: 403 }
+      );
+    }
+  }
+
   const lines = await db
     .select()
     .from(orderItems)

@@ -25,6 +25,7 @@ import { ApplyPraticienForm } from "./apply-praticien-form";
 import { ApplyCabinetForm } from "./apply-cabinet-form";
 import { ApplyImmobilierForm } from "./apply-immobilier-form";
 import { ApplySalonForm } from "./apply-salon-form";
+import { ApplyAvocatForm } from "./apply-avocat-form";
 import { RebuildButton } from "./RebuildButton";
 import { getRestaurantPayloadJson } from "@/core/blueprint/server";
 import { restaurantPlaceholderDefaults } from "@/core/blueprint/defaults-restaurant";
@@ -188,6 +189,7 @@ export default async function AdminBlueprintPage() {
       {active === "cabinet" ? <ApplyCabinetForm /> : null}
       {active === "immobilier" ? <ApplyImmobilierForm /> : null}
       {active === "salon" ? <ApplySalonForm /> : null}
+      {active === "avocat" ? <ApplyAvocatForm /> : null}
 
       {/* Rebuild always visible immediately after Apply forms */}
       <RebuildButton />
@@ -221,6 +223,9 @@ export default async function AdminBlueprintPage() {
       </div>
       <div className="mt-6">
         <ApplySalonForm />
+      </div>
+      <div className="mt-6">
+        <ApplyAvocatForm />
       </div>
         </div>
       </details>
@@ -264,6 +269,8 @@ export default async function AdminBlueprintPage() {
                   ? "hotel"
                   : active === "salon"
                   ? "salon"
+                  : active === "avocat"
+                    ? "avocat"
                   : active === "immobilier"
                   ? "immobilier"
                   : active === "cabinet"
@@ -290,6 +297,7 @@ export default async function AdminBlueprintPage() {
             <option value="cabinet">Cabinet (conseil, juridique)</option>
             <option value="immobilier">Immobilier (agence)</option>
             <option value="salon">Salon (coiffure, barbier)</option>
+            <option value="avocat">Avocat</option>
           </select>
         </div>
         <div>
@@ -353,6 +361,16 @@ export default async function AdminBlueprintPage() {
           <textarea
             name="payloadJsonCabinet"
             rows={10}
+            defaultValue={payloadCabinetJson}
+            className="mt-1 w-full rounded-md border font-mono text-xs"
+          />
+          <p className="mt-4 text-sm font-medium">Si blueprint = avocat</p>
+          <p className="text-xs text-neutral-500">
+            Même placeholders que cabinet (template partagé).
+          </p>
+          <textarea
+            name="payloadJsonAvocat"
+            rows={8}
             defaultValue={payloadCabinetJson}
             className="mt-1 w-full rounded-md border font-mono text-xs"
           />

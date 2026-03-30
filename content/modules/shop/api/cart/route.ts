@@ -1,22 +1,14 @@
 import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { cartItems, products } from "@/core/db/schema.modules";
+import { applyCartCookie, resolveCartSessionId } from "@/core/shop/cart-session";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-function getSessionId(req: Request): string {
-  const cookie = req.headers.get("cookie") ?? "";
-  const match = cookie.match(/session_token=([^;]+)/);
-  if (match) return match[1].slice(0, 255);
-  const uid = req.headers.get("x-cart-session");
-  if (uid) return `anon-${uid}`.slice(0, 255);
-  return "anon-default";
-}
-
 /** GET : contenu du panier (items + produits). */
-export async function GET(req: Request) {
+export async function GET() {
   const session = await auth();
-  const sessionId = session?.user?.id ?? getSessionId(req);
+  const { sessionId, setCookie } = await resolveCartSessionId(session?.user?.id);
   const db = getDb();
   const items = await db
     .select({
@@ -42,13 +34,15 @@ export async function GET(req: Request) {
     totalCents: i.quantity * i.priceCents,
   }));
   const subtotalCents = cart.reduce((s, i) => s + i.totalCents, 0);
-  return NextResponse.json({ cart, subtotalCents });
+  const res = NextResponse.json({ cart, subtotalCents });
+  if (setCookie) applyCartCookie(res, setCookie);
+  return res;
 }
 
 /** POST : ajouter ou mettre à jour une ligne (body: productId, quantity). */
 export async function POST(req: Request) {
   const session = await auth();
-  const sessionId = session?.user?.id ?? getSessionId(req);
+  const { sessionId, setCookie } = await resolveCartSessionId(session?.user?.id);
   const body = await req.json().catch(() => ({}));
   const productId = body.productId;
   const quantity = Math.max(0, parseInt(body.quantity, 10) || 1);
@@ -62,15 +56,17 @@ export async function POST(req: Request) {
     .select()
     .from(cartItems)
     .where(
-    and(
-      eq(cartItems.sessionId, sessionId),
-      eq(cartItems.productId, productId)
-    )
-  );
+      and(
+        eq(cartItems.sessionId, sessionId),
+        eq(cartItems.productId, productId)
+      )
+    );
   if (existing) {
     if (quantity === 0) {
       await db.delete(cartItems).where(eq(cartItems.id, existing.id));
-      return NextResponse.json({ ok: true, removed: true });
+      const res = NextResponse.json({ ok: true, removed: true });
+      if (setCookie) applyCartCookie(res, setCookie);
+      return res;
     }
     const [row] = await db
       .update(cartItems)
@@ -80,10 +76,15 @@ export async function POST(req: Request) {
       })
       .where(eq(cartItems.id, existing.id))
       .returning();
-    return NextResponse.json({ item: row });
+    const res = NextResponse.json({ item: row });
+    if (setCookie) applyCartCookie(res, setCookie);
+    return res;
   }
-  if (quantity === 0)
-    return NextResponse.json({ ok: true });
+  if (quantity === 0) {
+    const res = NextResponse.json({ ok: true });
+    if (setCookie) applyCartCookie(res, setCookie);
+    return res;
+  }
   const [row] = await db
     .insert(cartItems)
     .values({
@@ -93,5 +94,7 @@ export async function POST(req: Request) {
       quantity,
     })
     .returning();
-  return NextResponse.json({ item: row });
+  const res = NextResponse.json({ item: row });
+  if (setCookie) applyCartCookie(res, setCookie);
+  return res;
 }

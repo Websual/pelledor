@@ -14,6 +14,7 @@ Chaque blueprint = **template vitrine** + **modules ON/OFF** + **seed** + **menu
 | **cabinet** | Conseil / juridique | idem praticien | Vitrine cabinet + seed `mon-cabinet` |
 | **immobilier** | Agence | + **events** (portes ouvertes), chat OFF | Seed `mon-agence` + 6 prestations (visites, estimation…) |
 | **salon** | Coiffure / barbier | idem praticien | Seed `mon-salon` + 6 prestations ; `LIEN_RDV` → `/login` |
+| **avocat** | Cabinet d'avocat | booking, billing, stripe, artisan-quotes, chat, notifications, notes | Seed `mon-avocat` + consultations (initiale, suivi, urgente) |
 | **boutique** | E‑commerce | **shop**, stripe, notes | Catalogue, panier, commande, frais de port, paiement Stripe (style WooCommerce) |
 
 ## Blueprint e‑commerce (boutique)

@@ -1,14 +1,15 @@
 import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { products } from "@/core/db/schema.modules";
+import { requireShopAdmin } from "@/core/shop/admin";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-/** GET : liste des produits publiés (public) ou tous (admin). */
+/** GET : liste publiée (public) ou catalogue complet (admin uniquement). */
 export async function GET() {
   const db = getDb();
   const session = await auth();
-  if (session?.user) {
+  if (session?.user?.role === "admin") {
     const list = await db.select().from(products).orderBy(products.createdAt);
     return NextResponse.json({ products: list });
   }
@@ -23,8 +24,8 @@ export async function GET() {
 /** POST : créer un produit (admin). */
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = requireShopAdmin(session);
+  if (denied) return denied;
   const body = await req.json().catch(() => ({}));
   const name = String(body.name ?? "").trim();
   const slug = String(body.slug ?? "")

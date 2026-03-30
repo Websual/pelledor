@@ -11,7 +11,7 @@ export function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/modules/shop/cart")
+    fetch("/api/modules/shop/cart", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => setCart({ subtotalCents: data.subtotalCents ?? 0 }));
   }, []);
@@ -21,6 +21,7 @@ export function CheckoutForm() {
     fetch("/api/modules/shop/shipping/rates", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ subtotalCents: cart.subtotalCents, country }),
     })
       .then((r) => r.json())
@@ -39,6 +40,7 @@ export function CheckoutForm() {
       const orderRes = await fetch("/api/modules/shop/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: fd.get("email"),
           billingName: fd.get("billingName"),
@@ -51,7 +53,6 @@ export function CheckoutForm() {
           shippingCity: fd.get("shippingCity") || undefined,
           shippingPostalCode: fd.get("shippingPostalCode") || undefined,
           shippingCountry: fd.get("shippingCountry") || undefined,
-          shippingCents,
         }),
       });
       const orderData = await orderRes.json();
@@ -63,7 +64,11 @@ export function CheckoutForm() {
       const checkoutRes = await fetch("/api/modules/shop/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: orderData.orderId }),
+        credentials: "include",
+        body: JSON.stringify({
+          orderId: orderData.orderId,
+          checkoutToken: orderData.checkoutToken as string | undefined,
+        }),
       });
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok || !checkoutData.url) {

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://saas-os.local/schemas/page-blocks-payload.schema.json",
+  "title": "Page builder — payload JSONB (page_blocks.blocks)",
+  "oneOf": [
+    {
+      "title": "Document v1 (lignes → colonnes grille 12 → blocs)",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "rows"],
+      "properties": {
+        "version": { "const": 1 },
+        "rows": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/builderRow" }
+        }
+      }
+    },
+    {
+      "title": "Legacy — liste plate de blocs (normalisée en document v1 à l'enregistrement)",
+      "type": "array",
+      "items": { "$ref": "#/$defs/pageBlock" }
+    }
+  ],
+  "$defs": {
+    "pageBlock": {
+      "type": "object",
+      "required": ["id", "type", "config"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "enum": [
+            "hero",
+            "heading",
+            "text",
+            "image",
+            "gallery",
+            "cta",
+            "services",
+            "faq",
+            "testimonials",
+            "contact-info",
+            "separator",
+            "embed",
+            "booking-widget",
+            "click-collect-widget",
+            "quote-form",
+            "restaurant-menu"
+          ]
+        },
+        "config": { "type": "object" }
+      }
+    },
+    "builderColumn": {
+      "type": "object",
+      "required": ["id", "span", "blocks"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "span": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "columnSettings": { "type": "object" },
+        "blocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pageBlock" }
+        }
+      }
+    },
+    "builderRow": {
+      "type": "object",
+      "required": ["id", "columns"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "rowSettings": { "type": "object" },
+        "columns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/builderColumn" }
+        }
+      }
+    }
+  }
+}

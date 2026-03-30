@@ -34,6 +34,7 @@ import {
   setBlueprintBoutiqueActive,
   writeBoutiqueSaasModules,
 } from "@/core/blueprint/apply-boutique";
+import { applyAvocatToggles, seedAvocat } from "@/core/blueprint/apply-avocat";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
@@ -46,6 +47,7 @@ const KEY_CABINET = "blueprint.cabinet.payload";
 const KEY_IMMOBILIER = "blueprint.immobilier.payload";
 const KEY_SALON = "blueprint.salon.payload";
 const KEY_HOTEL = "blueprint.hotel.payload";
+const KEY_AVOCAT = "blueprint.avocat.payload";
 
 export async function saveBlueprintSettings(formData: FormData) {
   const session = await auth();
@@ -64,6 +66,7 @@ export async function saveBlueprintSettings(formData: FormData) {
       "salon",
       "hotel",
       "boutique",
+      "avocat",
     ].includes(active)
   ) {
     return { ok: false as const, error: "Blueprint invalide" };
@@ -264,8 +267,51 @@ export async function saveBlueprintSettings(formData: FormData) {
         set: { value: JSON.stringify(salPayload), updatedAt: new Date() },
       });
   }
+  if (active === "avocat") {
+    const raw = String(formData.get("payloadJsonAvocat") ?? "").trim();
+    let avocatPayload: Record<string, string> = {};
+    if (raw) {
+      try {
+        const aj = JSON.parse(raw) as Record<string, unknown>;
+        if (aj && typeof aj === "object")
+          avocatPayload = Object.fromEntries(
+            Object.entries(aj).map(([k, v]) => [k, String(v ?? "")])
+          );
+      } catch {
+        return { ok: false as const, error: "JSON avocat invalide" };
+      }
+    }
+    await db
+      .insert(appSettings)
+      .values({ key: KEY_AVOCAT, value: JSON.stringify(avocatPayload) })
+      .onConflictDoUpdate({
+        target: appSettings.key,
+        set: { value: JSON.stringify(avocatPayload), updatedAt: new Date() },
+      });
+  }
 
   return { ok: true as const };
+}
+
+export async function applyAvocatBusinessBlueprint() {
+  const session = await auth();
+  if (!session?.user?.id)
+    return { ok: false as const, error: "Non authentifié" };
+  try {
+    await applyAvocatToggles();
+    const r = await seedAvocat(session.user.id);
+    return {
+      ok: true as const,
+      message: r.message,
+      hint:
+        "pnpm saas:build && pnpm build - RDV /login - annuaire /annuaire/mon-avocat",
+    };
+  } catch (e) {
+    return {
+      ok: false as const,
+      error: e instanceof Error ? e.message : String(e),
+    };
+  }
 }
 
 export async function applyGiteBusinessBlueprint() {

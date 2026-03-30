@@ -1,7 +1,7 @@
 "use server";
 
 import { hash } from "bcryptjs";
-import { readdir, readFile, writeFile } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
 import postgres from "postgres";
 import { bootstrapServer } from "@/core/bootstrap-server";
@@ -11,28 +11,19 @@ import {
   generateEncryptionKeyHex,
   generateSalt,
 } from "@/core/security/crypto";
+import { assertSafePostgresUrl } from "@/core/security/database-url";
+import { runInstallDrizzleMigrations } from "@/core/security/install-drizzle-migrations";
+import { rateLimitMemory } from "@/core/security/rate-limit-memory";
+import { headers } from "next/headers";
 
 export type InstallResult =
   | { ok: true; envSnippet: string; wroteEnv: boolean }
   | { ok: false; error: string };
 
 async function runMigrationSql(databaseUrl: string): Promise<void> {
-  const dir = join(process.cwd(), "drizzle");
-  const files = (await readdir(dir))
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
   const sql = postgres(databaseUrl, { max: 1 });
   try {
-    for (const file of files) {
-      const raw = await readFile(join(dir, file), "utf8");
-      const statements = raw
-        .split("--> statement-breakpoint")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      for (const st of statements) {
-        await sql.unsafe(st);
-      }
-    }
+    await runInstallDrizzleMigrations(sql);
   } finally {
     await sql.end({ timeout: 5 });
   }
@@ -43,7 +34,23 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
     return { ok: false, error: "Deja installe." };
   }
 
+  const h = await headers();
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    h.get("x-real-ip")?.trim() ??
+    "unknown";
+  if (!rateLimitMemory(`install:${ip}`, 5, 60 * 60 * 1000)) {
+    return {
+      ok: false,
+      error: "Trop de tentatives d installation. Réessayez plus tard.",
+    };
+  }
+
   const databaseUrl = String(formData.get("databaseUrl") ?? "").trim();
+  const urlOk = assertSafePostgresUrl(databaseUrl);
+  if (!urlOk.ok) {
+    return { ok: false, error: urlOk.error };
+  }
   const adminEmail = String(formData.get("adminEmail") ?? "").trim().toLowerCase();
   const adminPassword = String(formData.get("adminPassword") ?? "");
   const blueprint = String(formData.get("blueprint") ?? "artisan").trim().toLowerCase();
@@ -67,6 +74,7 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
     "immobilier",
     "salon",
     "boutique",
+    "avocat",
   ]);
   if (!allowedBlueprints.has(blueprint)) {
     return { ok: false, error: "Blueprint invalide." };
@@ -98,10 +106,11 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
       INSERT INTO app_settings (key, value) VALUES ('blueprint.active', ${blueprint})
       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()
     `;
-    await sql.unsafe(`
-      INSERT INTO app_settings (key, value) VALUES ('blueprint.${blueprint}.payload', '{}')
+    const blueprintPayloadKey = `blueprint.${blueprint}.payload`;
+    await sql`
+      INSERT INTO app_settings (key, value) VALUES (${blueprintPayloadKey}, '{}')
       ON CONFLICT (key) DO NOTHING
-    `);
+    `;
     const inserted = await sql<{ id: string }[]>`
       INSERT INTO users (email, password_hash, role)
       VALUES (${adminEmail}, ${passwordHash}, 'admin')

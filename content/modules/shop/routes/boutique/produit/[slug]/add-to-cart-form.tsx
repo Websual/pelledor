@@ -16,6 +16,7 @@ export function AddToCartForm({ productId }: { productId: string }) {
           const res = await fetch("/api/modules/shop/cart", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ productId, quantity: qty }),
           });
           if (!res.ok) {

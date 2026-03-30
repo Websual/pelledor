@@ -1,29 +1,75 @@
 /* eslint-disable @next/next/no-img-element */
-import type { PageBlock, HeroConfig, TextConfig, ImageConfig, GalleryConfig, CtaConfig, ServicesConfig, ContactInfoConfig, SeparatorConfig, EmbedConfig } from "./block-types";
+import type { CSSProperties } from "react";
+import type {
+  PageBlock,
+  HeroConfig,
+  HeadingConfig,
+  TextConfig,
+  ImageConfig,
+  GalleryConfig,
+  CtaConfig,
+  ServicesConfig,
+  FaqConfig,
+  TestimonialsConfig,
+  ContactInfoConfig,
+  SeparatorConfig,
+  EmbedConfig,
+} from "./block-types";
+import {
+  normalizeBlocksToDocument,
+  parsePageBlocksFromDb,
+  type BuilderColumnV1,
+  type BuilderRowV1,
+  type PageDocumentV1,
+} from "./page-document";
+import { safeCssBackgroundUrl, safeHref, safeImageSrc } from "@/core/security/safe-url";
+import { sanitizeCmsHtml } from "@/core/security/sanitize-cms-html";
 
 // ─── Renderers individuels ────────────────────────────────────────────────────
 
+const alignClass = { left: "text-left", center: "text-center", right: "text-right" };
+
+function HeadingBlock({ config }: { config: HeadingConfig }) {
+  const level = config.level ?? "h2";
+  const Tag = level;
+  const sizes: Record<NonNullable<HeadingConfig["size"]>, string> = {
+    display: "text-4xl md:text-6xl",
+    xl: "text-3xl md:text-5xl",
+    lg: "text-2xl md:text-4xl",
+    md: "text-xl md:text-3xl",
+    sm: "text-lg md:text-xl",
+  };
+  const cl = sizes[config.size ?? "lg"];
+  const ta = alignClass[config.align ?? "left"];
+  return (
+    <div className={`py-6 px-6 ${ta}`}>
+      <Tag className={`${cl} font-light text-gray-900 tracking-tight`}>{config.text}</Tag>
+    </div>
+  );
+}
+
 function HeroBlock({ config }: { config: HeroConfig }) {
-  const align = config.textAlign ?? "center";
+  const ta = alignClass[config.textAlign ?? "center"];
   const overlayOpacity = (config.overlay ?? 40) / 100;
+  const bgUrl = safeCssBackgroundUrl(config.bgImage);
   return (
     <section
       className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
       style={{
-        background: config.bgImage
-          ? `url(${config.bgImage}) center/cover no-repeat`
+        background: bgUrl
+          ? `url(${bgUrl}) center/cover no-repeat`
           : config.bgColor ?? "#1a1a2e",
       }}
     >
-      {config.bgImage && (
+      {bgUrl && (
         <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${overlayOpacity})` }} />
       )}
-      <div className={`relative z-10 px-6 py-16 max-w-3xl w-full text-${align}`}>
+      <div className={`relative z-10 px-6 py-16 max-w-3xl w-full ${ta}`}>
         <h1 className="text-4xl md:text-6xl font-light text-white mb-4 leading-tight">{config.title}</h1>
         {config.subtitle && <p className="text-xl text-white/70 mb-8 font-light">{config.subtitle}</p>}
         {config.ctaText && config.ctaLink && (
           <a
-            href={config.ctaLink}
+            href={safeHref(config.ctaLink)}
             className="inline-block bg-white text-gray-900 px-8 py-3 font-medium hover:bg-gray-100 transition"
           >
             {config.ctaText}
@@ -36,12 +82,14 @@ function HeroBlock({ config }: { config: HeroConfig }) {
 
 function TextBlock({ config }: { config: TextConfig }) {
   const maxW = { sm: "max-w-sm", md: "max-w-2xl", lg: "max-w-4xl", full: "max-w-full" }[config.maxWidth ?? "md"];
+  const html = sanitizeCmsHtml(config.content ?? "");
+  if (!html.trim()) return null;
   return (
     <section className="py-12 px-6">
-      <div className={`${maxW} mx-auto text-${config.align ?? "left"}`}>
+      <div className={`${maxW} mx-auto ${alignClass[config.align ?? "left"]}`}>
         <div
           className="prose prose-lg max-w-none text-gray-700"
-          dangerouslySetInnerHTML={{ __html: config.content }}
+          dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
     </section>
@@ -50,12 +98,13 @@ function TextBlock({ config }: { config: TextConfig }) {
 
 function ImageBlock({ config }: { config: ImageConfig }) {
   const widthClass = { sm: "max-w-sm", md: "max-w-xl", lg: "max-w-3xl", full: "max-w-full" }[config.width ?? "full"];
-  if (!config.src) return null;
+  const src = safeImageSrc(config.src);
+  if (!src) return null;
   return (
     <section className="py-8 px-6">
       <div className={`${widthClass} mx-auto`}>
         <img
-          src={config.src}
+          src={src}
           alt={config.alt ?? ""}
           className={`w-full object-cover ${config.rounded ? "rounded-2xl" : ""}`}
         />
@@ -72,15 +121,19 @@ function GalleryBlock({ config }: { config: GalleryConfig }) {
   return (
     <section className="py-10 px-6">
       <div className={`grid ${cols} ${gap} max-w-5xl mx-auto`}>
-        {config.images.map((img, i) => (
-          <div key={i} className="overflow-hidden aspect-square group">
-            <img
-              src={img.src}
-              alt={img.alt ?? ""}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          </div>
-        ))}
+        {config.images.flatMap((img, i) => {
+          const s = safeImageSrc(img.src);
+          if (!s) return [];
+          return [
+            <div key={`${i}-${s.slice(0, 48)}`} className="overflow-hidden aspect-square group">
+              <img
+                src={s}
+                alt={img.alt ?? ""}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>,
+          ];
+        })}
       </div>
     </section>
   );
@@ -98,11 +151,84 @@ function CtaBlock({ config }: { config: CtaConfig }) {
     <section className={`py-10 px-6 ${align[config.align ?? "center"]}`}>
       {config.subtext && <p className="text-gray-500 mb-3 text-sm">{config.subtext}</p>}
       <a
-        href={config.link}
+        href={safeHref(config.link)}
         className={`inline-block font-medium transition ${styles[config.style ?? "primary"]} ${sizes[config.size ?? "md"]}`}
       >
         {config.text}
       </a>
+    </section>
+  );
+}
+
+function FaqBlock({ config }: { config: FaqConfig }) {
+  const items = config.items ?? [];
+  if (!items.length) return null;
+  return (
+    <section className="py-12 px-6">
+      <div className="max-w-3xl mx-auto">
+        {config.title ? (
+          <h2 className="text-2xl font-light text-gray-800 mb-8 text-center">{config.title}</h2>
+        ) : null}
+        <div className="space-y-2">
+          {items.map((item, i) => (
+            <details
+              key={i}
+              className="group border border-gray-200 rounded-xl bg-white open:shadow-sm transition-shadow"
+            >
+              <summary className="cursor-pointer select-none px-4 py-3.5 font-medium text-gray-800 flex justify-between items-center gap-4 list-none [&::-webkit-details-marker]:hidden">
+                <span>{item.question}</span>
+                <span className="text-gray-400 text-xs shrink-0 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div
+                className="px-4 pb-4 pt-0 prose prose-sm max-w-none text-gray-600 border-t border-gray-100"
+                dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(item.answer ?? "") }}
+              />
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsBlock({ config }: { config: TestimonialsConfig }) {
+  const items = config.items ?? [];
+  if (!items.length) return null;
+  const cols = { 1: "grid-cols-1", 2: "grid-cols-1 md:grid-cols-2", 3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" }[
+    config.columns ?? 2
+  ];
+  return (
+    <section className="py-12 px-6 bg-gray-50/80">
+      <div className="max-w-5xl mx-auto">
+        {config.title ? (
+          <h2 className="text-2xl font-light text-gray-800 mb-10 text-center">{config.title}</h2>
+        ) : null}
+        <div className={`grid ${cols} gap-6`}>
+          {items.map((item, i) => {
+            const av = safeImageSrc(item.avatarUrl);
+            return (
+              <figure key={i} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <blockquote className="text-gray-700 text-sm leading-relaxed mb-4">
+                  &ldquo;{item.quote}&rdquo;
+                </blockquote>
+                <figcaption className="flex items-center gap-3">
+                  {av ? (
+                    <img src={av} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm font-medium">
+                      {(item.author || "?").slice(0, 1).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-medium text-gray-900 text-sm">{item.author}</div>
+                    {item.role && <div className="text-xs text-gray-500">{item.role}</div>}
+                  </div>
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      </div>
     </section>
   );
 }
@@ -175,16 +301,55 @@ function SeparatorBlock({ config }: { config: SeparatorConfig }) {
   return <div className={spacing} />;
 }
 
-function EmbedBlock({ config }: { config: EmbedConfig }) {
-  if (!config.url) return null;
-  let src = config.url;
-  if (config.type === "youtube") {
-    const m = config.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/);
-    if (m) src = `https://www.youtube.com/embed/${m[1]}`;
-  } else if (config.type === "vimeo") {
-    const m = config.url.match(/vimeo\.com\/(\d+)/);
-    if (m) src = `https://player.vimeo.com/video/${m[1]}`;
+function embedIframeSrc(config: EmbedConfig): string | null {
+  const raw = config.url?.trim();
+  if (!raw) return null;
+  const t = config.type ?? "generic";
+  if (t === "youtube") {
+    const m = raw.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
+    if (!m?.[1]) return null;
+    return `https://www.youtube.com/embed/${encodeURIComponent(m[1])}`;
   }
+  if (t === "vimeo") {
+    const m = raw.match(/vimeo\.com\/(\d+)/);
+    if (!m?.[1]) return null;
+    return `https://player.vimeo.com/video/${encodeURIComponent(m[1])}`;
+  }
+  if (t === "maps") {
+    try {
+      const u = new URL(raw);
+      if (u.protocol !== "https:") return null;
+      const h = u.hostname.toLowerCase();
+      const ok =
+        h === "www.google.com" ||
+        h === "google.com" ||
+        h === "maps.google.com" ||
+        h === "maps.googleapis.com" ||
+        h === "www.openstreetmap.org";
+      return ok ? raw : null;
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== "https:") return null;
+    const h = u.hostname.toLowerCase();
+    const allowed = new Set([
+      "www.youtube.com",
+      "youtube.com",
+      "www.youtube-nocookie.com",
+      "player.vimeo.com",
+    ]);
+    return allowed.has(h) ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+function EmbedBlock({ config }: { config: EmbedConfig }) {
+  const src = embedIframeSrc(config);
+  if (!src) return null;
   return (
     <section className="py-8 px-6">
       <div className="max-w-4xl mx-auto">
@@ -211,11 +376,15 @@ export function BlockRenderer({ blocks }: { blocks: PageBlock[] }) {
       {blocks.map((block) => {
         switch (block.type) {
           case "hero": return <HeroBlock key={block.id} config={block.config as HeroConfig} />;
+          case "heading": return <HeadingBlock key={block.id} config={block.config as HeadingConfig} />;
           case "text": return <TextBlock key={block.id} config={block.config as TextConfig} />;
           case "image": return <ImageBlock key={block.id} config={block.config as ImageConfig} />;
           case "gallery": return <GalleryBlock key={block.id} config={block.config as GalleryConfig} />;
           case "cta": return <CtaBlock key={block.id} config={block.config as CtaConfig} />;
           case "services": return <ServicesBlock key={block.id} config={block.config as ServicesConfig} />;
+          case "faq": return <FaqBlock key={block.id} config={block.config as FaqConfig} />;
+          case "testimonials":
+            return <TestimonialsBlock key={block.id} config={block.config as TestimonialsConfig} />;
           case "contact-info": return <ContactInfoBlock key={block.id} config={block.config as ContactInfoConfig} />;
           case "separator": return <SeparatorBlock key={block.id} config={block.config as SeparatorConfig} />;
           case "embed": return <EmbedBlock key={block.id} config={block.config as EmbedConfig} />;
@@ -232,6 +401,86 @@ export function BlockRenderer({ blocks }: { blocks: PageBlock[] }) {
             return null;
         }
       })}
+    </div>
+  );
+}
+
+function resolvePageDocument(payload: unknown): PageDocumentV1 {
+  try {
+    return normalizeBlocksToDocument(payload);
+  } catch {
+    return parsePageBlocksFromDb(null);
+  }
+}
+
+function rowPaddingClass(rs: Record<string, unknown> | undefined): string {
+  if (!rs) return "";
+  return { none: "", sm: "py-6", md: "py-12", lg: "py-20" }[String(rs.paddingY)] ?? "";
+}
+
+function rowOuterStyle(rs: Record<string, unknown> | undefined): CSSProperties {
+  if (!rs) return {};
+  const s: CSSProperties = {};
+  if (typeof rs.background === "string") s.backgroundColor = rs.background;
+  if (typeof rs.backgroundImage === "string") {
+    s.backgroundImage = `url(${rs.backgroundImage})`;
+    s.backgroundSize = "cover";
+    s.backgroundPosition = "center";
+  }
+  return s;
+}
+
+function BuilderColumnCell({ col }: { col: BuilderColumnV1 }) {
+  const cs = col.columnSettings as Record<string, unknown> | undefined;
+  const ta = String(cs?.textAlign ?? "left");
+  const textAlign =
+    ta === "center" ? "text-center" : ta === "right" ? "text-right" : "text-left";
+  const pad = { none: "", sm: "p-2", md: "p-4", lg: "p-6" }[String(cs?.padding)] ?? "";
+  return (
+    <div
+      className={`min-w-0 ${textAlign} ${pad}`}
+      style={{ gridColumn: `span ${col.span} / span ${col.span}` }}
+      data-col-id={col.id}
+    >
+      <BlockRenderer blocks={col.blocks} />
+    </div>
+  );
+}
+
+function BuilderRowSection({ row }: { row: BuilderRowV1 }) {
+  const rs = row.rowSettings as Record<string, unknown> | undefined;
+  const py = rowPaddingClass(rs);
+  const style = rowOuterStyle(rs);
+  const innerBoxed = rs?.maxWidth === "boxed";
+  const grid = (
+    <div
+      className="grid w-full gap-4 md:gap-6"
+      style={{ gridTemplateColumns: "repeat(12, minmax(0, 1fr))" }}
+    >
+      {row.columns.map((col) => (
+        <BuilderColumnCell key={col.id} col={col} />
+      ))}
+    </div>
+  );
+  return (
+    <div className={`page-row w-full ${py}`} style={style} data-row-id={row.id}>
+      {innerBoxed ? (
+        <div className="max-w-6xl mx-auto px-4 md:px-6">{grid}</div>
+      ) : (
+        <div className="w-full px-4 md:px-6">{grid}</div>
+      )}
+    </div>
+  );
+}
+
+/** Rendu lignes / colonnes (grille 12) + dispatch blocs — pour preview admin et pages publiques. */
+export function PageDocumentRenderer({ payload }: { payload: unknown }) {
+  const doc = resolvePageDocument(payload);
+  return (
+    <div className="page-document">
+      {doc.rows.map((row) => (
+        <BuilderRowSection key={row.id} row={row} />
+      ))}
     </div>
   );
 }

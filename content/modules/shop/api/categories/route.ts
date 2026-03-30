@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { productCategories } from "@/core/db/schema.modules";
+import { requireShopAdmin } from "@/core/shop/admin";
 import { asc } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -17,8 +18,8 @@ export async function GET() {
 /** POST : créer une catégorie (admin). */
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = requireShopAdmin(session);
+  if (denied) return denied;
   const body = await req.json().catch(() => ({}));
   const name = String(body.name ?? "").trim();
   const slug = String(body.slug ?? "")
