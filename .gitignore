@@ -44,3 +44,11 @@ import/legacy-saas/_vendor_snapshot/
 # misc
 .DS_Store
 *.log
+
+# Internal / private files
+"WHITE PAPER _ Projet _SaaS OS_.md"
+WHITE*PAPER*.md
+consignes/
+.cursor/
+.saas-build-manifest.json
+.env.localn#
