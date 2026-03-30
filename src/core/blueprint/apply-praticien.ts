@@ -19,6 +19,7 @@ const ON = [
   "billing",
   "chat",
   "notifications",
+  "anamnese",
 ];
 const OFF = [
   "lodging",
@@ -27,6 +28,7 @@ const OFF = [
   "blog",
   "gift-cards",
   "artisan-quotes",
+  "click-collect",
 ];
 
 export async function applyPraticienToggles() {

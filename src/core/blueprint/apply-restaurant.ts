@@ -10,8 +10,8 @@ import {
 import { setModuleToggle } from "@/core/theme/db";
 import { eq } from "drizzle-orm";
 
-const ON = ["notes", "stripe", "directory", "restaurant", "notifications"];
-const OFF = ["lodging", "events", "blog", "gift-cards"];
+const ON = ["notes", "stripe", "directory", "restaurant", "notifications", "click-collect"];
+const OFF = ["lodging", "events", "blog", "gift-cards", "anamnese"];
 
 export async function applyRestaurantToggles() {
   for (const s of ON) await setModuleToggle(s, true);
