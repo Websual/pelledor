@@ -7,39 +7,34 @@
       "version": "7",
       "when": 1730000000000,
       "tag": "0000_init",
-      "sql": "0000_init.sql",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
       "when": 1730100000000,
-      "tag": "0001_step3",
-      "sql": "0001_step3_theme_modules.sql",
+      "tag": "0001_step3_theme_modules",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
       "when": 1730200000000,
-      "tag": "0002_modules",
-      "sql": "0002_modules_notes_stripe.sql",
+      "tag": "0002_modules_notes_stripe",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
       "when": 1730300000000,
-      "tag": "0003_platform",
-      "sql": "0003_platform_modules.sql",
+      "tag": "0003_platform_modules",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "7",
       "when": 1730400000000,
-      "tag": "0004_lodging",
-      "sql": "0004_rooms_lodging.sql",
+      "tag": "0004_rooms_lodging",
       "breakpoints": true
     },
     {
@@ -47,39 +42,62 @@
       "version": "7",
       "when": 1730500000000,
       "tag": "0005_restaurant",
-      "sql": "0005_restaurant.sql",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "7",
       "when": 1730600000000,
-      "tag": "0006_quotes",
-      "sql": "0006_artisan_quotes.sql",
+      "tag": "0006_artisan_quotes",
       "breakpoints": true
     },
     {
       "idx": 7,
       "version": "7",
       "when": 1730700000000,
-      "tag": "0007_shop",
-      "sql": "0007_shop_ecommerce.sql",
+      "tag": "0007_shop_ecommerce",
       "breakpoints": true
     },
     {
       "idx": 8,
       "version": "7",
       "when": 1730800000000,
-      "tag": "0012_cms_phase_c",
-      "sql": "0012_cms_phase_c.sql",
+      "tag": "0008_anamnese",
       "breakpoints": true
     },
     {
       "idx": 9,
       "version": "7",
       "when": 1730900000000,
+      "tag": "0009_click_collect",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1731000000000,
+      "tag": "0010_quote_signature",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1731100000000,
+      "tag": "0011_page_builder",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1731200000000,
+      "tag": "0012_cms_phase_c",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1731300000000,
       "tag": "0013_seo_phase_d",
-      "sql": "0013_seo_phase_d.sql",
       "breakpoints": true
     }
   ]

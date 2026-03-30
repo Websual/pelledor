@@ -18,7 +18,7 @@ const cspBaseline = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
-  basePath: "/saas-os",
+  // basePath removed for test.pelledor.com
   async headers() {
     const securityHeaders = [
       { key: "X-Frame-Options", value: "SAMEORIGIN" },

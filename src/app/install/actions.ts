@@ -3,6 +3,7 @@
 import { hash } from "bcryptjs";
 import { writeFile } from "fs/promises";
 import { join } from "path";
+import { spawn } from "child_process";
 import postgres from "postgres";
 import { bootstrapServer } from "@/core/bootstrap-server";
 import { Hooks } from "@/core/events/hooks";
@@ -150,6 +151,18 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
     wroteEnv = true;
   } catch {
     // read-only FS (ex. certain deploy) : utilisateur colle le snippet
+  }
+
+  // Déclencher un redémarrage automatique pour recharger .env.local (SAAS_INSTALLED + clés)
+  if (wroteEnv) {
+    setTimeout(() => {
+      const pm2 = spawn("pm2", ["restart", "pelledor", "--update-env"], {
+        detached: true,
+        stdio: "ignore",
+        env: { ...process.env, PATH: process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin:/root/.nvm/versions/node/v24.10.0/bin" },
+      });
+      pm2.unref();
+    }, 1500);
   }
 
   return { ok: true, envSnippet, wroteEnv };

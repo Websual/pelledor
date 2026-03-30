@@ -1,5 +1,7 @@
 /**
  * Validation minimale de DATABASE_URL pour limiter injections et URLs manifestement invalides.
+ * Note: localhost / 127.0.0.1 sont autorisés (installation self-hosted classique).
+ * Seules les plages cloud-metadata et LAN privées sont bloquées.
  */
 export function assertSafePostgresUrl(url: string): { ok: true } | { ok: false; error: string } {
   const trimmed = url.trim();
@@ -34,7 +36,7 @@ export function assertSafePostgresUrl(url: string): { ok: true } | { ok: false; 
     return {
       ok: false,
       error:
-        "Hôte réservé / non autorisé pour cette installation (utilisez une base accessible explicitement).",
+        "Hôte cloud-metadata non autorisé. Utilisez l'IP ou le hostname réel de votre base.",
     };
   }
   return { ok: true };
@@ -42,17 +44,18 @@ export function assertSafePostgresUrl(url: string): { ok: true } | { ok: false; 
 
 function isBlockedHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
+  // Autoriser localhost et 127.0.0.1 (self-hosted classique)
+  if (h === "localhost" || h === "127.0.0.1" || h === "::1") return false;
+  // Bloquer cloud-metadata
   if (h === "metadata.google.internal" || h.endsWith(".internal")) return true;
   const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(h);
   if (!m) return false;
   const a = Number(m[1]);
   const b = Number(m[2]);
-  if (a === 10) return true;
-  if (a === 127) return true;
-  if (a === 0) return true;
+  // Bloquer 169.254.x.x (link-local / AWS metadata)
   if (a === 169 && b === 254) return true;
-  if (a === 172 && b >= 16 && b <= 31) return true;
-  if (a === 192 && b === 168) return true;
+  // Bloquer 100.64-127 (CGNAT)
   if (a === 100 && b >= 64 && b <= 127) return true;
+  // Laisser passer 10.x, 172.16-31.x, 192.168.x (VPS / Docker / LAN légitimes)
   return false;
 }
