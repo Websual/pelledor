@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { events } from "@/core/db/schema.modules";
+import { rateLimitMemory } from "@/core/security/rate-limit-memory";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { getStripe } from "@/core/stripe";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -9,6 +11,18 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await rateLimitByIp("events-checkout", 40, 10 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de demandes. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
+  if (!rateLimitMemory(`events-checkout:user:${session.user.id}`, 30, 10 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Trop de demandes. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const eventId = body.eventId as string;
   const quantity = Math.min(10, Math.max(1, parseInt(body.quantity, 10) || 1));

@@ -5,6 +5,7 @@ import {
   practitioners,
   quoteRequests,
 } from "@/core/db/schema.modules";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -26,6 +27,12 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!(await rateLimitByIp("quote-request", 25, 15 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de demandes. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const establishment = String(body.establishment ?? "").trim();
   const clientName = String(body.clientName ?? "").trim();

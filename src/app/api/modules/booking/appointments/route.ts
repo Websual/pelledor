@@ -6,6 +6,7 @@ import {
   practitioners,
 } from "@/core/db/schema.modules";
 import { Hooks } from "@/core/events/hooks";
+import { rateLimitMemory } from "@/core/security/rate-limit-memory";
 import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -26,6 +27,12 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!rateLimitMemory(`booking-create:${session.user.id}`, 40, 15 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Trop de rendez-vous créés. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const { practitionerId, serviceId, startsAt } = body;
   if (!practitionerId || !serviceId || !startsAt) {

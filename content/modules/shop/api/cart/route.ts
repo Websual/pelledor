@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/core/db/server";
 import { cartItems, products } from "@/core/db/schema.modules";
 import { applyCartCookie, resolveCartSessionId } from "@/core/shop/cart-session";
+import { rateLimitByIp } from "@/core/security/rate-limit-request";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -41,6 +42,12 @@ export async function GET() {
 
 /** POST : ajouter ou mettre à jour une ligne (body: productId, quantity). */
 export async function POST(req: Request) {
+  if (!(await rateLimitByIp("shop-cart-mutate", 90, 10 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Trop de modifications du panier. Réessayez plus tard." },
+      { status: 429 }
+    );
+  }
   const session = await auth();
   const { sessionId, setCookie } = await resolveCartSessionId(session?.user?.id);
   const body = await req.json().catch(() => ({}));

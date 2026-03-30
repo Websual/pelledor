@@ -35,9 +35,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   const name = String(body.name ?? "").trim();
-  const priceCents = parseInt(body.priceCents ?? body.price_cents ?? 0);
-  if (!name || !priceCents)
-    return NextResponse.json({ error: "Nom et prix requis" }, { status: 400 });
+  const priceCents = parseInt(body.priceCents ?? body.price_cents ?? "0", 10);
+  if (!name || !Number.isFinite(priceCents) || priceCents < 1 || priceCents > 500_000) {
+    return NextResponse.json(
+      { error: "Nom et prix requis (1 cent – 5000 €)" },
+      { status: 400 }
+    );
+  }
   const db = getDb();
   const p = await db.query.practitioners.findFirst({
     where: eq(practitioners.userId, session.user.id),
