@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createNote } from "../actions";
 
-export function NewNoteForm() {
+export function NewNoteForm({ successRedirect = "/notes" }: { successRedirect?: string }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -21,7 +21,7 @@ export function NewNoteForm() {
       setErr(r.error || "Erreur");
       return;
     }
-    router.push("/notes");
+    router.push(successRedirect);
   }
 
   return (

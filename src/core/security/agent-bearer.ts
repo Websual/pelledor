@@ -34,15 +34,15 @@ function tokensEqual(a: string, b: string): boolean {
 }
 
 /**
- * Auth pour automates : `Authorization: Bearer <SAAS_OS_AGENT_API_TOKEN>`,
- * avec périmètre limité au praticien `SAAS_OS_AGENT_PRACTITIONER_ID`.
+ * Auth pour automates : `Authorization: Bearer <PELLEDOR_AGENT_TOKEN>`,
+ * avec périmètre limité au praticien `PELLEDOR_AGENT_PRACTITIONER_ID`.
  * Sinon session NextAuth (comportement habituel).
  */
 export async function requirePractitionerForCmsApi(req: Request): Promise<CmsApiAuth> {
   const raw = req.headers.get("authorization");
   const bearer = raw?.replace(/^Bearer\s+/i, "").trim() ?? "";
-  const agentSecret = process.env.SAAS_OS_AGENT_API_TOKEN?.trim() ?? "";
-  const agentPid = process.env.SAAS_OS_AGENT_PRACTITIONER_ID?.trim() ?? "";
+  const agentSecret = process.env.PELLEDOR_AGENT_TOKEN?.trim() ?? "";
+  const agentPid = process.env.PELLEDOR_AGENT_PRACTITIONER_ID?.trim() ?? "";
 
   if (bearer) {
     if (
@@ -51,7 +51,7 @@ export async function requirePractitionerForCmsApi(req: Request): Promise<CmsApi
     ) {
       return {
         ok: false,
-        error: "SAAS_OS_AGENT_API_TOKEN trop court (min. 32 caractères)",
+        error: "PELLEDOR_AGENT_TOKEN trop court (min. 32 caractères)",
         status: 503,
       };
     }
@@ -61,7 +61,7 @@ export async function requirePractitionerForCmsApi(req: Request): Promise<CmsApi
     if (!agentPid) {
       return {
         ok: false,
-        error: "SAAS_OS_AGENT_PRACTITIONER_ID manquant côté serveur",
+        error: "PELLEDOR_AGENT_PRACTITIONER_ID manquant côté serveur",
         status: 503,
       };
     }
@@ -72,7 +72,7 @@ export async function requirePractitionerForCmsApi(req: Request): Promise<CmsApi
     if (!practitioner) {
       return { ok: false, error: "Praticien agent introuvable", status: 404 };
     }
-    const agentCanEditTheme = process.env.SAAS_OS_AGENT_ALLOW_THEME === "true";
+    const agentCanEditTheme = process.env.PELLEDOR_AGENT_ALLOW_THEME === "true";
     return {
       ok: true,
       practitioner,

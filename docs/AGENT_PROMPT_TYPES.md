@@ -51,7 +51,7 @@ Ce document fixe des **modèles de consigne** pour éditer le contenu sans casse
 
 **Prompt modèle** :
 
-> Ne modifie le thème que si l’utilisateur est administrateur ou si l’instance autorise l’agent (`SAAS_OS_AGENT_ALLOW_THEME`). Utilise `POST /api/modules/page-builder/cms-bundle` avec un objet `theme` partiel compatible `ThemeTokens` ; fusionne de manière conservative (une ou deux familles de tokens à la fois).
+> Ne modifie le thème que si l’utilisateur est administrateur ou si l’instance autorise l’agent (`PELLEDOR_AGENT_ALLOW_THEME`). Utilise `POST /api/modules/page-builder/cms-bundle` avec un objet `theme` partiel compatible `ThemeTokens` ; fusionne de manière conservative (une ou deux familles de tokens à la fois).
 
 ---
 

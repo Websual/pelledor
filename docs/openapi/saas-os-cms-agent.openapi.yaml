@@ -7,10 +7,10 @@ info:
 
     **Authentification**
     - **Session** : cookie NextAuth (navigateur).
-    - **Agent** : en-tête `Authorization: Bearer <SAAS_OS_AGENT_API_TOKEN>`.
-      Le périmètre est fixé côté serveur par `SAAS_OS_AGENT_PRACTITIONER_ID` (UUID du praticien).
+    - **Agent** : en-tête `Authorization: Bearer <PELLEDOR_AGENT_TOKEN>`.
+      Le périmètre est fixé côté serveur par `PELLEDOR_AGENT_PRACTITIONER_ID` (UUID du praticien).
       La fusion du **thème global** via `POST /cms-bundle` avec un corps `theme` n’est autorisée pour l’agent
-      que si `SAAS_OS_AGENT_ALLOW_THEME=true`. Les administrateurs (session, `role === admin`) peuvent toujours fusionner le thème.
+      que si `PELLEDOR_AGENT_ALLOW_THEME=true`. Les administrateurs (session, `role === admin`) peuvent toujours fusionner le thème.
 
     **Base path** : l’application est déployée sous `/saas-os` (voir `next.config.ts`). Préfixez tous les chemins ci-dessous.
 
@@ -207,7 +207,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      description: Jeton `SAAS_OS_AGENT_API_TOKEN` (mot de passe de l’instance).
+      description: Jeton `PELLEDOR_AGENT_TOKEN` (mot de passe de l’instance).
     cookieAuth:
       type: apiKey
       in: cookie
@@ -259,7 +259,7 @@ components:
       properties:
         theme:
           type: object
-          description: Réservé admin session ou agent avec SAAS_OS_AGENT_ALLOW_THEME
+          description: Réservé admin session ou agent avec PELLEDOR_AGENT_ALLOW_THEME
         pages:
           type: array
           items:

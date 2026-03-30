@@ -9,11 +9,11 @@ function requireEnv(name: string): string {
 }
 
 function apiBase(): string {
-  return requireEnv("SAAS_OS_MCP_BASE_URL").replace(/\/$/, "");
+  return requireEnv("PELLEDOR_MCP_BASE_URL").replace(/\/$/, "");
 }
 
 function bearer(): string {
-  return requireEnv("SAAS_OS_AGENT_API_TOKEN");
+  return requireEnv("PELLEDOR_AGENT_TOKEN");
 }
 
 async function apiFetch(
@@ -55,7 +55,7 @@ server.registerTool(
   "cms_get_bundle",
   {
     description:
-      "Exporte le thème résolu (tokens) et toutes les pages builder du praticien configuré par SAAS_OS_AGENT_PRACTITIONER_ID côté serveur.",
+      "Exporte le thème résolu (tokens) et toutes les pages builder du praticien configuré par PELLEDOR_AGENT_PRACTITIONER_ID côté serveur.",
     inputSchema: {},
   },
   async () => {
@@ -139,7 +139,7 @@ server.registerTool(
   "cms_import_pages",
   {
     description:
-      "POST cms-bundle : importe un tableau de pages. La clé theme est ignorée sauf si le serveur a SAAS_OS_AGENT_ALLOW_THEME=true.",
+      "POST cms-bundle : importe un tableau de pages. La clé theme est ignorée sauf si le serveur a PELLEDOR_AGENT_ALLOW_THEME=true.",
     inputSchema: {
       pages: z
         .array(

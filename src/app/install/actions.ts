@@ -137,8 +137,8 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
   const envPath = join(process.cwd(), ".env.local");
   const PRESERVED_KEYS = [
     "AUTH_URL", "NEXTAUTH_URL", "NEXT_PUBLIC_APP_URL",
-    "SAAS_OS_AGENT_API_TOKEN", "SAAS_OS_AGENT_PRACTITIONER_ID", "SAAS_OS_AGENT_ALLOW_THEME",
-    "SAAS_OS_MCP_BASE_URL",
+    "PELLEDOR_AGENT_TOKEN", "PELLEDOR_AGENT_PRACTITIONER_ID", "PELLEDOR_AGENT_ALLOW_THEME",
+    "PELLEDOR_MCP_BASE_URL",
     "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_NOTE_PRICE_ID", "STRIPE_NOTE_PRICE_CENTS",
     "SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_SECURE", "MAIL_FROM",
   ];
@@ -171,8 +171,8 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
     `# STRIPE_WEBHOOK_SECRET=${preserved["STRIPE_WEBHOOK_SECRET"] ?? "whsec_..."}`,
     "",
     "# Agent / MCP (optionnel - automatisation par IA)",
-    `# SAAS_OS_AGENT_API_TOKEN=${preserved["SAAS_OS_AGENT_API_TOKEN"] ?? "token-secret-min-32-chars"}`,
-    `# SAAS_OS_AGENT_PRACTITIONER_ID=${preserved["SAAS_OS_AGENT_PRACTITIONER_ID"] ?? "uuid-du-praticien"}`,
+    `# PELLEDOR_AGENT_TOKEN=${preserved["PELLEDOR_AGENT_TOKEN"] ?? "token-secret-min-32-chars"}`,
+    `# PELLEDOR_AGENT_PRACTITIONER_ID=${preserved["PELLEDOR_AGENT_PRACTITIONER_ID"] ?? "uuid-du-praticien"}`,
     "",
   ];
 

@@ -20,6 +20,7 @@ export async function createNote(title: string, body: string) {
     body,
   });
   revalidatePath("/notes");
+  revalidatePath("/admin/notes");
   return { ok: true };
 }
 
@@ -31,5 +32,6 @@ export async function deleteNote(id: string) {
     .delete(notes)
     .where(and(eq(notes.id, id), eq(notes.userId, session.user.id)));
   revalidatePath("/notes");
+  revalidatePath("/admin/notes");
   return { ok: true };
 }

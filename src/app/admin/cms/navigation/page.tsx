@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import type { NavLinkType } from "@/core/cms/practitioner-utils";
 import { NAV_LINK_TYPES } from "@/core/cms/practitioner-utils";
 
@@ -24,11 +25,29 @@ export default function AdminSiteNavigationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [needsPractitioner, setNeedsPractitioner] = useState(false);
 
   const refresh = useCallback(() => {
+    setLoading(true);
+    setMessage(null);
     fetch("/api/modules/cms/navigation")
-      .then((r) => r.json())
-      .then((d) => {
+      .then(async (r) => {
+        const d = await r.json();
+        if (!r.ok) {
+          setNeedsPractitioner(false);
+          setMessage(d.error || "Chargement impossible");
+          setItems([]);
+          return;
+        }
+        if (d.noPractitioner) {
+          setNeedsPractitioner(true);
+          setMessage(
+            "Aucune fiche établissement liée à votre compte. Créez un praticien / établissement dans « Profil & prestations » ou appliquez votre blueprint depuis l’admin."
+          );
+          setItems([]);
+          return;
+        }
+        setNeedsPractitioner(false);
         const raw = d.items ?? [];
         setItems(
           raw.map((x: { label: string; linkType: string; linkTarget: string; sortOrder: number }) => ({
@@ -40,8 +59,13 @@ export default function AdminSiteNavigationPage() {
             sortOrder: x.sortOrder ?? 0,
           }))
         );
-        setLoading(false);
-      });
+      })
+      .catch(() => {
+        setNeedsPractitioner(false);
+        setMessage("Réseau ou serveur indisponible.");
+        setItems([]);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -112,7 +136,16 @@ export default function AdminSiteNavigationPage() {
         </p>
       </div>
       {message && (
-        <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">{message}</p>
+        <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          <p>{message}</p>
+          {needsPractitioner && (
+            <p>
+              <Link href="/admin/data" className="font-medium text-blue-700 underline">
+                Ouvrir Profil & prestations →
+              </Link>
+            </p>
+          )}
+        </div>
       )}
       <div className="space-y-3">
         {items.map((row, i) => (
@@ -188,13 +221,14 @@ export default function AdminSiteNavigationPage() {
         <button
           type="button"
           onClick={addRow}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm"
+          disabled={needsPractitioner}
+          className="rounded-lg border border-gray-300 px-4 py-2 text-sm disabled:opacity-50"
         >
           + Ligne
         </button>
         <button
           type="button"
-          disabled={saving}
+          disabled={saving || needsPractitioner}
           onClick={save}
           className="rounded-lg bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
         >

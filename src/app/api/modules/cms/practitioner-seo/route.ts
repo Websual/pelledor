@@ -17,7 +17,13 @@ export async function GET() {
   const p = await db.query.practitioners.findFirst({
     where: eq(practitioners.userId, session.user.id),
   });
-  if (!p) return NextResponse.json({ error: "Praticien introuvable" }, { status: 404 });
+  if (!p) {
+    return NextResponse.json({
+      publicSiteUrl: "",
+      seoRobotsTxt: "",
+      noPractitioner: true,
+    });
+  }
   return NextResponse.json({
     publicSiteUrl: p.publicSiteUrl ?? "",
     seoRobotsTxt: p.seoRobotsTxt ?? "",

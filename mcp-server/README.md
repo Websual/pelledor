@@ -5,13 +5,13 @@ Processus **stdio** qui expose des outils pour l’API documentée dans `../docs
 ## Prérequis
 
 1. Variables sur l’instance Next (voir `.env.example` à la racine du monorepo) :
-   - `SAAS_OS_AGENT_API_TOKEN` — secret partagé avec ce client
-   - `SAAS_OS_AGENT_PRACTITIONER_ID` — UUID du praticien ciblé par l’agent
-   - Optionnel : `SAAS_OS_AGENT_ALLOW_THEME=true` pour autoriser la fusion du thème via `POST /cms-bundle`
+   - `PELLEDOR_AGENT_TOKEN` — secret partagé avec ce client
+   - `PELLEDOR_AGENT_PRACTITIONER_ID` — UUID du praticien ciblé par l’agent
+   - Optionnel : `PELLEDOR_AGENT_ALLOW_THEME=true` pour autoriser la fusion du thème via `POST /cms-bundle`
 
 2. Variables pour **ce** package (lancement du MCP) :
-   - `SAAS_OS_MCP_BASE_URL` — URL de base **avec** le préfixe d’appli, ex. `http://localhost:3000/saas-os` ou `https://domaine.tld/saas-os`
-   - `SAAS_OS_AGENT_API_TOKEN` — le même secret que sur le serveur
+   - `PELLEDOR_MCP_BASE_URL` — URL de base **avec** le préfixe d’appli, ex. `http://localhost:3000/saas-os` ou `https://domaine.tld/saas-os`
+   - `PELLEDOR_AGENT_TOKEN` — le même secret que sur le serveur
 
 ## Installation
 
@@ -23,8 +23,8 @@ pnpm install
 ## Démarrage
 
 ```bash
-export SAAS_OS_MCP_BASE_URL="http://localhost:3000/saas-os"
-export SAAS_OS_AGENT_API_TOKEN="votre-secret"
+export PELLEDOR_MCP_BASE_URL="http://localhost:3000/saas-os"
+export PELLEDOR_AGENT_TOKEN="votre-secret"
 pnpm start
 ```
 

@@ -7,8 +7,11 @@ import { isNavLinkType } from "@/core/cms/practitioner-utils";
 
 export async function GET() {
   const { practitioner, error } = await getPractitionerForSession();
-  if (error) {
-    return NextResponse.json({ error }, { status: error === "Unauthorized" ? 401 : 404 });
+  if (error === "Unauthorized") {
+    return NextResponse.json({ error }, { status: 401 });
+  }
+  if (error === "Praticien introuvable") {
+    return NextResponse.json({ items: [], noPractitioner: true });
   }
   const db = getDb();
   const items = await db

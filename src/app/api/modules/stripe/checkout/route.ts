@@ -23,7 +23,7 @@ export async function POST() {
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${base}/notes?paid=1`,
-      cancel_url: `${base}/notes/billing`,
+      cancel_url: `${base}/admin/billing`,
       metadata: { userId: session.user.id, purpose: "notes" },
       customer_email: session.user.email || undefined,
     });
@@ -43,7 +43,7 @@ export async function POST() {
       },
     ],
     success_url: `${base}/notes?paid=1`,
-    cancel_url: `${base}/notes/billing`,
+    cancel_url: `${base}/admin/billing`,
     metadata: { userId: session.user.id, purpose: "notes" },
     customer_email: session.user.email || undefined,
   });
