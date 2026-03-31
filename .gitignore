@@ -53,3 +53,4 @@ consignes/
 .saas-build-manifest.json
 .env.localn#
 .pnpm-store/
+_internal/

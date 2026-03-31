@@ -21,6 +21,19 @@ Sans `SAAS_INSTALLED=true`, les requêtes hors assets sont redirigées vers **`/
 3. Le serveur écrit `.env.local` si possible (sinon copier le bloc affiché)  
 4. **Redémarrer** `pnpm dev` pour charger `DATABASE_URL` et les clés  
 
+## Bootstrap VPS (Ubuntu/Debian)
+
+Pour une machine neuve, un script est fourni pour préparer le serveur
+(Node, pnpm, pm2, nginx), installer les dépendances et lancer l'application.
+
+```bash
+chmod +x scripts/vps-bootstrap-ubuntu.sh
+sudo APP_DIR=/var/www/pelledor DOMAIN=votre-domaine.com ./scripts/vps-bootstrap-ubuntu.sh
+```
+
+Ensuite, ouvrez `http://votre-domaine.com/install` pour terminer la configuration
+applicative (base, compte admin, blueprint).
+
 | Variable | Rôle |
 |----------|------|
 | `ENCRYPTION_KEY` | Chiffrement des secrets en base |
@@ -56,6 +69,7 @@ Puis `pnpm build` / déploiement habituel. Le fichier **`.saas-build-manifest.js
 | Doc | Contenu |
 |-----|--------|
 | [docs/INSTALL.md](docs/INSTALL.md) | Installation détaillée, variables, migrations |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | Déploiement serveur (PM2/Nginx) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Core, modules, thème, build (livre blanc) |
 | [docs/MODULES_API.md](docs/MODULES_API.md) | API des modules, flux Notes + Stripe |
 | [docs/HOOKS.md](docs/HOOKS.md) | Hooks / événements |
