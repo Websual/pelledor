@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createNote } from "../actions";
 
-export function NewNoteForm({ successRedirect = "/notes" }: { successRedirect?: string }) {
+type NewNoteFormProps = {
+  successRedirect?: string;
+};
+
+export function NewNoteForm({ successRedirect = "/notes" }: NewNoteFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");

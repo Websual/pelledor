@@ -36,8 +36,9 @@ function loadBlueprintBusiness(): { modulesOn: string[]; modulesOff: string[] } 
         "billing",
         "artisan-quotes",
         "notifications",
+        "blog",
       ],
-      modulesOff: ["events", "blog", "gift-cards", "chat"],
+      modulesOff: ["events", "gift-cards", "chat"],
     };
   }
 }

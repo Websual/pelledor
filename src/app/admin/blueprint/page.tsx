@@ -137,7 +137,7 @@ export default async function AdminBlueprintPage() {
         );
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl space-y-6">
       {active === "none" && (
         <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-5 py-4">
           <p className="font-semibold text-blue-900">🎉 Bienvenue ! Votre instance est prête.</p>
@@ -146,24 +146,21 @@ export default async function AdminBlueprintPage() {
             pour le blueprint de votre choix. Cela activera les modules adaptés et cr&eacute;era des
             donn&eacute;es de d&eacute;mo pour votre secteur.
           </p>
-          <p className="mt-2 text-xs text-blue-600">
-            Apr&egrave;s l&apos;application : <code className="rounded bg-blue-100 px-1">pnpm saas:build &amp;&amp; pnpm build</code> puis red&eacute;marrez le serveur.
+          <p className="mt-2 text-xs text-blue-700">
+            Vous pourrez finaliser en un clic avec le bouton <strong>Mettre à jour le site</strong>.
           </p>
         </div>
       )}
       <h1 className="text-xl font-semibold">Blueprints (vitrine + métier)</h1>
       <p className="mt-2 text-sm text-neutral-600">
-        Les maquettes HTML vivent dans{" "}
-        <code className="rounded bg-neutral-100 px-1">content/blueprints/templates/&lt;id&gt;/index.html</code>.
-        Chaque fichier utilise des placeholders{" "}
-        <code className="rounded bg-neutral-100 px-1">{"{{CLE}}"}</code> remplis
-        depuis la base (ou défauts artisan).
+        Choisissez un métier pour activer une configuration prête à l&apos;emploi :
+        navigation, modules utiles et données de démarrage.
       </p>
       <p className="mt-2 text-sm text-neutral-600">
         <Link href="/" className="text-blue-600 underline" target="_blank">
           Voir la page d’accueil
         </Link>{" "}
-        — gîte, <strong>hôtel</strong> (lodging), immobilier, salon…
+        — aperçu public de votre site.
       </p>
 
       {active && active !== "none" && (
@@ -196,7 +193,7 @@ export default async function AdminBlueprintPage() {
 
       <details className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50">
         <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-700">
-          Tous les blueprints disponibles
+          Comparer tous les métiers
         </summary>
         <div className="px-4 pb-4">
       <ApplyBusinessForm />
@@ -256,8 +253,16 @@ export default async function AdminBlueprintPage() {
         </section>
       )}
 
-      <h2 className="mt-12 text-lg font-semibold">Site vitrine (HTML)</h2>
-      <form action={saveBlueprintSettingsAction} className="mt-8 space-y-6">
+      <details className="mt-10 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+        <summary className="cursor-pointer text-sm font-medium text-neutral-800">
+          Réglages avancés (optionnel)
+        </summary>
+        <p className="mt-2 text-xs text-neutral-600">
+          Cette section est utile si vous souhaitez personnaliser finement les textes
+          et contenus techniques des templates.
+        </p>
+        <h2 className="mt-4 text-lg font-semibold">Configuration avancée du site</h2>
+      <form action={saveBlueprintSettingsAction} className="mt-6 space-y-6">
         <div>
           <label className="block text-sm font-medium">Blueprint actif</label>
           <select
@@ -432,6 +437,7 @@ export default async function AdminBlueprintPage() {
           Branchés : … gîte + <strong>hôtel</strong> (lodging) … immobilier, salon.
         </p>
       </section>
+      </details>
     </div>
   );
 }

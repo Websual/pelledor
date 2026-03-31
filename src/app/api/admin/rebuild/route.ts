@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { spawn } from "child_process";
 import { join } from "path";
 import { writeFile, readFile } from "fs/promises";
+import { existsSync } from "fs";
 
 const STATUS_FILE = join(process.cwd(), ".rebuild-status.json");
 
@@ -63,11 +64,16 @@ export async function POST() {
   await setStatus({ status: "running", startedAt, log: "" });
 
   const cwd = process.cwd();
+  const hasPnpm = existsSync(join(cwd, "pnpm-lock.yaml"));
+  const hasNpm = existsSync(join(cwd, "package-lock.json"));
+  const packageManager = hasPnpm && !hasNpm ? "pnpm" : "npm";
   const child = spawn(
     "sh",
     [
       "-c",
-      "if command -v pnpm >/dev/null 2>&1; then pnpm run saas:build && pnpm run build; else npm run saas:build && npm run build; fi",
+      packageManager === "pnpm"
+        ? "pnpm run saas:build && pnpm install && pnpm run build"
+        : "npm run saas:build && npm install && npm run build",
     ],
     { cwd, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );

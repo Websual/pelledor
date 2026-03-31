@@ -12,7 +12,10 @@
 ```bash
 git clone <repo> /var/www/mon-saas
 cd /var/www/mon-saas
-npm install
+# Utiliser le lockfile du repo :
+# - pnpm-lock.yaml => pnpm install
+# - package-lock.json => npm install
+pnpm install
 ```
 
 ## 2. Créer la base de données
@@ -47,16 +50,17 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ## 4. Migrer la base de données
 
 ```bash
-npm run db:push
+pnpm db:push
 # ou
-npx drizzle-kit migrate
+pnpm db:migrate
 ```
 
 ## 5. Build (modules + Next.js)
 
 ```bash
-npm run saas:build   # fusionne les modules dans src/
-npm run build        # compile Next.js production
+pnpm run saas:build   # fusionne les modules dans src/
+pnpm install          # installe d'éventuelles deps ajoutées par modules
+pnpm run build        # compile Next.js production
 ```
 
 ## 6. Démarrer avec PM2
@@ -129,7 +133,8 @@ Une fois installé → accéder à `/admin/blueprint` pour appliquer le blueprin
 Dans `/admin/blueprint` :
 1. Cliquer "Appliquer blueprint <métier>" pour activer les modules + créer les données de démo
 2. Optionnel : modifier les tokens du site (nom entreprise, couleurs, etc.)
-3. Rebuild si nécessaire : `npm run saas:build && npm run build && pm2 restart saas-os`
+3. Rebuild si nécessaire : bouton "Mettre à jour le site" dans `/admin/blueprint`
+   (ou CLI : `pnpm run saas:build && pnpm install && pnpm run build && pm2 restart saas-os`)
 
 ## Déploiement de démo sur sous-domaine
 

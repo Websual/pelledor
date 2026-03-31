@@ -4,6 +4,25 @@ import { applyRestaurantBusinessBlueprint } from "./actions";
 import { useState } from "react";
 
 export function ApplyRestaurantForm() {
+  const willEnable = [
+    "Notes",
+    "Stripe",
+    "Annuaire",
+    "Restaurant",
+    "Notifications",
+    "Click & Collect",
+  ];
+  const willDisable = [
+    "Hébergement",
+    "Événements",
+    "Blog",
+    "Cartes cadeaux",
+    "Anamnèse",
+    "Rendez-vous classiques",
+    "Facturation",
+    "Chat",
+  ];
+
   const [pending, setPending] = useState(false);
   const [state, setState] = useState<
     | { ok: true; message: string; hint: string }
@@ -18,6 +37,27 @@ export function ApplyRestaurantForm() {
         Module <strong>restaurant</strong> : tables + créneaux 90 min + résa publique.
         Seed <code className="rounded bg-white px-1">mon-restaurant</code> + 4 tables.
       </p>
+      <div className="mt-3 grid gap-3 rounded border border-rose-200 bg-white p-3 text-xs text-rose-900 sm:grid-cols-2">
+        <div>
+          <p className="font-semibold">Sera activé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willEnable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-semibold">Sera désactivé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willDisable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] text-rose-700">
+            Vous pourrez réactiver un module ensuite dans <strong>/admin/modules</strong>.
+          </p>
+        </div>
+      </div>
       <button
         type="button"
         disabled={pending}
@@ -33,7 +73,7 @@ export function ApplyRestaurantForm() {
       </button>
       {state?.ok && (
         <p className="mt-4 text-sm text-green-800">
-          {state.message} — {state.hint}
+          {state.message}. Cliquez sur <strong>Mettre à jour le site</strong> pour finaliser.
         </p>
       )}
       {state && !state.ok && (

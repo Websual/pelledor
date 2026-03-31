@@ -4,6 +4,16 @@ import { applyArtisanBusinessBlueprint } from "./actions";
 import { useState } from "react";
 
 export function ApplyBusinessForm() {
+  const willEnable = [
+    "Profil entreprise",
+    "Planning & rendez-vous",
+    "Devis & factures",
+    "Paiements Stripe",
+    "Notifications",
+    "Blog",
+  ];
+  const willDisable = ["Événements", "Cartes cadeaux", "Chat"];
+
   const [pending, setPending] = useState(false);
   const [state, setState] = useState<
     | { ok: true; seedMessage: string; hint: string }
@@ -29,11 +39,33 @@ export function ApplyBusinessForm() {
       </h2>
       <p className="mt-2 text-sm text-amber-900/90">
         Active les <strong>modules utiles à un artisan</strong> (planning,
-        factures, Stripe, profil), désactive le superflu (événements, blog…),
+        factures, Stripe, profil), désactive le superflu (événements, chat,
+        cartes cadeaux),
         crée un <strong>profil entreprise</strong> lié à votre compte + prestations
-        + horaires, et réécrit <code className="rounded bg-white px-1">saas-modules.json</code>{" "}
-        pour le prochain <code className="rounded bg-white px-1">pnpm saas:build</code>.
+        + horaires.
       </p>
+      <div className="mt-3 grid gap-3 rounded border border-amber-200 bg-white p-3 text-xs text-amber-900 sm:grid-cols-2">
+        <div>
+          <p className="font-semibold">Sera activé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willEnable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-semibold">Sera désactivé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willDisable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] text-amber-700">
+            Vous pourrez toujours réactiver un module ensuite dans
+            <strong> /admin/modules</strong>.
+          </p>
+        </div>
+      </div>
       <button
         type="button"
         disabled={pending}
@@ -47,12 +79,10 @@ export function ApplyBusinessForm() {
           <p className="font-semibold text-green-800">✅ Blueprint Artisan appliqué</p>
           <p>{state.seedMessage}</p>
           <div className="rounded bg-white border border-green-200 p-3">
-            <p className="font-medium text-green-900 mb-2">📦 Étape suivante — reconstruire l&apos;app :</p>
-            <code className="block whitespace-pre-wrap text-xs text-neutral-700 font-mono bg-neutral-50 rounded p-2 select-all">
-              npm run saas:build && npm run build && pm2 restart pelledor
-            </code>
-            <p className="mt-2 text-xs text-neutral-500">
-              Ou en dev : <code className="font-mono bg-neutral-100 px-1 rounded">npm run saas:build</code> puis relancer le serveur.
+            <p className="font-medium text-green-900 mb-2">Étape suivante</p>
+            <p className="text-xs text-neutral-700">
+              Cliquez sur <strong>Mettre à jour le site</strong> juste en dessous
+              pour finaliser l&apos;activation.
             </p>
           </div>
           <div className="rounded bg-white border border-green-200 p-3 space-y-2">
@@ -72,7 +102,9 @@ export function ApplyBusinessForm() {
               </a>
             </div>
           </div>
-          <p className="text-xs text-neutral-600">{state.hint}</p>
+          <p className="text-xs text-neutral-600">
+            Vos nouveaux réglages sont prêts.
+          </p>
         </div>
       )}
       {state && !state.ok && (

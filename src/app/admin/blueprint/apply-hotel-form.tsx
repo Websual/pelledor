@@ -4,6 +4,18 @@ import { applyHotelBusinessBlueprint } from "./actions";
 import { useState } from "react";
 
 export function ApplyHotelForm() {
+  const willEnable = ["Notes", "Stripe", "Annuaire", "Hébergement", "Notifications"];
+  const willDisable = [
+    "Rendez-vous classiques",
+    "Facturation",
+    "Événements",
+    "Blog",
+    "Cartes cadeaux",
+    "Chat",
+    "Restaurant",
+    "Devis artisan",
+  ];
+
   const [pending, setPending] = useState(false);
   const [state, setState] = useState<
     | {
@@ -24,6 +36,27 @@ export function ApplyHotelForm() {
         <code className="rounded bg-white px-1">mon-hotel</code> + 3 chambres
         (classique, supérieure, suite vue mer).
       </p>
+      <div className="mt-3 grid gap-3 rounded border border-sky-200 bg-white p-3 text-xs text-sky-900 sm:grid-cols-2">
+        <div>
+          <p className="font-semibold">Sera activé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willEnable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-semibold">Sera désactivé</p>
+          <ul className="mt-1 space-y-0.5">
+            {willDisable.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] text-sky-700">
+            Vous pourrez réactiver un module ensuite dans <strong>/admin/modules</strong>.
+          </p>
+        </div>
+      </div>
       <button
         type="button"
         disabled={pending}
@@ -48,7 +81,7 @@ export function ApplyHotelForm() {
       </button>
       {state?.ok && (
         <p className="mt-4 text-sm text-green-800">
-          {state.seedMessage} ({state.practitionerSlug}) — {state.hint}
+          {state.seedMessage} ({state.practitionerSlug}). Cliquez sur <strong>Mettre à jour le site</strong> pour finaliser.
         </p>
       )}
       {state && !state.ok && (

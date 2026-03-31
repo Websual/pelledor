@@ -196,12 +196,24 @@ export async function runInstall(formData: FormData): Promise<InstallResult> {
   // Déclencher un redémarrage automatique pour recharger .env.local (SAAS_INSTALLED + clés)
   if (wroteEnv) {
     setTimeout(() => {
-      const pm2 = spawn("pm2", ["restart", "pelledor", "--update-env"], {
-        detached: true,
-        stdio: "ignore",
-        env: { ...process.env, PATH: process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin:/root/.nvm/versions/node/v24.10.0/bin" },
-      });
-      pm2.unref();
+      const preferredProcess =
+        process.env.PM2_PROCESS_NAME?.trim() ||
+        process.env.APP_PM2_NAME?.trim() ||
+        "saas-os";
+      const candidates = [preferredProcess, "pelledor", "saas-os"];
+      for (const name of candidates) {
+        const pm2 = spawn("pm2", ["restart", name, "--update-env"], {
+          detached: true,
+          stdio: "ignore",
+          env: {
+            ...process.env,
+            PATH:
+              process.env.PATH ??
+              "/usr/local/bin:/usr/bin:/bin:/root/.nvm/versions/node/v24.10.0/bin",
+          },
+        });
+        pm2.unref();
+      }
     }, 1500);
   }
 
